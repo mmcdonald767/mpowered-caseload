@@ -600,7 +600,7 @@
       }
 
       // ── 2. Check wildcard cookie (set by dashboard) ──────
-      var sessionCookie = getCookie('mp_session');
+      var sessionCookie = getCookie('mp_session') || getCookie('mp_session_active');
 
       // ── 3. Check localStorage token (portal-native auth) ─
       var localToken = null;
