@@ -766,10 +766,13 @@
         }
         localToken = 'cookie_session';
       }
-
-      if (sessionCookie || localToken) {
+if (sessionCookie || localToken) {
         console.log('[mpSessionGuard] Authenticated. Source: ' +
           (sessionCookie ? 'mp_session cookie' : 'localStorage auth_token'));
+        
+        // Clear the OAuth hash token from the address bar to prevent redirect leakage
+        window.history.replaceState(null, null, window.location.pathname + window.location.search);
+        
         return;
       }
 
