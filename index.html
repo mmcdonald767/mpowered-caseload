@@ -703,10 +703,19 @@
        with any element. The guard runs first: if it redirects,
        none of the subsequent code executes.
     ════════════════════════════════════════════════════════ */
-    document.addEventListener('DOMContentLoaded', function () {
-      mpSessionGuard();
-      hydrateStatCards();
+document.addEventListener('DOMContentLoaded', function () {
+  mpSessionGuard();
+  hydrateStatCards();
+  
+  // New: Fetch and render student data
+  fetch('AKfycbwhMJNCd2pPr4PhH90vhfMOj_XFfyDDSzE3iaqPQ4ThM-59XRVI9UH76ABrbm_iQFsF/exec') // Use the same /exec URL from your Google Apps Script
+    .then(function(res) { return res.json(); })
+    .then(function(students) {
+      console.log('Caseload fetched:', students);
+      // TODO: Call a function here to loop through 'students' 
+      // and inject them into your DOM (e.g., inside the #studentRoster container)
     });
+});
 
   </script>
 
