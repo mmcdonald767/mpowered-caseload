@@ -1099,7 +1099,16 @@
         }
       }
     });
+document.addEventListener('DOMContentLoaded', function () {
+  mpSessionGuard();
+  hydrateStatCards();
 
+  // Fetch and render the initial student list
+  fetch(GAS_WEBHOOK_URL)
+    .then(function(res) { return res.json(); })
+    .then(function(data) { renderStudentRoster(data); })
+    .catch(function(err) { console.error('Initial fetch failed:', err); });
+});
   </script>
 
 </body>
