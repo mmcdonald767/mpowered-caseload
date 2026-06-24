@@ -858,7 +858,7 @@
     ════════════════════════════════════════════════════════ */
 function _gasPost(payload) {
   // Strip any accidental hash or query fragments completely at runtime
-  var cleanUrl = GAS_WEBHOOK_URL.split('#')''.split('?')'';
+  var cleanUrl = GAS_WEBHOOK_URL.split('#')[0].split('?')[0];
 
   return fetch(cleanUrl, {
     method:  'POST',
