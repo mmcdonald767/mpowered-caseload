@@ -347,10 +347,7 @@
   <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8" role="main">
 
     <!-- Student form / roster container — ID required by spec -->
-<div id="studentForm" aria-label="Student roster and form workspace">
-
 <div id="studentRoster" aria-label="Student roster and form workspace">
-
       <!-- Roster section header + action buttons -->
       <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
         <div>
@@ -525,216 +522,91 @@
        JAVASCRIPT
   ═══════════════════════════════════════════════════════════ -->
   <script>
-    'use strict';
+   'use strict';
 
-    /* ════════════════════════════════════════════════════════
-       SESSION GUARD — mpSessionGuard
-       ────────────────────────────────────────────────────────
-       AUTHENTICATION RESOLUTION ORDER
-       ─────────────────────────────────────────────────────────
-       1. LOCAL DEV BYPASS
-          localhost / 127.0.0.1 always passes without checking
-          any token so the page previews cleanly during
-          development.
+// 1. Helper functions
+function getCookie(name) {
+  try {
+    var match = document.cookie.match(new RegExp('(?:^|;\\s*)' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]+)'));
+    return match ? decodeURIComponent(match) : null;
+  } catch (e) { return null; }
+}
 
-       2. WILDCARD COOKIE — mp_session  (PRIMARY)
-          The dashboard (dashboard.mpowerededucation.com) sets
-          a wildcard cookie:
-            mp_session=<value>; Domain=.mpowerededucation.com
-          Because the cookie domain is .mpowerededucation.com,
-          the browser automatically sends it on every request
-          to every subdomain, including this one. Checking for
-          it client-side proves the dashboard session is active.
+function logout() {
+  localStorage.clear();
+  window.location.replace('/login.html');
+}
 
-          NOTE: If the dashboard sets mp_session as HttpOnly,
-          JS cannot read it here. In that case the cookie check
-          below will return null and the guard falls through to
-          the localStorage check. You can resolve this by having
-          the dashboard also set a non-HttpOnly indicator cookie
-          (e.g. mp_session_active=1) that JS can read.
+// 2. Authentication Guard
+function mpSessionGuard() {
+  var isLocal = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost';
+  if (isLocal) return;
 
-       3. LOCALSTORAGE — auth_token  (FALLBACK)
-          The Caseload Portal's own login flow writes
-          auth_token to localStorage. If the wildcard cookie
-          is absent but this key is present, the user has
-          authenticated via the portal's native login.
+  var sessionCookie = getCookie('mp_session') || getCookie('mp_session_active');
+  var localToken = localStorage.getItem('auth_token');
 
-       4. COOKIE → LOCALSTORAGE SYNC
-          If the wildcard cookie is detected but localStorage
-          has no auth_token, this guard writes a sentinel value
-          to localStorage so the rest of the portal's JS logic
-          (stat cards, initCaseloadCard on the dashboard, etc.)
-          behaves correctly without requiring a rewrite.
-          The sentinel value is 'cookie_session' — a stable
-          string that downstream code can check with
-          localStorage.getItem('auth_token').
+  if (sessionCookie && !localToken) {
+    localStorage.setItem('auth_token', 'cookie_session');
+    localToken = 'cookie_session';
+  }
 
-       5. UNAUTHENTICATED REDIRECT
-          Only fires when all three signals are absent. The
-          user is sent to /login.html with a ?next= return path.
-    ════════════════════════════════════════════════════════ */
+  if (!(sessionCookie || localToken)) {
+    window.location.replace('/login.html?next=' + encodeURIComponent(window.location.pathname));
+  }
+}
 
-    /* ── Helper: read a named cookie value ──────────────────
-       Parses document.cookie with a targeted regex. Returns
-       the decoded value string if found, or null if the cookie
-       is absent or unreadable (e.g. HttpOnly).
-    ──────────────────────────────────────────────────────── */
-    function getCookie(name) {
-      try {
-        var match = document.cookie.match(
-          new RegExp('(?:^|;\\s*)' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]+)')
-        );
-        return match ? decodeURIComponent(match[1]) : null;
-      } catch (e) {
-        console.warn('[getCookie] Failed to read cookie "' + name + '":', e);
-        return null;
-      }
-    }
+// 3. Stat Card Hydration
+function hydrateStatCards() {
+  var countEl = document.getElementById('statStudentCount');
+  var iepEl   = document.getElementById('statIepDue');
+  var obsEl   = document.getElementById('statObs');
+  if (countEl) countEl.textContent = localStorage.getItem('cl_student_count') || '—';
+  if (iepEl)   iepEl.textContent   = localStorage.getItem('cl_iep_due_30d') || '—';
+  if (obsEl)   obsEl.textContent   = localStorage.getItem('cl_active_obs') || '—';
+}
 
-    function mpSessionGuard() {
-      var isLocal = window.location.hostname === '127.0.0.1'
-                 || window.location.hostname === 'localhost';
-
-      // ── 1. Local dev bypass ──────────────────────────────
-      if (isLocal) {
-        console.log('[mpSessionGuard] Local environment. Guard bypassed.');
-        return;
-      }
-
-      // ── 2. Check wildcard cookie (set by dashboard) ──────
-      var sessionCookie = getCookie('mp_session') || getCookie('mp_session_active');
-
-      // ── 3. Check localStorage token (portal-native auth) ─
-      var localToken = null;
-      try {
-        localToken = localStorage.getItem('auth_token');
-      } catch (e) {
-        console.warn('[mpSessionGuard] localStorage read failed:', e);
-      }
-
-      // ── 4. Cookie → localStorage sync ───────────────────
-      //    If the wildcard cookie authenticates this user but
-      //    localStorage has no token, write a sentinel so the
-      //    rest of the portal's JS sees a populated auth_token
-      //    without requiring a full login flow.
-      if (sessionCookie && !localToken) {
-        try {
-          localStorage.setItem('auth_token',       'cookie_session');
-          localStorage.setItem('mp_beta_auth_time', Date.now().toString());
-          console.log('[mpSessionGuard] Wildcard cookie detected. localStorage synced.');
-        } catch (e) {
-          console.warn('[mpSessionGuard] localStorage sync write failed:', e);
-        }
-        // Re-read after write so the authenticated path below sees it
-        localToken = 'cookie_session';
-      }
-
-      // ── 5. Authenticated — proceed ───────────────────────
-      if (sessionCookie || localToken) {
-        console.log('[mpSessionGuard] Authenticated. Source: ' +
-          (sessionCookie ? 'mp_session cookie' : 'localStorage auth_token'));
-        return;
-      }
-
-      // ── 6. No auth signal found — redirect to login ──────
-      console.error('[mpSessionGuard] No auth token or session cookie. Redirecting to login.');
-      var returnPath = encodeURIComponent(
-        window.location.pathname + window.location.search
-      );
-      window.location.replace('/login.html?next=' + returnPath);
-    }
-
-
-    /* ════════════════════════════════════════════════════════
-       LOGOUT
-       ────────────────────────────────────────────────────────
-       Clears all auth-related keys from localStorage, then
-       redirects to /login.html. Wired to the Sign Out button
-       in the navigation bar via onclick="logout()".
-    ════════════════════════════════════════════════════════ */
-    function logout() {
-      try {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('mp_beta_email');
-        localStorage.removeItem('mp_beta_auth_time');
-        localStorage.removeItem('mp_user_role');
-        localStorage.clear(); // belt-and-suspenders: wipe all remaining app state
-      } catch (e) {
-        console.warn('[logout] localStorage clear failed:', e);
-      }
-      window.location.replace('/login.html');
-    }
-
-
-    /* ════════════════════════════════════════════════════════
-       STAT CARD HYDRATION
-       ────────────────────────────────────────────────────────
-       Reads cached caseload summary counts from localStorage
-       (written by the data layer or a future sync function)
-       and populates the header stat cards. Falls back to a
-       dash when no cached data is present yet.
-    ════════════════════════════════════════════════════════ */
-    function hydrateStatCards() {
-      var studentCount = null;
-      var iepDue       = null;
-      var activeObs    = null;
-
-      try {
-        studentCount = localStorage.getItem('cl_student_count');
-        iepDue       = localStorage.getItem('cl_iep_due_30d');
-        activeObs    = localStorage.getItem('cl_active_obs');
-      } catch (e) {
-        console.warn('[hydrateStatCards] localStorage read failed:', e);
-      }
-
-      var countEl = document.getElementById('statStudentCount');
-      var iepEl   = document.getElementById('statIepDue');
-      var obsEl   = document.getElementById('statObs');
-
-      if (countEl) countEl.textContent = studentCount !== null ? studentCount : '—';
-      if (iepEl)   iepEl.textContent   = iepDue       !== null ? iepDue       : '—';
-      if (obsEl)   obsEl.textContent   = activeObs    !== null ? activeObs    : '—';
-    }
-
+// 4. Student Roster Renderer
 function renderStudentRoster(students) {
-  var container = document.getElementById('studentRoster'); // Ensure this ID is in your HTML
-  if (!container) {
-    console.warn('Container #studentRoster not found in your HTML');
+var container = document.getElementById('studentRoster');
+  if (!container) return;
+
+  container.innerHTML = ''; // Clear loading/placeholder
+
+  if (!students || students.length === 0) {
+    container.innerHTML = '<p class="text-sm text-slate-400 text-center py-8">No students found.</p>';
     return;
   }
-  
-  // Clear the "No students" placeholder
-  container.innerHTML = ''; 
 
-  students.forEach(function(s) {
+  students.forEach(function (s) {
     var card = document.createElement('div');
-    card.className = 'module-card'; // Reusing your existing card styling
-    card.innerHTML = '<h3>' + s['First Name'] + ' ' + s['Last Name'] + '</h3>' +
-                     '<p>' + s['Primary Disability'] + '</p>';
+    card.className = 'module-card bg-surface-800 p-4 rounded-lg shadow-md border border-slate-700 mb-4';
+    card.innerHTML = '<p class="text-lg font-semibold">' + (s['First Name'] || 'N/A') + ' ' + (s['Last Name'] || 'N/A') + '</p>' +
+                     '<p class="text-sm text-slate-400">Disability: ' + (s['Disability'] || 'N/A') + '</p>';
     container.appendChild(card);
   });
 }
-    /* ════════════════════════════════════════════════════════
-       BOOT
-       ────────────────────────────────────────────────────────
-       DOMContentLoaded ensures the guard and hydration run
-       after the DOM is ready but before the user can interact
-       with any element. The guard runs first: if it redirects,
-       none of the subsequent code executes.
-    ════════════════════════════════════════════════════════ */
+
+// 5. Unified DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function () {
   mpSessionGuard();
   hydrateStatCards();
-  
-  // Connect the fetch to your new render function
-  fetch('https://script.google.com/macros/s/AKfycbygSN-l8HxzwCTfj7RiEsbjsbqYRgwyy2TfI15qxMPq1xVG5moPlkEc84biE4nh30-o/exec')
+
+  var SHEET_FETCH_URL = 'https://script.google.com/macros/s/AKfycb.../exec'; // REPLACE WITH YOUR ACTUAL URL
+
+  var container = document.getElementById('studentRoster');
+  if (container) container.innerHTML = '<p class="text-center py-8">Loading caseload…</p>';
+
+  fetch(SHEET_FETCH_URL)
     .then(function(res) { return res.json(); })
-    .then(function(students) {
-      console.log('Caseload fetched:', students);
-      renderStudentRoster(students); // THIS IS THE MISSING TRIGGER
+    .then(function(data) {
+      var students = Array.isArray(data) ? data : (data.students || []);
+      renderStudentRoster(students);
+    })
+    .catch(function(err) {
+      console.error('Fetch error:', err);
+      if (container) container.innerHTML = '<p class="text-red-400 text-center py-8">Error loading data.</p>';
     });
 });
-
   </script>
 
 </body>
