@@ -441,10 +441,10 @@
         </div>
       </div>
 
-      <!-- Fetch error state — shown if loadRoster() fails -->
+      <!-- Error state — shown if loadRoster() fails -->
       <div id="rosterError" style="display:none;">
         <div class="placeholder-card" role="alert">
-          <p class="text-[0.85rem] text-red-400 text-center font-semibold mb-1">Failed to load roster</p>
+          <p class="text-[0.85rem] font-semibold text-red-400 text-center mb-1">Failed to load roster</p>
           <p id="rosterErrorMsg" class="text-[0.75rem] text-slate-500 text-center mb-4"></p>
           <div class="flex justify-center">
             <button class="btn-ghost" onclick="loadRoster()">Retry</button>
@@ -708,19 +708,6 @@
     ════════════════════════════════════════════════════════ */
     var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwIMHt-r6_8foH1Vey5959KqjrMji2hwAm7NXkp2JPXhXiujh8EHN3MyGEKnIRL_vBd/exec';
 
-    /* Column indexes in the Intake sheet — must match the appendRow()
-       order in code.gs doPost:
-         col 0  submittedAt
-         col 1  (empty)
-         col 2  First Name
-         col 3  Last Name
-         col 4  (empty)
-         col 5  (empty)
-         col 6  Disability                                          */
-    var COL_FIRST_NAME = 2;
-    var COL_LAST_NAME  = 3;
-    var COL_DISABILITY = 6;
-
 
     /* ════════════════════════════════════════════════════════
        COOKIE HELPER
@@ -843,23 +830,68 @@
 
 
     /* ════════════════════════════════════════════════════════
-       RENDER STUDENT ROSTER
-       Maps Google Sheets row objects into student cards and
-       injects them into #rosterGrid. Hides the empty-state
-       placeholder once cards are present.
-
-       Expected column keys:
-         "First Name"  — student given name
-         "Last Name"   — student family name
-         "Disability"  — primary disability category
-
-       data-* attributes on each card allow the optimistic
-       update in addStudent() to reconstruct the roster array
-       without a re-fetch.
+       COLUMN INDEX MAP
+       Must match the appendRow() order in code.gs doPost:
+         col 0  submittedAt
+         col 1  (empty)
+         col 2  First Name
+         col 3  Last Name
+         col 4  (empty)
+         col 5  (empty)
+         col 6  Disability
     ════════════════════════════════════════════════════════ */
-    function renderStudentRoster(input) {
+    var COL_FIRST_NAME = 2;
+    var COL_LAST_NAME  = 3;
+    var COL_DISABILITY = 6;
+
+
+    /* ════════════════════════════════════════════════════════
+       _gasPost(payload) — shared fetch helper [private]
+       ────────────────────────────────────────────────────────
+       All requests to the GAS endpoint go through here.
+       Content-Type is 'text/plain;charset=utf-8' because
+       Apps Script does not handle CORS preflight (OPTIONS),
+       which 'application/json' would trigger. The body is
+       still valid JSON and is parsed server-side via
+       JSON.parse(e.postData.contents).
+       Returns a Promise that resolves to the parsed JSON body.
+    ════════════════════════════════════════════════════════ */
+    function _gasPost(payload) {
+      return fetch(GAS_WEBHOOK_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body:    JSON.stringify(payload)
+      })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status + ' \u2014 ' + response.statusText);
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        if (data.result !== 'success') {
+          throw new Error(data.error || 'Apps Script returned result: ' + data.result);
+        }
+        return data;
+      });
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       RENDER STUDENT ROSTER
+       ────────────────────────────────────────────────────────
+       Accepts the 2D array returned by code.gs doPost
+       { action:'getRoster' }: rows[0] is the header row
+       (skipped), rows[1..n] are data rows indexed by COL_*.
+
+       Also accepts an array of keyed objects produced by the
+       optimistic update path in addStudent(), so a single
+       re-render function handles both cases.
+    ════════════════════════════════════════════════════════ */
+    function renderStudentRoster(rows) {
       var rosterGrid  = document.getElementById('rosterGrid');
       var rosterEmpty = document.getElementById('rosterEmpty');
+      var rosterError = document.getElementById('rosterError');
 
       if (!rosterGrid) {
         console.warn('[renderStudentRoster] #rosterGrid not found in DOM.');
@@ -867,54 +899,42 @@
       }
 
       rosterGrid.innerHTML = '';
+      if (rosterError) rosterError.style.display = 'none';
 
-      /* Normalise input into an array of keyed objects.
-         Three possible shapes arrive here:
-           (a) { result:'success', rows:[[...],[...]] }
-               — from loadRoster() POST response
-           (b) [[...],[...]]
-               — raw 2D array (legacy / direct doGet)
-           (c) [{ 'First Name':..., ... }]
-               — already-normalised objects from optimistic add   */
-      var rows;
-      if (input && !Array.isArray(input) && Array.isArray(input.rows)) {
-        /* Shape (a): unwrap the rows property, skip header row 0 */
-        rows = input.rows.slice(1).map(function (row) {
+      /* Normalise: 2D array from doPost getRoster vs keyed objects
+         from optimistic add. Arrays-of-arrays have arrays as elements;
+         keyed-object arrays have plain objects as elements.           */
+      var students;
+      if (rows && rows.length > 0 && Array.isArray(rows[0])) {
+        /* 2D sheet data — row 0 is headers, skip it */
+        students = rows.slice(1).map(function (row) {
           return {
             'First Name': String(row[COL_FIRST_NAME] || '').trim(),
             'Last Name':  String(row[COL_LAST_NAME]  || '').trim(),
             'Disability': String(row[COL_DISABILITY]  || '').trim()
           };
-        }).filter(function (s) { return s['First Name'] || s['Last Name']; });
-      } else if (Array.isArray(input) && input.length > 0 && Array.isArray(input[0])) {
-        /* Shape (b): 2D array — skip header row 0 */
-        rows = input.slice(1).map(function (row) {
-          return {
-            'First Name': String(row[COL_FIRST_NAME] || '').trim(),
-            'Last Name':  String(row[COL_LAST_NAME]  || '').trim(),
-            'Disability': String(row[COL_DISABILITY]  || '').trim()
-          };
-        }).filter(function (s) { return s['First Name'] || s['Last Name']; });
+        }).filter(function (s) {
+          return s['First Name'] || s['Last Name'];
+        });
       } else {
-        /* Shape (c): already keyed objects */
-        rows = input || [];
+        students = rows || [];
       }
 
-      if (!rows || rows.length === 0) {
+      if (!students.length) {
         if (rosterEmpty) rosterEmpty.style.display = '';
         return;
       }
 
       if (rosterEmpty) rosterEmpty.style.display = 'none';
 
-      /* Update the Students stat card with the live count */
+      /* Sync the Students stat card to the live count */
       var countEl = document.getElementById('statStudentCount');
       if (countEl) {
-        countEl.textContent = rows.length;
-        try { localStorage.setItem('cl_student_count', String(rows.length)); } catch (e) {}
+        countEl.textContent = students.length;
+        try { localStorage.setItem('cl_student_count', String(students.length)); } catch (e) {}
       }
 
-      rows.forEach(function (student) {
+      students.forEach(function (student) {
         var firstName  = student['First Name']  || 'N/A';
         var lastName   = student['Last Name']   || 'N/A';
         var disability = student['Disability']  || 'N/A';
@@ -924,7 +944,6 @@
         card.setAttribute('data-first-name', firstName);
         card.setAttribute('data-last-name',  lastName);
         card.setAttribute('data-disability', disability);
-
         card.innerHTML =
           '<p class="text-[0.95rem] font-semibold text-slate-100 leading-snug mb-1">' +
             firstName + ' ' + lastName +
@@ -938,12 +957,8 @@
 
     /* ════════════════════════════════════════════════════════
        LOAD ROSTER
-       Fetches the current Intake sheet via a POST with
-       action:"getRoster". We use POST (not GET) because Apps
-       Script GET responses travel through a 302 redirect that
-       strips the Access-Control-Allow-Origin header, causing
-       every cross-origin GET to be blocked by the browser.
-       POST responses are served directly and CORS works.
+       POSTs { action:'getRoster' } to doPost, then passes
+       the returned 2D rows array to renderStudentRoster().
     ════════════════════════════════════════════════════════ */
     function loadRoster() {
       var rosterEmpty = document.getElementById('rosterEmpty');
@@ -951,40 +966,25 @@
       if (rosterEmpty) rosterEmpty.style.display = 'none';
       if (rosterError) rosterError.style.display = 'none';
 
-      fetch(GAS_WEBHOOK_URL, {
-        method: 'POST',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'getRoster' })
-      })
-      .then(function (response) {
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        return response.json();
-      })
-      .then(function (data) {
-        if (data.result === 'success') {
-          renderStudentRoster(data);
-        } else {
-          throw new Error(data.error || 'Apps Script returned an error');
-        }
-      })
-      .catch(function (err) {
-        console.error('[loadRoster] Failed:', err);
-        if (rosterError) {
-          rosterError.style.display = '';
-          var msgEl = document.getElementById('rosterErrorMsg');
-          if (msgEl) msgEl.textContent = err.message;
-        } else {
-          if (rosterEmpty) rosterEmpty.style.display = '';
-        }
-      });
+      _gasPost({ action: 'getRoster' })
+        .then(function (data) {
+          renderStudentRoster(data.rows || []);
+        })
+        .catch(function (err) {
+          console.error('[loadRoster] Failed:', err);
+          if (rosterError) {
+            rosterError.style.display = '';
+            var msgEl = document.getElementById('rosterErrorMsg');
+            if (msgEl) msgEl.textContent = err.message;
+          } else {
+            if (rosterEmpty) rosterEmpty.style.display = '';
+          }
+        });
     }
 
 
     /* ════════════════════════════════════════════════════════
-       OPEN ADD STUDENT MODAL
-       Resets any previous state, shows the modal, then moves
-       keyboard focus to the first input field.
+       OPEN / CLOSE ADD STUDENT MODAL
     ════════════════════════════════════════════════════════ */
     function openAddStudentModal() {
       var modal = document.getElementById('addStudentModal');
@@ -992,16 +992,11 @@
       _resetAddStudentModal();
       modal.classList.remove('hidden');
       setTimeout(function () {
-        var firstField = document.getElementById('asFirstName');
-        if (firstField) firstField.focus();
+        var f = document.getElementById('asFirstName');
+        if (f) f.focus();
       }, 50);
     }
 
-
-    /* ════════════════════════════════════════════════════════
-       CLOSE ADD STUDENT MODAL
-       Hides the modal and clears all field values and status.
-    ════════════════════════════════════════════════════════ */
     function closeAddStudentModal() {
       var modal = document.getElementById('addStudentModal');
       if (!modal) return;
@@ -1011,9 +1006,7 @@
 
 
     /* ════════════════════════════════════════════════════════
-       _resetAddStudentModal  [private]
-       Clears fields, status message, and re-enables buttons.
-       Called on both open (clear previous session) and close.
+       MODAL PRIVATE HELPERS
     ════════════════════════════════════════════════════════ */
     function _resetAddStudentModal() {
       ['asFirstName', 'asLastName', 'asDisability'].forEach(function (id) {
@@ -1028,39 +1021,22 @@
       _setAddStudentLoading(false);
     }
 
-
-    /* ════════════════════════════════════════════════════════
-       _setAddStudentLoading  [private]
-       Toggles the Save button between its normal and in-flight
-       states while the fetch is running.
-    ════════════════════════════════════════════════════════ */
     function _setAddStudentLoading(isLoading) {
       var saveBtn    = document.getElementById('asSaveBtn');
       var saveBtnTxt = document.getElementById('asSaveBtnText');
       var cancelBtn  = document.getElementById('asCancelBtn');
       if (!saveBtn) return;
-
       if (isLoading) {
-        saveBtn.disabled      = true;
-        saveBtn.style.opacity = '0.6';
-        saveBtn.style.cursor  = 'not-allowed';
+        saveBtn.disabled = true; saveBtn.style.opacity = '0.6'; saveBtn.style.cursor = 'not-allowed';
         if (saveBtnTxt) saveBtnTxt.textContent = 'Saving\u2026';
         if (cancelBtn)  cancelBtn.disabled = true;
       } else {
-        saveBtn.disabled      = false;
-        saveBtn.style.opacity = '1';
-        saveBtn.style.cursor  = 'pointer';
+        saveBtn.disabled = false; saveBtn.style.opacity = '1'; saveBtn.style.cursor = 'pointer';
         if (saveBtnTxt) saveBtnTxt.textContent = 'Save Student';
         if (cancelBtn)  cancelBtn.disabled = false;
       }
     }
 
-
-    /* ════════════════════════════════════════════════════════
-       _showAddStudentStatus  [private]
-       Renders a success (green) or error (red) inline message
-       inside the modal.
-    ════════════════════════════════════════════════════════ */
     function _showAddStudentStatus(message, isError) {
       var msg = document.getElementById('asStatusMsg');
       if (!msg) return;
@@ -1072,8 +1048,7 @@
 
     /* ════════════════════════════════════════════════════════
        HANDLE ADD STUDENT SUBMIT
-       Validates the three required fields, builds the payload,
-       and delegates to addStudent(). Wired to the Save button.
+       Validates fields, then delegates to addStudent().
     ════════════════════════════════════════════════════════ */
     function handleAddStudentSubmit() {
       var firstName  = ((document.getElementById('asFirstName')  || {}).value || '').trim();
@@ -1107,53 +1082,24 @@
 
 
     /* ════════════════════════════════════════════════════════
-       addStudent(studentData)
-       POSTs a new student record to the Google Apps Script
-       /exec endpoint.
-
-       Content-Type must be 'text/plain;charset=utf-8' to avoid
-       a CORS preflight OPTIONS request, which the Apps Script
-       runtime does not support. The body is valid JSON and is
-       parsed inside doPost(e) via JSON.parse(e.postData.contents).
-
-       Expected Apps Script doPost(e):
-         function doPost(e) {
-           var sheet = SpreadsheetApp
-             .openById('YOUR_SHEET_ID')
-             .getSheetByName('Sheet1');
-           var data = JSON.parse(e.postData.contents);
-           sheet.appendRow([
-             data['First Name'],
-             data['Last Name'],
-             data['Disability'],
-             data['submittedAt']
-           ]);
-           return ContentService
-             .createTextOutput(JSON.stringify({ result: 'success' }))
-             .setMimeType(ContentService.MimeType.JSON);
-         }
+       ADD STUDENT
+       ────────────────────────────────────────────────────────
+       POSTs the new student payload to doPost (default action).
+       On success:
+         1. Shows a confirmation message in the modal.
+         2. Optimistically prepends the new card to the roster
+            so the user sees it immediately.
+         3. After 1.6 s closes the modal and re-fetches the
+            full roster from Sheets to confirm persisted state.
     ════════════════════════════════════════════════════════ */
     function addStudent(studentData) {
       _setAddStudentLoading(true);
 
-      fetch(GAS_WEBHOOK_URL, {
-        method: 'POST',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(studentData)
-      })
-      .then(function (response) {
-        if (!response.ok) {
-          throw new Error('Server responded with HTTP ' + response.status);
-        }
-        return response.json();
-      })
-      .then(function (data) {
-        if (data.result === 'success') {
+      _gasPost(studentData)
+        .then(function () {
           _showAddStudentStatus('\u2713 Student record saved to caseload.', false);
 
-          /* Optimistic roster update: prepend the new card so the user
-             sees the result immediately without a full page reload. */
+          /* Optimistic prepend */
           var rosterGrid = document.getElementById('rosterGrid');
           var existing = rosterGrid
             ? Array.from(rosterGrid.querySelectorAll('.student-card-data')).map(function (el) {
@@ -1166,33 +1112,21 @@
             : [];
           renderStudentRoster([studentData].concat(existing));
 
-          /* Bump the stat card count */
-          var countEl = document.getElementById('statStudentCount');
-          if (countEl) {
-            var prev = parseInt(countEl.textContent, 10) || 0;
-            countEl.textContent = prev + 1;
-            try { localStorage.setItem('cl_student_count', String(prev + 1)); } catch (e) {}
-          }
-
           setTimeout(function () {
             closeAddStudentModal();
             loadRoster(); /* confirm persisted state from Sheets */
           }, 1600);
-        } else {
-          throw new Error(data.error || 'Unknown error from Apps Script');
-        }
-      })
-      .catch(function (err) {
-        console.error('[addStudent] POST failed:', err);
-        _showAddStudentStatus('Save failed: ' + err.message, true);
-        _setAddStudentLoading(false);
-      });
+        })
+        .catch(function (err) {
+          console.error('[addStudent] Failed:', err);
+          _showAddStudentStatus('Save failed: ' + err.message, true);
+          _setAddStudentLoading(false);
+        });
     }
 
 
     /* ════════════════════════════════════════════════════════
        BOOT — single DOMContentLoaded
-       Guard runs first — if it redirects, nothing else executes.
     ════════════════════════════════════════════════════════ */
     document.addEventListener('DOMContentLoaded', function () {
       mpSessionGuard();
@@ -1212,6 +1146,7 @@
         }
       }
     });
+
   </script>
 
 </body>
