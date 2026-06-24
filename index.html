@@ -138,21 +138,32 @@
     }
     .placeholder-card:hover { border-color: rgba(108,143,255,0.35); }
 
-    .field-label { display: block; font-size: 0.75rem; font-weight: 600; color: #7d8fb3; margin-bottom: 0.4rem; }
-.field-input { 
-  width: 100%; 
-  background: #0f1117; 
-  border: 1px solid #252c42; 
-  border-radius: 8px; 
-  padding: 0.6rem 0.8rem; 
-  color: #e8ecf4; 
-  font-size: 0.9rem;
-  transition: border-color 0.15s, outline 0.15s;
-}
-.field-input:focus { 
-  outline: 2px solid #6c8fff; 
-  border-color: transparent; 
-}
+    /* Form field label */
+    .field-label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #7d8fb3;
+      margin-bottom: 0.4rem;
+    }
+
+    /* Form field input */
+    .field-input {
+      width: 100%;
+      background: #0f1117;
+      border: 1px solid #252c42;
+      border-radius: 8px;
+      padding: 0.6rem 0.8rem;
+      color: #e8ecf4;
+      font-size: 0.9rem;
+      font-family: 'Inter', system-ui, sans-serif;
+      transition: border-color 0.15s, outline 0.15s;
+    }
+    .field-input:focus {
+      outline: 2px solid #6c8fff;
+      border-color: transparent;
+    }
+    .field-input::placeholder { color: #3a4466; }
 
     /* Eyebrow label */
     .eyebrow {
@@ -362,8 +373,8 @@
   ═══════════════════════════════════════════════════════════ -->
   <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8" role="main">
 
-    <!-- Student form / roster container — ID required by spec -->
-<div id="studentRoster" aria-label="Student roster and form workspace">
+    <div id="studentRoster" aria-label="Student roster and form workspace">
+
       <!-- Roster section header + action buttons -->
       <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
         <div>
@@ -383,22 +394,27 @@
             Filter
           </button>
           <button class="btn-ghost"
-        onclick="openAddStudentModal()"
-        aria-label="Add a new student to the caseload"
-        aria-haspopup="dialog">
-  <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-       stroke="currentColor" stroke-width="2.5"
-       stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <line x1="12" y1="5" x2="12" y2="19"/>
-    <line x1="5" y1="12" x2="19" y2="12"/>
-  </svg>
-  Add Student
-</button>
+                  onclick="openAddStudentModal()"
+                  aria-label="Add a new student to the caseload"
+                  aria-haspopup="dialog">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Add Student
+          </button>
         </div>
       </div>
 
-      <!-- Empty / placeholder roster state -->
-      <div class="placeholder-card" role="region" aria-label="Empty student roster">
+      <!-- Live roster grid — populated by renderStudentRoster() -->
+      <div id="rosterGrid"
+           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      </div>
+
+      <!-- Empty / placeholder roster state — shown until rosterGrid has cards -->
+      <div id="rosterEmpty" class="placeholder-card" role="region" aria-label="Empty student roster">
         <div class="flex flex-col items-center gap-3 max-w-sm mx-auto">
           <div class="w-14 h-14 rounded-full flex items-center justify-center mb-1"
                style="background: rgba(108,143,255,0.08); border: 1px solid rgba(108,143,255,0.2);">
@@ -420,7 +436,7 @@
             create your first record.
           </p>
           <p class="font-mono text-[0.68rem] text-slate-600 mt-1">
-            container: <span style="color:#6c8fff;">#studentForm</span>
+            container: <span style="color:#6c8fff;">#rosterGrid</span>
           </p>
         </div>
       </div>
@@ -512,7 +528,7 @@
         </div>
       </div>
 
-    </div><!-- /#studentForm -->
+    </div><!-- /#studentRoster -->
   </main>
 
   <!-- ════════════════════════════════════════════════════════
@@ -535,404 +551,556 @@
     </div>
   </footer>
 
+  <!-- ════════════════════════════════════════════════════════
+       ADD STUDENT MODAL
+       Hidden by default. openAddStudentModal() removes 'hidden'.
+       Closed by closeAddStudentModal() via Cancel, the X button,
+       or the Escape key. Backdrop click is intentionally a no-op
+       to prevent accidental data loss while the user is typing.
+  ═══════════════════════════════════════════════════════════ -->
+  <div id="addStudentModal"
+       class="hidden fixed inset-0 z-50"
+       style="background: rgba(15,17,23,0.80); backdrop-filter: blur(4px);"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="addStudentModalTitle">
+
+    <!-- Centering wrapper — scrollable on short viewports -->
+    <div class="min-h-full flex items-center justify-center p-4">
+
+      <!-- Inner panel -->
+      <div class="panel w-full max-w-md relative">
+
+        <!-- Modal header -->
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <p class="eyebrow">Student Records</p>
+            <h2 id="addStudentModalTitle"
+                class="text-[1rem] font-semibold text-slate-100 tracking-tight leading-snug">
+              Add New Student
+            </h2>
+          </div>
+          <button class="btn-ghost"
+                  onclick="closeAddStudentModal()"
+                  aria-label="Close Add Student modal">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.5"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+            Close
+          </button>
+        </div>
+
+        <hr class="rule" style="margin-bottom: 1.4rem;" />
+
+        <!-- First Name -->
+        <div style="margin-bottom: 1rem;">
+          <label class="field-label" for="asFirstName">First Name</label>
+          <input id="asFirstName"
+                 type="text"
+                 class="field-input"
+                 placeholder="e.g. Jordan"
+                 autocomplete="given-name"
+                 aria-required="true"
+                 aria-describedby="asFirstNameHint" />
+          <p id="asFirstNameHint" class="mt-1 text-[0.72rem] text-slate-500">
+            Student's legal first name as listed in the IEP.
+          </p>
+        </div>
+
+        <!-- Last Name -->
+        <div style="margin-bottom: 1rem;">
+          <label class="field-label" for="asLastName">Last Name</label>
+          <input id="asLastName"
+                 type="text"
+                 class="field-input"
+                 placeholder="e.g. Rivera"
+                 autocomplete="family-name"
+                 aria-required="true"
+                 aria-describedby="asLastNameHint" />
+          <p id="asLastNameHint" class="mt-1 text-[0.72rem] text-slate-500">
+            Student's legal last name as listed in the IEP.
+          </p>
+        </div>
+
+        <!-- Primary Disability -->
+        <div style="margin-bottom: 1.5rem;">
+          <label class="field-label" for="asDisability">Primary Disability</label>
+          <input id="asDisability"
+                 type="text"
+                 class="field-input"
+                 placeholder="e.g. Specific Learning Disability (SLD)"
+                 autocomplete="off"
+                 aria-required="true"
+                 aria-describedby="asDisabilityHint" />
+          <p id="asDisabilityHint" class="mt-1 text-[0.72rem] text-slate-500">
+            IDEA primary disability category as listed in the IEP document.
+          </p>
+        </div>
+
+        <!-- Validation / status message -->
+        <p id="asStatusMsg"
+           class="hidden text-[0.8rem] mb-4"
+           role="alert"
+           aria-live="assertive">
+        </p>
+
+        <!-- Action buttons -->
+        <div class="flex items-center justify-end gap-3">
+          <button class="btn-ghost"
+                  id="asCancelBtn"
+                  onclick="closeAddStudentModal()"
+                  aria-label="Cancel and close the Add Student modal">
+            Cancel
+          </button>
+          <button id="asSaveBtn"
+                  onclick="handleAddStudentSubmit()"
+                  style="display: inline-flex; align-items: center; justify-content: center;
+                         gap: 0.45rem;
+                         background: linear-gradient(135deg, #3b5bdb 0%, #6c8fff 100%);
+                         color: #fff; font-weight: 600; font-size: 0.825rem;
+                         border: none; border-radius: 9px; padding: 0.6rem 1.25rem;
+                         cursor: pointer; white-space: nowrap;
+                         box-shadow: 0 2px 12px rgba(60,91,219,0.35);
+                         transition: filter 0.12s, box-shadow 0.12s, transform 0.12s;"
+                  aria-label="Save the new student record">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.3"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span id="asSaveBtnText">Save Student</span>
+          </button>
+        </div>
+
+      </div><!-- /panel -->
+    </div><!-- /centering wrapper -->
+  </div><!-- /#addStudentModal -->
 
   <!-- ════════════════════════════════════════════════════════
-       JAVASCRIPT
+       JAVASCRIPT — single unified block
+       Execution order:
+         1. mpSessionGuard    — auth check on DOMContentLoaded
+         2. hydrateStatCards  — populates header stat counts
+         3. logout            — wired to Sign Out button
+         4. renderStudentRoster — renders Google Sheet data
+            into #rosterGrid
+         5. Add Student modal — open / close / submit / POST
   ═══════════════════════════════════════════════════════════ -->
   <script>
-<!-- ════════════════════════════════════════════════════════════
-     PATCH C — JavaScript
-     ────────────────────────────────────────────────────────────
-     Paste this block INSIDE your existing <script> tag in
-     index.html, directly above the closing </script> tag.
-     It sits cleanly alongside mpSessionGuard, hydrateStatCards,
-     logout, and renderStudentRoster without touching any of them.
-  ════════════════════════════════════════════════════════════════ -->
-   /* ════════════════════════════════════════════════════════
-     CONFIGURATION
-     ────────────────────────────────────────────────────────
-     The GAS_WEBHOOK_URL below matches the endpoint already
-     used in dashboard.html's handleSubmit(). Update this
-     if you deploy a dedicated caseload Apps Script project.
-  ════════════════════════════════════════════════════════ */
-  var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwhMJNCd2pPr4PhH90vhfMOj_XFfyDDSzE3iaqPQ4ThM-59XRVI9UH76ABrbm_iQFsF/exec';
- 
- 
-  /* ════════════════════════════════════════════════════════
-     openAddStudentModal()
-     Shows the modal and moves keyboard focus to the first
-     field so keyboard and screen-reader users can begin
-     entering data immediately without an extra Tab press.
-  ════════════════════════════════════════════════════════ */
-  function openAddStudentModal() {
-    var modal = document.getElementById('addStudentModal');
-    if (!modal) return;
- 
-    // Reset any previous state before showing
-    _resetAddStudentModal();
- 
-    modal.classList.remove('hidden');
- 
-    // Move focus to first field after the browser has painted
-    setTimeout(function () {
-      var firstField = document.getElementById('asFirstName');
-      if (firstField) firstField.focus();
-    }, 50);
-  }
- 
- 
-  /* ════════════════════════════════════════════════════════
-     closeAddStudentModal()
-     Hides the modal and clears all field values + status.
-  ════════════════════════════════════════════════════════ */
-  function closeAddStudentModal() {
-    var modal = document.getElementById('addStudentModal');
-    if (!modal) return;
-    modal.classList.add('hidden');
-    _resetAddStudentModal();
-  }
- 
- 
-  /* ════════════════════════════════════════════════════════
-     _resetAddStudentModal()  [private]
-     Clears fields, status message, and re-enables buttons.
-     Called on both open (wipe previous session) and close.
-  ════════════════════════════════════════════════════════ */
-  function _resetAddStudentModal() {
-    var fields = ['asFirstName', 'asLastName', 'asDisability'];
-    fields.forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.value = '';
-    });
- 
-    var msg = document.getElementById('asStatusMsg');
-    if (msg) {
-      msg.textContent = '';
-      msg.className = 'hidden text-[0.8rem] mb-4';
-    }
- 
-    _setAddStudentLoading(false);
-  }
- 
- 
-  /* ════════════════════════════════════════════════════════
-     _setAddStudentLoading(isLoading)  [private]
-     Toggles the Save button between its normal state and a
-     loading / disabled state while the fetch is in flight.
-  ════════════════════════════════════════════════════════ */
-  function _setAddStudentLoading(isLoading) {
-    var saveBtn    = document.getElementById('asSaveBtn');
-    var saveBtnTxt = document.getElementById('asSaveBtnText');
-    var cancelBtn  = document.getElementById('asCancelBtn');
- 
-    if (!saveBtn) return;
- 
-    if (isLoading) {
-      saveBtn.disabled   = true;
-      saveBtn.style.opacity = '0.6';
-      saveBtn.style.cursor  = 'not-allowed';
-      if (saveBtnTxt) saveBtnTxt.textContent = 'Saving…';
-      if (cancelBtn)  cancelBtn.disabled = true;
-    } else {
-      saveBtn.disabled   = false;
-      saveBtn.style.opacity = '1';
-      saveBtn.style.cursor  = 'pointer';
-      if (saveBtnTxt) saveBtnTxt.textContent = 'Save Student';
-      if (cancelBtn)  cancelBtn.disabled = false;
-    }
-  }
- 
- 
-  /* ════════════════════════════════════════════════════════
-     _showAddStudentStatus(message, isError)  [private]
-     Renders a success (green) or error (red) status line
-     in the modal's #asStatusMsg element.
-  ════════════════════════════════════════════════════════ */
-  function _showAddStudentStatus(message, isError) {
-    var msg = document.getElementById('asStatusMsg');
-    if (!msg) return;
-    msg.textContent = message;
-    msg.className = 'text-[0.8rem] mb-4 ' + (isError ? 'text-red-400' : 'text-emerald-400');
-    msg.classList.remove('hidden');
-  }
- 
- 
-  /* ════════════════════════════════════════════════════════
-     handleAddStudentSubmit()
-     Validates the three required fields, builds the payload,
-     and hands off to addStudent(). Wired to the Save button.
-  ════════════════════════════════════════════════════════ */
-  function handleAddStudentSubmit() {
-    var firstName  = (document.getElementById('asFirstName')  || {}).value || '';
-    var lastName   = (document.getElementById('asLastName')   || {}).value || '';
-    var disability = (document.getElementById('asDisability') || {}).value || '';
- 
-    // Trim whitespace
-    firstName  = firstName.trim();
-    lastName   = lastName.trim();
-    disability = disability.trim();
- 
-    // Client-side validation
-    var missing = [];
-    if (!firstName)  missing.push('First Name');
-    if (!lastName)   missing.push('Last Name');
-    if (!disability) missing.push('Primary Disability');
- 
-    if (missing.length > 0) {
-      _showAddStudentStatus(
-        'Please complete: ' + missing.join(', ') + '.',
-        true
-      );
-      // Focus the first empty field
-      var focusTargets = {
-        'First Name':        'asFirstName',
-        'Last Name':         'asLastName',
-        'Primary Disability':'asDisability',
-      };
-      var firstMissingEl = document.getElementById(focusTargets[missing[0]]);
-      if (firstMissingEl) firstMissingEl.focus();
-      return;
-    }
- 
-    // Build the payload — keys match the Google Sheet column headers
-    var studentData = {
-      'First Name':  firstName,
-      'Last Name':   lastName,
-      'Disability':  disability,
-      'submittedAt': new Date().toISOString(),
-    };
- 
-    addStudent(studentData);
-  }
- 
- 
-  /* ════════════════════════════════════════════════════════
-     addStudent(studentData)
-     POSTs a new student record to the Google Apps Script
-     /exec endpoint as a JSON body.
- 
-     Expected Apps Script doPost(e) shape:
-     ─────────────────────────────────────
-       function doPost(e) {
-         var sheet = SpreadsheetApp
-           .openById('YOUR_SHEET_ID')
-           .getSheetByName('Sheet1');
-         var data  = JSON.parse(e.postData.contents);
-         sheet.appendRow([
-           data['First Name'],
-           data['Last Name'],
-           data['Disability'],
-           data['submittedAt']
-         ]);
-         return ContentService
-           .createTextOutput(JSON.stringify({ result: 'success' }))
-           .setMimeType(ContentService.MimeType.JSON);
-       }
- 
-     Note: GAS requires Content-Type 'text/plain' on cross-origin
-     POST requests to avoid a CORS preflight that the Apps Script
-     runtime does not support. The payload is still valid JSON.
-  ════════════════════════════════════════════════════════ */
-  function addStudent(studentData) {
-    _setAddStudentLoading(true);
- 
-    fetch(GAS_WEBHOOK_URL, {
-      method: 'POST',
-      headers: {
-        // Must be text/plain to avoid a CORS preflight OPTIONS request,
-        // which Apps Script /exec does not handle. The body is still
-        // valid JSON and parsed with JSON.parse(e.postData.contents).
-        'Content-Type': 'text/plain;charset=utf-8',
-      },
-      body: JSON.stringify(studentData),
-    })
-    .then(function (response) {
-      if (!response.ok) {
-        throw new Error('Server responded with HTTP ' + response.status);
+    'use strict';
+
+    /* ════════════════════════════════════════════════════════
+       CONFIGURATION
+    ════════════════════════════════════════════════════════ */
+    var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwhMJNCd2pPr4PhH90vhfMOj_XFfyDDSzE3iaqPQ4ThM-59XRVI9UH76ABrbm_iQFsF/exec';
+
+
+    /* ════════════════════════════════════════════════════════
+       COOKIE HELPER
+       Reads a named cookie. Returns null if absent or on error.
+    ════════════════════════════════════════════════════════ */
+    function getCookie(name) {
+      try {
+        var match = document.cookie.match(
+          new RegExp('(?:^|;\\s*)' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]+)')
+        );
+        return match ? decodeURIComponent(match[1]) : null;
+      } catch (e) {
+        console.warn('[getCookie] Failed to read cookie "' + name + '":', e);
+        return null;
       }
-      return response.json();
-    })
-    .then(function (data) {
-      if (data.result === 'success') {
-        _showAddStudentStatus('✓ Student record saved to caseload.', false);
- 
-        // Optimistically prepend the new card to the live roster
-        // so the user sees the result without a full page reload.
-        if (typeof renderStudentRoster === 'function') {
-          var roster   = document.getElementById('studentForm');
-          var existing = roster
-            ? Array.from(roster.querySelectorAll('.student-card-data'))
-                   .map(function (el) {
-                     return {
-                       'First Name':  el.dataset.firstName  || '',
-                       'Last Name':   el.dataset.lastName   || '',
-                       'Disability':  el.dataset.disability || '',
-                     };
-                   })
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       SESSION GUARD
+       Authentication resolution order:
+         1. Local dev bypass — localhost / 127.0.0.1 always passes
+         2. Wildcard cookie  — mp_session (set by dashboard OAuth)
+         3. localStorage     — auth_token (portal-native login)
+       If no auth signal is found, redirects to /login.html.
+    ════════════════════════════════════════════════════════ */
+    function mpSessionGuard() {
+      var isLocal = (
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1'
+      );
+      if (isLocal) {
+        console.log('[mpSessionGuard] Local environment. Guard bypassed.');
+        return;
+      }
+
+      var sessionCookie = getCookie('mp_session') || getCookie('mp_session_active');
+
+      var localToken = null;
+      try {
+        localToken = localStorage.getItem('auth_token');
+      } catch (e) {
+        console.warn('[mpSessionGuard] localStorage read failed:', e);
+      }
+
+      /* Cookie -> localStorage sync: if the wildcard cookie is present but
+         localStorage has no token, write a sentinel so the rest of the
+         portal's JS sees a populated auth_token without a full login flow. */
+      if (sessionCookie && !localToken) {
+        try {
+          localStorage.setItem('auth_token', 'cookie_session');
+          localStorage.setItem('mp_beta_auth_time', Date.now().toString());
+          console.log('[mpSessionGuard] Wildcard cookie detected. localStorage synced.');
+        } catch (e) {
+          console.warn('[mpSessionGuard] localStorage sync write failed:', e);
+        }
+        localToken = 'cookie_session';
+      }
+
+      if (sessionCookie || localToken) {
+        console.log('[mpSessionGuard] Authenticated. Source: ' +
+          (sessionCookie ? 'mp_session cookie' : 'localStorage auth_token'));
+        return;
+      }
+
+      console.error('[mpSessionGuard] No auth signal found. Redirecting to login.');
+      var returnPath = encodeURIComponent(
+        window.location.pathname + window.location.search
+      );
+      window.location.replace('/login.html?next=' + returnPath);
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       LOGOUT
+       Clears all auth-related keys, then redirects to /login.html.
+       Wired to the Sign Out button via onclick="logout()".
+    ════════════════════════════════════════════════════════ */
+    function logout() {
+      try {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('mp_beta_email');
+        localStorage.removeItem('mp_beta_auth_time');
+        localStorage.removeItem('mp_user_role');
+        localStorage.clear();
+      } catch (e) {
+        console.warn('[logout] localStorage clear failed:', e);
+      }
+      window.location.replace('/login.html');
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       STAT CARD HYDRATION
+       Reads cached caseload summary counts from localStorage
+       and populates the three header stat cards. Falls back to
+       an em-dash when no cached data is present yet.
+    ════════════════════════════════════════════════════════ */
+    function hydrateStatCards() {
+      var studentCount = null;
+      var iepDue       = null;
+      var activeObs    = null;
+
+      try {
+        studentCount = localStorage.getItem('cl_student_count');
+        iepDue       = localStorage.getItem('cl_iep_due_30d');
+        activeObs    = localStorage.getItem('cl_active_obs');
+      } catch (e) {
+        console.warn('[hydrateStatCards] localStorage read failed:', e);
+      }
+
+      var countEl = document.getElementById('statStudentCount');
+      var iepEl   = document.getElementById('statIepDue');
+      var obsEl   = document.getElementById('statObs');
+
+      if (countEl) countEl.textContent = studentCount !== null ? studentCount : '\u2014';
+      if (iepEl)   iepEl.textContent   = iepDue       !== null ? iepDue       : '\u2014';
+      if (obsEl)   obsEl.textContent   = activeObs    !== null ? activeObs    : '\u2014';
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       RENDER STUDENT ROSTER
+       Maps Google Sheets row objects into student cards and
+       injects them into #rosterGrid. Hides the empty-state
+       placeholder once cards are present.
+
+       Expected column keys:
+         "First Name"  — student given name
+         "Last Name"   — student family name
+         "Disability"  — primary disability category
+
+       data-* attributes on each card allow the optimistic
+       update in addStudent() to reconstruct the roster array
+       without a re-fetch.
+    ════════════════════════════════════════════════════════ */
+    function renderStudentRoster(students) {
+      var rosterGrid  = document.getElementById('rosterGrid');
+      var rosterEmpty = document.getElementById('rosterEmpty');
+
+      if (!rosterGrid) {
+        console.warn('[renderStudentRoster] #rosterGrid not found in DOM.');
+        return;
+      }
+
+      rosterGrid.innerHTML = '';
+
+      if (!students || students.length === 0) {
+        if (rosterEmpty) rosterEmpty.style.display = '';
+        return;
+      }
+
+      if (rosterEmpty) rosterEmpty.style.display = 'none';
+
+      students.forEach(function (student) {
+        var firstName  = student['First Name']  || 'N/A';
+        var lastName   = student['Last Name']   || 'N/A';
+        var disability = student['Disability']  || 'N/A';
+
+        var card = document.createElement('div');
+        card.className = 'panel student-card-data';
+        card.setAttribute('data-first-name', firstName);
+        card.setAttribute('data-last-name',  lastName);
+        card.setAttribute('data-disability', disability);
+
+        card.innerHTML =
+          '<p class="text-[0.95rem] font-semibold text-slate-100 leading-snug mb-1">' +
+            firstName + ' ' + lastName +
+          '</p>' +
+          '<p class="text-[0.8rem] text-slate-400">' + disability + '</p>';
+
+        rosterGrid.appendChild(card);
+      });
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       OPEN ADD STUDENT MODAL
+       Resets any previous state, shows the modal, then moves
+       keyboard focus to the first input field.
+    ════════════════════════════════════════════════════════ */
+    function openAddStudentModal() {
+      var modal = document.getElementById('addStudentModal');
+      if (!modal) return;
+      _resetAddStudentModal();
+      modal.classList.remove('hidden');
+      setTimeout(function () {
+        var firstField = document.getElementById('asFirstName');
+        if (firstField) firstField.focus();
+      }, 50);
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       CLOSE ADD STUDENT MODAL
+       Hides the modal and clears all field values and status.
+    ════════════════════════════════════════════════════════ */
+    function closeAddStudentModal() {
+      var modal = document.getElementById('addStudentModal');
+      if (!modal) return;
+      modal.classList.add('hidden');
+      _resetAddStudentModal();
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       _resetAddStudentModal  [private]
+       Clears fields, status message, and re-enables buttons.
+       Called on both open (clear previous session) and close.
+    ════════════════════════════════════════════════════════ */
+    function _resetAddStudentModal() {
+      ['asFirstName', 'asLastName', 'asDisability'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+      var msg = document.getElementById('asStatusMsg');
+      if (msg) {
+        msg.textContent = '';
+        msg.className = 'hidden text-[0.8rem] mb-4';
+      }
+      _setAddStudentLoading(false);
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       _setAddStudentLoading  [private]
+       Toggles the Save button between its normal and in-flight
+       states while the fetch is running.
+    ════════════════════════════════════════════════════════ */
+    function _setAddStudentLoading(isLoading) {
+      var saveBtn    = document.getElementById('asSaveBtn');
+      var saveBtnTxt = document.getElementById('asSaveBtnText');
+      var cancelBtn  = document.getElementById('asCancelBtn');
+      if (!saveBtn) return;
+
+      if (isLoading) {
+        saveBtn.disabled      = true;
+        saveBtn.style.opacity = '0.6';
+        saveBtn.style.cursor  = 'not-allowed';
+        if (saveBtnTxt) saveBtnTxt.textContent = 'Saving\u2026';
+        if (cancelBtn)  cancelBtn.disabled = true;
+      } else {
+        saveBtn.disabled      = false;
+        saveBtn.style.opacity = '1';
+        saveBtn.style.cursor  = 'pointer';
+        if (saveBtnTxt) saveBtnTxt.textContent = 'Save Student';
+        if (cancelBtn)  cancelBtn.disabled = false;
+      }
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       _showAddStudentStatus  [private]
+       Renders a success (green) or error (red) inline message
+       inside the modal.
+    ════════════════════════════════════════════════════════ */
+    function _showAddStudentStatus(message, isError) {
+      var msg = document.getElementById('asStatusMsg');
+      if (!msg) return;
+      msg.textContent = message;
+      msg.className = 'text-[0.8rem] mb-4 ' + (isError ? 'text-red-400' : 'text-emerald-400');
+      msg.classList.remove('hidden');
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       HANDLE ADD STUDENT SUBMIT
+       Validates the three required fields, builds the payload,
+       and delegates to addStudent(). Wired to the Save button.
+    ════════════════════════════════════════════════════════ */
+    function handleAddStudentSubmit() {
+      var firstName  = ((document.getElementById('asFirstName')  || {}).value || '').trim();
+      var lastName   = ((document.getElementById('asLastName')   || {}).value || '').trim();
+      var disability = ((document.getElementById('asDisability') || {}).value || '').trim();
+
+      var missing = [];
+      if (!firstName)  missing.push('First Name');
+      if (!lastName)   missing.push('Last Name');
+      if (!disability) missing.push('Primary Disability');
+
+      if (missing.length > 0) {
+        _showAddStudentStatus('Please complete: ' + missing.join(', ') + '.', true);
+        var focusMap = {
+          'First Name':         'asFirstName',
+          'Last Name':          'asLastName',
+          'Primary Disability': 'asDisability'
+        };
+        var firstEl = document.getElementById(focusMap[missing[0]]);
+        if (firstEl) firstEl.focus();
+        return;
+      }
+
+      addStudent({
+        'First Name':  firstName,
+        'Last Name':   lastName,
+        'Disability':  disability,
+        'submittedAt': new Date().toISOString()
+      });
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       addStudent(studentData)
+       POSTs a new student record to the Google Apps Script
+       /exec endpoint.
+
+       Content-Type must be 'text/plain;charset=utf-8' to avoid
+       a CORS preflight OPTIONS request, which the Apps Script
+       runtime does not support. The body is valid JSON and is
+       parsed inside doPost(e) via JSON.parse(e.postData.contents).
+
+       Expected Apps Script doPost(e):
+         function doPost(e) {
+           var sheet = SpreadsheetApp
+             .openById('YOUR_SHEET_ID')
+             .getSheetByName('Sheet1');
+           var data = JSON.parse(e.postData.contents);
+           sheet.appendRow([
+             data['First Name'],
+             data['Last Name'],
+             data['Disability'],
+             data['submittedAt']
+           ]);
+           return ContentService
+             .createTextOutput(JSON.stringify({ result: 'success' }))
+             .setMimeType(ContentService.MimeType.JSON);
+         }
+    ════════════════════════════════════════════════════════ */
+    function addStudent(studentData) {
+      _setAddStudentLoading(true);
+
+      fetch(GAS_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(studentData)
+      })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error('Server responded with HTTP ' + response.status);
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        if (data.result === 'success') {
+          _showAddStudentStatus('\u2713 Student record saved to caseload.', false);
+
+          /* Optimistic roster update: prepend the new card so the user
+             sees the result immediately without a full page reload. */
+          var rosterGrid = document.getElementById('rosterGrid');
+          var existing = rosterGrid
+            ? Array.from(rosterGrid.querySelectorAll('.student-card-data')).map(function (el) {
+                return {
+                  'First Name': el.dataset.firstName  || '',
+                  'Last Name':  el.dataset.lastName   || '',
+                  'Disability': el.dataset.disability || ''
+                };
+              })
             : [];
           renderStudentRoster([studentData].concat(existing));
+
+          /* Bump the stat card count */
+          var countEl = document.getElementById('statStudentCount');
+          if (countEl) {
+            var prev = parseInt(countEl.textContent, 10) || 0;
+            countEl.textContent = prev + 1;
+            try { localStorage.setItem('cl_student_count', String(prev + 1)); } catch (e) {}
+          }
+
+          setTimeout(function () { closeAddStudentModal(); }, 1600);
+        } else {
+          throw new Error(data.error || 'Unknown error from Apps Script');
         }
- 
-        // Auto-close after a brief success pause
-        setTimeout(function () { closeAddStudentModal(); }, 1600);
-      } else {
-        throw new Error(data.error || 'Unknown error from Apps Script');
-      }
-    })
-    .catch(function (err) {
-      console.error('[addStudent] POST failed:', err);
-      _showAddStudentStatus('Save failed: ' + err.message, true);
-      _setAddStudentLoading(false);
-    });
-  }
- 
- 
-  /* ════════════════════════════════════════════════════════
-     Escape-key handler
-     Closes the modal when the user presses Escape, matching
-     standard dialog accessibility expectations.
-  ════════════════════════════════════════════════════════ */
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') {
-      var modal = document.getElementById('addStudentModal');
-      if (modal && !modal.classList.contains('hidden')) {
-        closeAddStudentModal();
-      }
+      })
+      .catch(function (err) {
+        console.error('[addStudent] POST failed:', err);
+        _showAddStudentStatus('Save failed: ' + err.message, true);
+        _setAddStudentLoading(false);
+      });
     }
-  });
+
+
+    /* ════════════════════════════════════════════════════════
+       BOOT — DOMContentLoaded
+       Guard runs first — if it redirects, nothing else executes.
+    ════════════════════════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', function () {
+      mpSessionGuard();
+      hydrateStatCards();
+    });
+
+
+    /* ════════════════════════════════════════════════════════
+       ESCAPE KEY — closes the Add Student modal
+    ════════════════════════════════════════════════════════ */
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        var modal = document.getElementById('addStudentModal');
+        if (modal && !modal.classList.contains('hidden')) {
+          closeAddStudentModal();
+        }
+      }
+    });
+
   </script>
 
-     Hidden by default. openAddStudentModal() removes 'hidden'.
-     Closed by closeAddStudentModal() (Cancel btn + ✕ btn).
-     Backdrop click intentionally does NOT close the modal to
-     prevent accidental dismissal while the user is typing.       -->
-<div id="addStudentModal"
-     class="hidden fixed inset-0 z-50 bg-surface-900/80"
-     style="backdrop-filter: blur(4px);"
-     role="dialog"
-     aria-modal="true"
-     aria-labelledby="addStudentModalTitle">
- 
-  <!-- Centering wrapper — scrollable on small viewports -->
-  <div class="min-h-full flex items-center justify-center p-4">
- 
-    <!-- Panel — matches existing .panel design token -->
-    <div class="panel w-full max-w-md relative"
-         style="background: #171b26; border: 1px solid #252c42; border-radius: 14px; padding: 1.75rem;">
- 
-      <!-- ── Modal header ─────────────────────────────────── -->
-      <div class="flex items-center justify-between mb-5">
-        <div>
-          <p class="eyebrow" style="font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: #6c8fff; font-family: 'JetBrains Mono', monospace; font-weight: 600; margin-bottom: 0.2rem;">
-            Student Records
-          </p>
-          <h2 id="addStudentModalTitle"
-              class="text-[1rem] font-semibold text-slate-100 tracking-tight leading-snug">
-            Add New Student
-          </h2>
-        </div>
-        <!-- ✕ close button -->
-        <button class="btn-ghost"
-                onclick="closeAddStudentModal()"
-                aria-label="Close the Add Student modal">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2.5"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-          Close
-        </button>
-      </div>
- 
-      <!-- ── Divider ──────────────────────────────────────── -->
-      <hr class="rule" style="margin-bottom: 1.4rem;" />
- 
-      <!-- ── Form fields ──────────────────────────────────── -->
-      <!-- First Name -->
-      <div style="margin-bottom: 1rem;">
-        <label class="field-label" for="asFirstName">First Name</label>
-        <input id="asFirstName"
-               type="text"
-               class="field-input"
-               placeholder="e.g. Jordan"
-               autocomplete="given-name"
-               aria-required="true"
-               aria-describedby="asFirstNameHint" />
-        <p id="asFirstNameHint" class="mt-1 text-[0.72rem] text-slate-500">
-          Student's legal first name as listed in the IEP.
-        </p>
-      </div>
- 
-      <!-- Last Name -->
-      <div style="margin-bottom: 1rem;">
-        <label class="field-label" for="asLastName">Last Name</label>
-        <input id="asLastName"
-               type="text"
-               class="field-input"
-               placeholder="e.g. Rivera"
-               autocomplete="family-name"
-               aria-required="true"
-               aria-describedby="asLastNameHint" />
-        <p id="asLastNameHint" class="mt-1 text-[0.72rem] text-slate-500">
-          Student's legal last name as listed in the IEP.
-        </p>
-      </div>
- 
-      <!-- Disability -->
-      <div style="margin-bottom: 1.5rem;">
-        <label class="field-label" for="asDisability">Primary Disability</label>
-        <input id="asDisability"
-               type="text"
-               class="field-input"
-               placeholder="e.g. Specific Learning Disability (SLD)"
-               autocomplete="off"
-               aria-required="true"
-               aria-describedby="asDisabilityHint" />
-        <p id="asDisabilityHint" class="mt-1 text-[0.72rem] text-slate-500">
-          IDEA primary disability category as listed in the IEP document.
-        </p>
-      </div>
- 
-      <!-- ── Validation / status message ─────────────────── -->
-      <p id="asStatusMsg"
-         class="hidden text-[0.8rem] mb-4"
-         role="alert"
-         aria-live="assertive">
-      </p>
- 
-      <!-- ── Action buttons ───────────────────────────────── -->
-      <div class="flex items-center justify-end gap-3">
-        <button class="btn-ghost"
-                onclick="closeAddStudentModal()"
-                id="asCancelBtn"
-                aria-label="Cancel and close the Add Student modal">
-          Cancel
-        </button>
- 
-        <button id="asSaveBtn"
-                onclick="handleAddStudentSubmit()"
-                style="display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
-                       background: linear-gradient(135deg, #3b5bdb 0%, #6c8fff 100%);
-                       color: #fff; font-weight: 600; font-size: 0.825rem;
-                       border: none; border-radius: 9px; padding: 0.6rem 1.25rem;
-                       cursor: pointer; white-space: nowrap;
-                       box-shadow: 0 2px 12px rgba(60,91,219,0.35);
-                       transition: filter 0.12s, box-shadow 0.12s, transform 0.12s;"
-                onmouseover="this.style.filter='brightness(1.1)'; this.style.boxShadow='0 4px 20px rgba(60,91,219,0.55)';"
-                onmouseout="this.style.filter=''; this.style.boxShadow='0 2px 12px rgba(60,91,219,0.35)';"
-                aria-label="Save the new student record">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2.3"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-          <span id="asSaveBtnText">Save Student</span>
-        </button>
-      </div>
- 
-    </div><!-- /panel -->
-  </div><!-- /centering wrapper -->
-</div><!-- /#addStudentModal -->
 </body>
 </html>
