@@ -708,7 +708,7 @@ document.addEventListener('DOMContentLoaded', function () {
   hydrateStatCards();
   
   // New: Fetch and render student data
-  fetch('AKfycbwhMJNCd2pPr4PhH90vhfMOj_XFfyDDSzE3iaqPQ4ThM-59XRVI9UH76ABrbm_iQFsF/exec') // Use the same /exec URL from your Google Apps Script
+  fetch('https://script.google.com/macros/s/AKfycbygSN-l8HxzwCTfj7RiEsbjsbqYRgwyy2TfI15qxMPq1xVG5moPlkEc84biE4nh30-o/exec') // Use the same /exec URL from your Google Apps Script
     .then(function(res) { return res.json(); })
     .then(function(students) {
       console.log('Caseload fetched:', students);
