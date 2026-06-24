@@ -856,25 +856,28 @@
        JSON.parse(e.postData.contents).
        Returns a Promise that resolves to the parsed JSON body.
     ════════════════════════════════════════════════════════ */
-    function _gasPost(payload) {
-      return fetch(GAS_WEBHOOK_URL, {
-        method:  'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body:    JSON.stringify(payload)
-      })
-      .then(function (response) {
-        if (!response.ok) {
-          throw new Error('HTTP ' + response.status + ' \u2014 ' + response.statusText);
-        }
-        return response.json();
-      })
-      .then(function (data) {
-        if (data.result !== 'success') {
-          throw new Error(data.error || 'Apps Script returned result: ' + data.result);
-        }
-        return data;
-      });
+function _gasPost(payload) {
+  // Strip any accidental hash or query fragments completely at runtime
+  var cleanUrl = GAS_WEBHOOK_URL.split('#')''.split('?')'';
+
+  return fetch(cleanUrl, {
+    method:  'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body:    JSON.stringify(payload)
+  })
+  .then(function (response) {
+    if (!response.ok) {
+      throw new Error('HTTP ' + response.status + ' \u2014 ' + response.statusText);
     }
+    return response.json();
+  })
+  .then(function (data) {
+    if (data.result !== 'success') {
+      throw new Error(data.error || 'Apps Script returned result: ' + data.result);
+    }
+    return data;
+  });
+}
 
 
     /* ════════════════════════════════════════════════════════
