@@ -347,7 +347,9 @@
   <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8" role="main">
 
     <!-- Student form / roster container — ID required by spec -->
-    <div id="studentForm" aria-label="Student roster and form workspace">
+<div id="studentForm" aria-label="Student roster and form workspace">
+
+<div id="studentRoster" aria-label="Student roster and form workspace">
 
       <!-- Roster section header + action buttons -->
       <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
@@ -694,7 +696,24 @@
       if (obsEl)   obsEl.textContent   = activeObs    !== null ? activeObs    : '—';
     }
 
+function renderStudentRoster(students) {
+  var container = document.getElementById('studentRoster'); // Ensure this ID is in your HTML
+  if (!container) {
+    console.warn('Container #studentRoster not found in your HTML');
+    return;
+  }
+  
+  // Clear the "No students" placeholder
+  container.innerHTML = ''; 
 
+  students.forEach(function(s) {
+    var card = document.createElement('div');
+    card.className = 'module-card'; // Reusing your existing card styling
+    card.innerHTML = '<h3>' + s['First Name'] + ' ' + s['Last Name'] + '</h3>' +
+                     '<p>' + s['Primary Disability'] + '</p>';
+    container.appendChild(card);
+  });
+}
     /* ════════════════════════════════════════════════════════
        BOOT
        ────────────────────────────────────────────────────────
@@ -707,13 +726,12 @@ document.addEventListener('DOMContentLoaded', function () {
   mpSessionGuard();
   hydrateStatCards();
   
-  // New: Fetch and render student data
-  fetch('https://script.google.com/macros/s/AKfycbygSN-l8HxzwCTfj7RiEsbjsbqYRgwyy2TfI15qxMPq1xVG5moPlkEc84biE4nh30-o/exec') // Use the same /exec URL from your Google Apps Script
+  // Connect the fetch to your new render function
+  fetch('https://script.google.com/macros/s/YOUR_ACTUAL_DEPLOYMENT_ID_GOES_HERE/exec')
     .then(function(res) { return res.json(); })
     .then(function(students) {
       console.log('Caseload fetched:', students);
-      // TODO: Call a function here to loop through 'students' 
-      // and inject them into your DOM (e.g., inside the #studentRoster container)
+      renderStudentRoster(students); // THIS IS THE MISSING TRIGGER
     });
 });
 
