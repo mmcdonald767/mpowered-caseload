@@ -7,7 +7,6 @@
   <title>Caseload Management Portal &mdash; M-Powered Education</title>
   <meta name="robots" content="noindex, nofollow" />
 
-  <!-- Tailwind CDN must load before tailwind.config is set -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <script>
@@ -23,14 +22,11 @@
               600: '#252c42',
               500: '#2e3650',
             },
-            accent: {
-              DEFAULT: '#6c8fff',
-              soft:    '#3b5bdb',
-            },
+            accent:  { DEFAULT: '#6c8fff', soft: '#3b5bdb' },
             success: '#34d399',
           },
           fontFamily: {
-            sans: ['"Inter"', 'system-ui', 'sans-serif'],
+            sans: ['"Inter"',          'system-ui', 'sans-serif'],
             mono: ['"JetBrains Mono"', 'monospace'],
           },
         }
@@ -39,15 +35,13 @@
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet" />
 
   <style>
-    /* Reset & base */
     *, *::before, *::after { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
 
-    /* Applied immediately to prevent white flash before
-       the Tailwind CDN bundle finishes parsing            */
     body {
       background-color: #0f1117;
       color: #e8ecf4;
@@ -55,190 +49,172 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Custom scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar       { width: 6px; }
     ::-webkit-scrollbar-track { background: #171b26; }
     ::-webkit-scrollbar-thumb { background: #2e3650; border-radius: 3px; }
 
-    /* Nav link */
+    /* ── Navigation link ────────────────────────────────── */
     .nav-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
+      display: inline-flex; align-items: center; gap: 0.4rem;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: #7d8fb3;
-      border: 1px solid #252c42;
-      border-radius: 7px;
-      padding: 0.4rem 0.85rem;
-      text-decoration: none;
+      font-size: 0.75rem; font-weight: 500; color: #7d8fb3;
+      border: 1px solid #252c42; border-radius: 7px;
+      padding: 0.4rem 0.85rem; text-decoration: none;
       transition: color 0.14s, border-color 0.14s, background 0.14s;
       white-space: nowrap;
     }
-    .nav-link:hover {
-      color: #e8ecf4;
-      border-color: #6c8fff;
-      background: rgba(108,143,255,0.07);
-    }
-    .nav-link.active {
-      color: #6c8fff;
-      border-color: rgba(108,143,255,0.4);
-      background: rgba(108,143,255,0.06);
-    }
+    .nav-link:hover  { color: #e8ecf4; border-color: #6c8fff; background: rgba(108,143,255,0.07); }
+    .nav-link.active { color: #6c8fff; border-color: rgba(108,143,255,0.4); background: rgba(108,143,255,0.06); }
 
-    /* Ghost / utility button */
+    /* ── Ghost button ───────────────────────────────────── */
     .btn-ghost {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      background: transparent;
-      color: #7d8fb3;
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: transparent; color: #7d8fb3;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
-      font-weight: 500;
-      border: 1px solid #252c42;
-      border-radius: 7px;
-      padding: 0.4rem 0.85rem;
-      cursor: pointer;
+      font-size: 0.72rem; font-weight: 500;
+      border: 1px solid #252c42; border-radius: 7px;
+      padding: 0.4rem 0.85rem; cursor: pointer;
       transition: color 0.14s, border-color 0.14s, background 0.14s;
       white-space: nowrap;
     }
-    .btn-ghost:hover {
-      color: #f87171;
-      border-color: rgba(248,113,113,0.45);
-      background: rgba(248,113,113,0.06);
-    }
-    .btn-ghost:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-    .btn-ghost:focus-visible {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(108,143,255,0.35);
-    }
+    .btn-ghost:hover        { color: #f87171; border-color: rgba(248,113,113,0.45); background: rgba(248,113,113,0.06); }
+    .btn-ghost:disabled     { opacity: 0.4; cursor: not-allowed; }
+    .btn-ghost:focus-visible{ outline: none; box-shadow: 0 0 0 3px rgba(108,143,255,0.35); }
 
-    /* Panel / card */
+    /* ── Primary accent button ──────────────────────────── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      background: linear-gradient(135deg, #3b5bdb 0%, #6c8fff 100%);
+      color: #fff; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem; font-weight: 600;
+      border: none; border-radius: 8px;
+      padding: 0.45rem 1rem; cursor: pointer; white-space: nowrap;
+      box-shadow: 0 2px 10px rgba(60,91,219,0.3);
+      transition: filter 0.12s, box-shadow 0.12s;
+      text-decoration: none;
+    }
+    .btn-primary:hover { filter: brightness(1.1); box-shadow: 0 4px 18px rgba(60,91,219,0.5); }
+
+    /* ── Edit/Track action button ───────────────────────── */
+    .btn-action {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: rgba(108,143,255,0.08);
+      color: #6c8fff;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem; font-weight: 600;
+      border: 1px solid rgba(108,143,255,0.25); border-radius: 6px;
+      padding: 0.3rem 0.75rem; cursor: pointer; white-space: nowrap;
+      transition: background 0.14s, border-color 0.14s, color 0.14s;
+    }
+    .btn-action:hover { background: rgba(108,143,255,0.16); border-color: rgba(108,143,255,0.5); color: #a8bfff; }
+
+    /* ── Panel ──────────────────────────────────────────── */
     .panel {
-      background: #171b26;
-      border: 1px solid #1e2335;
-      border-radius: 14px;
-      padding: 1.75rem;
+      background: #171b26; border: 1px solid #1e2335;
+      border-radius: 14px; padding: 1.75rem;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    /* Placeholder dashed card */
-    .placeholder-card {
-      background: #171b26;
-      border: 1.5px dashed #252c42;
-      border-radius: 12px;
-      padding: 3rem 2rem;
-      text-align: center;
-      transition: border-color 0.2s;
-    }
-    .placeholder-card:hover { border-color: rgba(108,143,255,0.35); }
-
-    /* Form field label */
-    .field-label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #7d8fb3;
-      margin-bottom: 0.4rem;
-    }
-
-    /* Form field input */
-    .field-input {
-      width: 100%;
-      background: #0f1117;
-      border: 1px solid #252c42;
-      border-radius: 8px;
-      padding: 0.6rem 0.8rem;
-      color: #e8ecf4;
-      font-size: 0.9rem;
-      font-family: 'Inter', system-ui, sans-serif;
-      transition: border-color 0.15s, outline 0.15s;
-    }
-    .field-input:focus {
-      outline: 2px solid #6c8fff;
-      border-color: transparent;
-    }
-    .field-input::placeholder { color: #3a4466; }
-
-    /* Eyebrow label */
-    .eyebrow {
-      font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #6c8fff;
-      margin-bottom: 0.4rem;
-    }
-
-    /* FERPA badge */
-    .ferpa-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-size: 0.67rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      color: #34d399;
-      border: 1px solid rgba(52,211,153,0.3);
-      border-radius: 20px;
-      padding: 0.2rem 0.6rem;
-      background: rgba(52,211,153,0.07);
-      flex-shrink: 0;
-    }
-
-    /* Stat card */
+    /* ── Stat card ──────────────────────────────────────── */
     .stat-card {
-      background: #171b26;
-      border: 1px solid #1e2335;
-      border-radius: 10px;
-      padding: 1.1rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
+      background: #171b26; border: 1px solid #1e2335;
+      border-radius: 10px; padding: 1.1rem 1.25rem;
+      display: flex; flex-direction: column; gap: 0.3rem;
+    }
+    .stat-card.warn { border-color: rgba(251,191,36,0.3); }
+    .stat-card.warn .stat-value { color: #fbbf24; }
+
+    /* ── Eyebrow ────────────────────────────────────────── */
+    .eyebrow {
+      font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: #6c8fff; margin-bottom: 0.2rem;
     }
 
-    /* Stats grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 0.85rem;
+    /* ── FERPA badge ────────────────────────────────────── */
+    .ferpa-badge {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.67rem; font-weight: 600; letter-spacing: 0.06em;
+      color: #34d399; border: 1px solid rgba(52,211,153,0.3);
+      border-radius: 20px; padding: 0.2rem 0.6rem;
+      background: rgba(52,211,153,0.07); flex-shrink: 0;
     }
 
-    /* Quick-action card hover (anchor) */
-    a.panel:hover {
-      border-color: rgba(108,143,255,0.4);
-      box-shadow: 0 6px 28px rgba(0,0,0,0.4);
-      text-decoration: none;
+    /* ── Placeholder / empty state ──────────────────────── */
+    .placeholder-card {
+      background: #171b26; border: 1.5px dashed #252c42;
+      border-radius: 12px; padding: 3rem 2rem; text-align: center;
     }
 
-    /* Divider */
+    /* ── Roster table ───────────────────────────────────── */
+    .roster-table { width: 100%; border-collapse: collapse; }
+
+    .roster-table thead tr {
+      border-bottom: 1px solid #1e2335;
+    }
+    .roster-table thead th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: #4a5578; padding: 0 1rem 0.75rem 0;
+      text-align: left; white-space: nowrap;
+    }
+    .roster-table thead th:last-child { text-align: right; padding-right: 0; }
+
+    .roster-table tbody tr {
+      border-bottom: 1px solid #1a1f2e;
+      transition: background 0.1s;
+    }
+    .roster-table tbody tr:last-child { border-bottom: none; }
+    .roster-table tbody tr:hover { background: rgba(108,143,255,0.03); }
+
+    .roster-table tbody td {
+      padding: 0.9rem 1rem 0.9rem 0;
+      vertical-align: middle;
+      font-size: 0.85rem; color: #c4cde4;
+    }
+    .roster-table tbody td:last-child { text-align: right; padding-right: 0; }
+
+    .td-name    { color: #e8ecf4; font-weight: 600; }
+    .td-tag     { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #6c8fff; }
+    .td-dis     { font-size: 0.8rem; color: #7d8fb3; }
+    .td-iep     { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; white-space: nowrap; }
+    .td-iep .iep-warn { color: #fbbf24; }
+    .td-iep .iep-ok   { color: #4a5578; }
+
+    /* ── Divider ────────────────────────────────────────── */
     .rule { border: none; border-top: 1px solid #1e2335; margin: 1.5rem 0; }
+
+    /* ── Skeleton loading shimmer ───────────────────────── */
+    @keyframes shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position:  600px 0; }
+    }
+    .skeleton {
+      background: linear-gradient(90deg, #1e2335 25%, #252c42 50%, #1e2335 75%);
+      background-size: 600px 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 4px;
+      display: inline-block;
+    }
   </style>
 </head>
 
 <body class="bg-surface-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
 
   <!-- ════════════════════════════════════════════════════════
-       TOP NAVIGATION BAR
+       TOP NAVIGATION
   ═══════════════════════════════════════════════════════════ -->
   <header class="bg-surface-800 border-b border-surface-700 flex-shrink-0" role="banner">
     <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between flex-wrap gap-3">
 
-      <!-- Left: brand + nav links -->
+      <!-- Brand + nav -->
       <div class="flex items-center gap-4 min-w-0">
-
-        <!-- Brand mark -->
         <div class="flex items-center gap-2.5 flex-shrink-0">
           <div class="w-8 h-8 rounded-[8px] flex items-center justify-center"
                style="background: linear-gradient(135deg, #3b5bdb, #6c8fff);">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                 stroke="#fff" stroke-width="2.3"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                 stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
               <circle cx="9" cy="7" r="4"/>
               <path d="M23 21v-2a4 4 0 00-3-3.87"/>
@@ -250,30 +226,20 @@
           </span>
         </div>
 
-        <span class="text-surface-500 select-none hidden sm:block" aria-hidden="true">|</span>
+        <span class="text-surface-600 select-none hidden sm:block" aria-hidden="true">|</span>
 
-        <!-- Navigation links -->
         <nav class="flex items-center gap-2" role="navigation" aria-label="Main navigation">
-          <a href="https://caseload.mpowerededucation.com"
-             class="nav-link active"
-             aria-current="page"
-             aria-label="Caseload Portal (current page)">
+          <a href="/" class="nav-link active" aria-current="page" aria-label="Caseload Portal">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2.2"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-              <path d="M16 3.13a4 4 0 010 7.75"/>
+                 stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
             </svg>
             Caseload Portal
           </a>
-          <a href="https://data.mpowerededucation.com"
-             class="nav-link"
-             aria-label="Data Utility — Click-Track observation tool">
+          <a href="https://data.mpowerededucation.com" class="nav-link" aria-label="Data Utility">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2.2"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                 stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
             </svg>
             Data Utility
@@ -283,23 +249,18 @@
 
       <!-- Right: FERPA badge + sign out -->
       <div class="flex items-center gap-2.5 flex-shrink-0">
-        <span class="ferpa-badge hidden sm:inline-flex"
-              aria-label="FERPA compliant">
+        <span class="ferpa-badge hidden sm:inline-flex" aria-label="FERPA compliant">
           <svg width="9" height="9" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2.5"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="11" width="18" height="11" rx="2"/>
-            <path d="M7 11V7a5 5 0 0110 0v4"/>
+               stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
           </svg>
           FERPA
         </span>
-        <button onclick="logout()" class="btn-ghost" aria-label="Sign out of M-Powered Education">
+        <button onclick="logout()" class="btn-ghost" aria-label="Sign out">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2.3"
-               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+               stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
+            <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
           </svg>
           Sign Out
         </button>
@@ -309,58 +270,48 @@
   </header>
 
   <!-- ════════════════════════════════════════════════════════
-       PAGE HEADER — Purpose / context ribbon
+       PAGE HEADER — title + Add Student CTA
   ═══════════════════════════════════════════════════════════ -->
-  <section class="bg-surface-800 border-b border-surface-700 flex-shrink-0"
-           aria-label="Portal description">
+  <section class="bg-surface-800 border-b border-surface-700 flex-shrink-0" aria-label="Portal header">
     <div class="max-w-7xl mx-auto px-6 py-8">
       <div class="flex items-start justify-between flex-wrap gap-6">
 
-        <!-- Description -->
         <div class="max-w-2xl">
           <p class="eyebrow">Special Education &middot; Caseload Management</p>
           <h1 class="text-2xl font-bold text-slate-100 tracking-tight leading-tight mb-2">
             Caseload Management Portal
           </h1>
           <p class="text-[0.9rem] text-slate-400 leading-relaxed">
-            A centralized hub for your special education caseload. Add students, track IEP
-            timelines, manage service minutes, and route data to your observation and reporting
-            tools &mdash; all from one compliant, secure interface.
+            Read-only caseload overview. Select <strong class="text-slate-300">Edit / Track</strong>
+            on any student row to open the dedicated modification and progress-monitoring view.
           </p>
         </div>
 
-        <!-- Quick-glance stat cards -->
-        <div class="stats-grid flex-shrink-0 w-full sm:w-auto sm:min-w-[320px]"
-             role="region" aria-label="Caseload summary statistics">
-          <div class="stat-card" aria-label="Total students on caseload">
-            <span class="text-[0.65rem] font-semibold uppercase tracking-widest text-slate-500">
-              Students
-            </span>
-            <span id="statStudentCount"
-                  class="font-mono text-[1.6rem] font-bold text-slate-100 leading-none">
-              &mdash;
-            </span>
-            <span class="text-[0.7rem] text-slate-500">on caseload</span>
-          </div>
-          <div class="stat-card" aria-label="IEP meetings due within 30 days">
-            <span class="text-[0.65rem] font-semibold uppercase tracking-widest text-slate-500">
-              IEPs Due
-            </span>
-            <span id="statIepDue"
-                  class="font-mono text-[1.6rem] font-bold text-slate-100 leading-none">
-              &mdash;
-            </span>
-            <span class="text-[0.7rem] text-slate-500">within 30 days</span>
-          </div>
-          <div class="stat-card" aria-label="Active observation sessions">
-            <span class="text-[0.65rem] font-semibold uppercase tracking-widest text-slate-500">
-              Observations
-            </span>
-            <span id="statObs"
-                  class="font-mono text-[1.6rem] font-bold leading-none" style="color:#34d399;">
-              &mdash;
-            </span>
-            <span class="text-[0.7rem] text-slate-500">active sessions</span>
+        <!-- Metric cards -->
+        <div class="flex-shrink-0 w-full sm:w-auto">
+          <div class="grid grid-cols-3 gap-3 sm:min-w-[360px]" role="region" aria-label="Caseload statistics">
+
+            <div class="stat-card" aria-label="Total students">
+              <span class="text-[0.63rem] font-semibold uppercase tracking-widest text-slate-500">Students</span>
+              <span id="statStudentCount" class="stat-value font-mono text-[1.6rem] font-bold text-slate-100 leading-none"
+                    aria-live="polite">&mdash;</span>
+              <span class="text-[0.68rem] text-slate-500">on caseload</span>
+            </div>
+
+            <div class="stat-card warn" aria-label="IEPs due within 30 days">
+              <span class="text-[0.63rem] font-semibold uppercase tracking-widest text-slate-500">IEPs Due</span>
+              <span id="statIepDue" class="stat-value font-mono text-[1.6rem] font-bold text-slate-100 leading-none"
+                    aria-live="polite">&mdash;</span>
+              <span class="text-[0.68rem] text-slate-500">within 30 days</span>
+            </div>
+
+            <div class="stat-card" aria-label="Active observation sessions">
+              <span class="text-[0.63rem] font-semibold uppercase tracking-widest text-slate-500">Observations</span>
+              <span id="statObs" class="stat-value font-mono text-[1.6rem] font-bold leading-none"
+                    style="color:#34d399;" aria-live="polite">&mdash;</span>
+              <span class="text-[0.68rem] text-slate-500">active sessions</span>
+            </div>
+
           </div>
         </div>
 
@@ -369,177 +320,178 @@
   </section>
 
   <!-- ════════════════════════════════════════════════════════
-       MAIN CONTENT
+       MAIN CONTENT — Roster
   ═══════════════════════════════════════════════════════════ -->
   <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8" role="main">
 
-    <div id="studentRoster" aria-label="Student roster and form workspace">
+    <!-- Roster panel -->
+    <div class="panel">
 
-      <!-- Roster section header + action buttons -->
-      <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+      <!-- Roster toolbar -->
+      <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
         <div>
           <p class="eyebrow">Student Roster</p>
-          <h2 class="text-[1.1rem] font-semibold text-slate-100 tracking-tight">
-            Active Caseload
-          </h2>
+          <h2 class="text-[1.05rem] font-semibold text-slate-100 tracking-tight">Active Caseload</h2>
         </div>
         <div class="flex items-center gap-2">
-          <button class="btn-ghost" disabled title="Filtering coming soon"
-                  aria-label="Filter roster (coming soon)">
+          <!-- Reload -->
+          <button class="btn-ghost" onclick="loadRoster()" id="reloadBtn" aria-label="Reload caseload data">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2.2"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                 stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/>
             </svg>
-            Filter
+            Reload
           </button>
-          <button class="btn-ghost"
-                  onclick="openAddStudentModal()"
-                  aria-label="Add a new student to the caseload"
-                  aria-haspopup="dialog">
+          <!-- Add Student — links to dedicated creation page -->
+          <a href="/add-student.html" class="btn-primary" aria-label="Add a new student">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2.5"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="12" y1="5" x2="12" y2="19"/>
-              <line x1="5" y1="12" x2="19" y2="12"/>
+                 stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
             Add Student
-          </button>
+          </a>
         </div>
       </div>
 
-      <!-- Live roster grid — populated by renderStudentRoster() -->
-      <div id="rosterGrid"
-           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <!-- Loading skeleton -->
+      <div id="rosterLoading" aria-label="Loading roster" aria-live="polite">
+        <div class="space-y-3 py-2">
+          <div class="skeleton h-5 w-full" style="opacity:0.5;"></div>
+          <div class="skeleton h-5 w-5/6"  style="opacity:0.4;"></div>
+          <div class="skeleton h-5 w-4/6"  style="opacity:0.3;"></div>
+          <div class="skeleton h-5 w-5/6"  style="opacity:0.25;"></div>
+          <div class="skeleton h-5 w-3/4"  style="opacity:0.2;"></div>
+        </div>
       </div>
 
-      <!-- Empty / placeholder roster state — shown until rosterGrid has cards -->
-      <div id="rosterEmpty" class="placeholder-card" role="region" aria-label="Empty student roster">
-        <div class="flex flex-col items-center gap-3 max-w-sm mx-auto">
-          <div class="w-14 h-14 rounded-full flex items-center justify-center mb-1"
-               style="background: rgba(108,143,255,0.08); border: 1px solid rgba(108,143,255,0.2);">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
-                 stroke="#6c8fff" stroke-width="1.6"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-              <path d="M16 3.13a4 4 0 010 7.75"/>
+      <!-- Error state -->
+      <div id="rosterError" class="hidden" role="alert">
+        <div class="placeholder-card">
+          <p class="text-[0.85rem] font-semibold text-red-400 mb-1">Failed to load caseload</p>
+          <p id="rosterErrorMsg" class="text-[0.75rem] text-slate-500 mb-4"></p>
+          <button class="btn-ghost" onclick="loadRoster()">Retry</button>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div id="rosterEmpty" class="hidden">
+        <div class="placeholder-card">
+          <div class="flex flex-col items-center gap-3 max-w-sm mx-auto">
+            <div class="w-14 h-14 rounded-full flex items-center justify-center"
+                 style="background: rgba(108,143,255,0.08); border: 1px solid rgba(108,143,255,0.2);">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+                   stroke="#6c8fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
+              </svg>
+            </div>
+            <p class="text-[0.95rem] font-semibold text-slate-300">No students on caseload yet</p>
+            <p class="text-[0.8rem] text-slate-500 text-center leading-relaxed">
+              Use <strong class="text-slate-400">Add Student</strong> to create the first record.
+              It will appear here on next load.
+            </p>
+            <a href="/add-student.html" class="btn-primary mt-1" aria-label="Add first student">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add Student
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live roster table — hidden until data loads -->
+      <div id="rosterTableWrap" class="hidden overflow-x-auto">
+        <table class="roster-table" aria-label="Active student caseload">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">ID / Tag</th>
+              <th scope="col">Disability</th>
+              <th scope="col">IEP Window</th>
+              <th scope="col" style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rosterTbody">
+            <!-- rows injected by renderRoster() -->
+          </tbody>
+        </table>
+      </div>
+
+    </div><!-- /panel -->
+
+    <hr class="rule" />
+
+    <!-- Quick-action routing panel -->
+    <div>
+      <p class="eyebrow mb-3">Quick Actions</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+
+        <a href="https://data.mpowerededucation.com"
+           class="panel flex items-start gap-3 no-underline" style="text-decoration:none;"
+           aria-label="Open the Click-Track Data Utility">
+          <div class="w-9 h-9 rounded-[8px] flex items-center justify-center flex-shrink-0 mt-0.5"
+               style="background: rgba(108,143,255,0.1); border: 1px solid rgba(108,143,255,0.2);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                 stroke="#6c8fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
             </svg>
           </div>
-          <p class="text-[0.95rem] font-semibold text-slate-300 text-center leading-snug">
-            No students on caseload yet
-          </p>
-          <p class="text-[0.8rem] text-slate-500 leading-relaxed text-center">
-            Your student roster will appear here once the caseload data layer is connected.
-            Use the <strong class="text-slate-400">Add Student</strong> button above to
-            create your first record.
-          </p>
-          <p class="font-mono text-[0.68rem] text-slate-600 mt-1">
-            container: <span style="color:#6c8fff;">#rosterGrid</span>
-          </p>
-        </div>
-      </div>
+          <div class="min-w-0">
+            <p class="text-[0.85rem] font-semibold text-slate-100 leading-tight mb-0.5">Data Utility</p>
+            <p class="text-[0.75rem] text-slate-400 leading-snug">
+              Launch Click-Track to collect frequency tallies, interval data, and ABC observations.
+            </p>
+          </div>
+        </a>
 
-      <!-- Error state — shown if loadRoster() fails -->
-      <div id="rosterError" style="display:none;">
-        <div class="placeholder-card" role="alert">
-          <p class="text-[0.85rem] font-semibold text-red-400 text-center mb-1">Failed to load roster</p>
-          <p id="rosterErrorMsg" class="text-[0.75rem] text-slate-500 text-center mb-4"></p>
-          <div class="flex justify-center">
-            <button class="btn-ghost" onclick="loadRoster()">Retry</button>
+        <div class="panel flex items-start gap-3 opacity-50 select-none" aria-label="IEP Manager (coming soon)">
+          <div class="w-9 h-9 rounded-[8px] flex items-center justify-center flex-shrink-0 mt-0.5"
+               style="background: rgba(74,85,120,0.1); border: 1px solid rgba(74,85,120,0.2);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                 stroke="#4a5578" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 mb-0.5">
+              <p class="text-[0.85rem] font-semibold text-slate-400 leading-tight">IEP Manager</p>
+              <span class="font-mono text-[0.6rem] font-semibold uppercase tracking-wide text-slate-600 border border-surface-600 rounded px-1 py-px">Soon</span>
+            </div>
+            <p class="text-[0.75rem] text-slate-500 leading-snug">
+              Draft and track IEP goals, service minutes, and annual review timelines.
+            </p>
           </div>
         </div>
-      </div>
 
-      <hr class="rule" />
-
-      <!-- Quick-action routing panel -->
-      <div>
-        <p class="eyebrow mb-3">Quick Actions</p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-
-          <!-- Active: Data Utility link -->
-          <a href="https://data.mpowerededucation.com"
-             class="panel flex items-start gap-3 no-underline"
-             aria-label="Open the Click-Track Data Utility">
-            <div class="w-9 h-9 rounded-[8px] flex items-center justify-center flex-shrink-0 mt-0.5"
-                 style="background: rgba(108,143,255,0.1); border: 1px solid rgba(108,143,255,0.2);">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                   stroke="#6c8fff" stroke-width="2.2"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-              </svg>
-            </div>
-            <div class="min-w-0">
-              <p class="text-[0.85rem] font-semibold text-slate-100 leading-tight mb-0.5">
-                Data Utility
-              </p>
-              <p class="text-[0.75rem] text-slate-400 leading-snug">
-                Launch Click-Track to collect frequency tallies, interval data, and ABC observations.
-              </p>
-            </div>
-          </a>
-
-          <!-- Coming soon: IEP Manager -->
-          <div class="panel flex items-start gap-3 opacity-50 select-none"
-               aria-label="IEP Manager (coming soon)">
-            <div class="w-9 h-9 rounded-[8px] flex items-center justify-center flex-shrink-0 mt-0.5"
-                 style="background: rgba(74,85,120,0.1); border: 1px solid rgba(74,85,120,0.2);">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                   stroke="#4a5578" stroke-width="2.2"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                <polyline points="14 2 14 8 20 8"/>
-                <line x1="16" y1="13" x2="8" y2="13"/>
-                <line x1="16" y1="17" x2="8" y2="17"/>
-              </svg>
-            </div>
-            <div class="min-w-0">
-              <div class="flex items-center gap-2 mb-0.5">
-                <p class="text-[0.85rem] font-semibold text-slate-400 leading-tight">IEP Manager</p>
-                <span class="font-mono text-[0.6rem] font-semibold uppercase tracking-wide
-                             text-slate-600 border border-surface-600 rounded px-1 py-px">
-                  Soon
-                </span>
-              </div>
-              <p class="text-[0.75rem] text-slate-500 leading-snug">
-                Draft and track IEP goals, service minutes, and annual review timelines.
-              </p>
-            </div>
+        <div class="panel flex items-start gap-3 opacity-50 select-none" aria-label="Progress Reports (coming soon)">
+          <div class="w-9 h-9 rounded-[8px] flex items-center justify-center flex-shrink-0 mt-0.5"
+               style="background: rgba(74,85,120,0.1); border: 1px solid rgba(74,85,120,0.2);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                 stroke="#4a5578" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6"  y1="20" x2="6"  y2="14"/>
+            </svg>
           </div>
-
-          <!-- Coming soon: Progress Reports -->
-          <div class="panel flex items-start gap-3 opacity-50 select-none"
-               aria-label="Progress Reports (coming soon)">
-            <div class="w-9 h-9 rounded-[8px] flex items-center justify-center flex-shrink-0 mt-0.5"
-                 style="background: rgba(74,85,120,0.1); border: 1px solid rgba(74,85,120,0.2);">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                   stroke="#4a5578" stroke-width="2.2"
-                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="18" y1="20" x2="18" y2="10"/>
-                <line x1="12" y1="20" x2="12" y2="4"/>
-                <line x1="6"  y1="20" x2="6"  y2="14"/>
-              </svg>
+          <div class="min-w-0">
+            <div class="flex items-center gap-2 mb-0.5">
+              <p class="text-[0.85rem] font-semibold text-slate-400 leading-tight">Progress Reports</p>
+              <span class="font-mono text-[0.6rem] font-semibold uppercase tracking-wide text-slate-600 border border-surface-600 rounded px-1 py-px">Soon</span>
             </div>
-            <div class="min-w-0">
-              <div class="flex items-center gap-2 mb-0.5">
-                <p class="text-[0.85rem] font-semibold text-slate-400 leading-tight">Progress Reports</p>
-                <span class="font-mono text-[0.6rem] font-semibold uppercase tracking-wide
-                             text-slate-600 border border-surface-600 rounded px-1 py-px">
-                  Soon
-                </span>
-              </div>
-              <p class="text-[0.75rem] text-slate-500 leading-snug">
-                Generate IDEA-compliant progress reports from observation and goal data.
-              </p>
-            </div>
+            <p class="text-[0.75rem] text-slate-500 leading-snug">
+              Generate IDEA-compliant progress reports from observation and goal data.
+            </p>
           </div>
-
         </div>
-      </div>
 
-    </div><!-- /#studentRoster -->
+      </div>
+    </div>
+
   </main>
 
   <!-- ════════════════════════════════════════════════════════
@@ -548,157 +500,20 @@
   <footer class="border-t border-surface-700 flex-shrink-0 mt-auto" role="contentinfo">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between flex-wrap gap-3">
       <div class="flex items-center gap-2">
-        <div class="w-5 h-5 rounded-[5px] flex items-center justify-center flex-shrink-0"
+        <div class="w-5 h-5 rounded-[5px] flex items-center justify-center"
              style="background: linear-gradient(135deg, #3b5bdb, #6c8fff);">
-          <span class="font-bold text-white select-none" style="font-size: 9px;">M</span>
+          <span class="font-bold text-white select-none" style="font-size:9px;">M</span>
         </div>
         <span class="font-mono text-[0.65rem] text-slate-600">
           &copy; 2025 M-Powered Education &middot; Caseload Management Portal
         </span>
       </div>
-      <span class="font-mono text-[0.65rem] text-slate-600">
-        caseload.mpowerededucation.com
-      </span>
+      <span class="font-mono text-[0.65rem] text-slate-600">caseload.mpowerededucation.com</span>
     </div>
   </footer>
 
   <!-- ════════════════════════════════════════════════════════
-       ADD STUDENT MODAL
-       Hidden by default. openAddStudentModal() removes 'hidden'.
-       Closed by closeAddStudentModal() via Cancel, the X button,
-       or the Escape key. Backdrop click is intentionally a no-op
-       to prevent accidental data loss while the user is typing.
-  ═══════════════════════════════════════════════════════════ -->
-  <div id="addStudentModal"
-       class="hidden fixed inset-0 z-50"
-       style="background: rgba(15,17,23,0.80); backdrop-filter: blur(4px);"
-       role="dialog"
-       aria-modal="true"
-       aria-labelledby="addStudentModalTitle">
-
-    <!-- Centering wrapper — scrollable on short viewports -->
-    <div class="min-h-full flex items-center justify-center p-4">
-
-      <!-- Inner panel -->
-      <div class="panel w-full max-w-md relative">
-
-        <!-- Modal header -->
-        <div class="flex items-center justify-between mb-5">
-          <div>
-            <p class="eyebrow">Student Records</p>
-            <h2 id="addStudentModalTitle"
-                class="text-[1rem] font-semibold text-slate-100 tracking-tight leading-snug">
-              Add New Student
-            </h2>
-          </div>
-          <button class="btn-ghost"
-                  onclick="closeAddStudentModal()"
-                  aria-label="Close Add Student modal">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2.5"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="18" y1="6" x2="6" y2="18"/>
-              <line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-            Close
-          </button>
-        </div>
-
-        <hr class="rule" style="margin-bottom: 1.4rem;" />
-
-        <!-- First Name -->
-        <div style="margin-bottom: 1rem;">
-          <label class="field-label" for="asFirstName">First Name</label>
-          <input id="asFirstName"
-                 type="text"
-                 class="field-input"
-                 placeholder="e.g. Jordan"
-                 autocomplete="given-name"
-                 aria-required="true"
-                 aria-describedby="asFirstNameHint" />
-          <p id="asFirstNameHint" class="mt-1 text-[0.72rem] text-slate-500">
-            Student's legal first name as listed in the IEP.
-          </p>
-        </div>
-
-        <!-- Last Name -->
-        <div style="margin-bottom: 1rem;">
-          <label class="field-label" for="asLastName">Last Name</label>
-          <input id="asLastName"
-                 type="text"
-                 class="field-input"
-                 placeholder="e.g. Rivera"
-                 autocomplete="family-name"
-                 aria-required="true"
-                 aria-describedby="asLastNameHint" />
-          <p id="asLastNameHint" class="mt-1 text-[0.72rem] text-slate-500">
-            Student's legal last name as listed in the IEP.
-          </p>
-        </div>
-
-        <!-- Primary Disability -->
-        <div style="margin-bottom: 1.5rem;">
-          <label class="field-label" for="asDisability">Primary Disability</label>
-          <input id="asDisability"
-                 type="text"
-                 class="field-input"
-                 placeholder="e.g. Specific Learning Disability (SLD)"
-                 autocomplete="off"
-                 aria-required="true"
-                 aria-describedby="asDisabilityHint" />
-          <p id="asDisabilityHint" class="mt-1 text-[0.72rem] text-slate-500">
-            IDEA primary disability category as listed in the IEP document.
-          </p>
-        </div>
-
-        <!-- Validation / status message -->
-        <p id="asStatusMsg"
-           class="hidden text-[0.8rem] mb-4"
-           role="alert"
-           aria-live="assertive">
-        </p>
-
-        <!-- Action buttons -->
-        <div class="flex items-center justify-end gap-3">
-          <button class="btn-ghost"
-                  id="asCancelBtn"
-                  onclick="closeAddStudentModal()"
-                  aria-label="Cancel and close the Add Student modal">
-            Cancel
-          </button>
-          <button id="asSaveBtn"
-                  onclick="handleAddStudentSubmit()"
-                  style="display: inline-flex; align-items: center; justify-content: center;
-                         gap: 0.45rem;
-                         background: linear-gradient(135deg, #3b5bdb 0%, #6c8fff 100%);
-                         color: #fff; font-weight: 600; font-size: 0.825rem;
-                         border: none; border-radius: 9px; padding: 0.6rem 1.25rem;
-                         cursor: pointer; white-space: nowrap;
-                         box-shadow: 0 2px 12px rgba(60,91,219,0.35);
-                         transition: filter 0.12s, box-shadow 0.12s, transform 0.12s;"
-                  aria-label="Save the new student record">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2.3"
-                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="20 6 9 17 4 12"/>
-            </svg>
-            <span id="asSaveBtnText">Save Student</span>
-          </button>
-        </div>
-
-      </div><!-- /panel -->
-    </div><!-- /centering wrapper -->
-  </div><!-- /#addStudentModal -->
-
-  <!-- ════════════════════════════════════════════════════════
-       JAVASCRIPT — single unified block
-       Execution order:
-         1. mpSessionGuard    — auth check on DOMContentLoaded
-         2. hydrateStatCards  — populates header stat counts
-         3. logout            — wired to Sign Out button
-         4. renderStudentRoster — renders Google Sheet data
-            into #rosterGrid
-         5. Add Student modal — open / close / submit / POST
+       JAVASCRIPT
   ═══════════════════════════════════════════════════════════ -->
   <script>
     'use strict';
@@ -708,10 +523,29 @@
     ════════════════════════════════════════════════════════ */
     var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbwIMHt-r6_8foH1Vey5959KqjrMji2hwAm7NXkp2JPXhXiujh8EHN3MyGEKnIRL_vBd/exec';
 
+    /*
+     * DATA SCHEMA — Intake sheet column indexes
+     *   [0]  Timestamp
+     *   [1]  Identifier (Tag) / Unique Student ID
+     *   [2]  First Name
+     *   [3]  Last Name
+     *   [4]  IEP Start Date
+     *   [5]  IEP End Date
+     *   [6]  Disability Category
+     *   [7]  Supplemental Aids
+     *   [8]  Goals (JSON String)
+     *   [9]  Accommodations (JSON String)
+     */
+    var COL_ID        = 1;
+    var COL_FIRST     = 2;
+    var COL_LAST      = 3;
+    var COL_IEP_START = 4;
+    var COL_IEP_END   = 5;
+    var COL_DISABILITY= 6;
+
 
     /* ════════════════════════════════════════════════════════
        COOKIE HELPER
-       Reads a named cookie. Returns null if absent or on error.
     ════════════════════════════════════════════════════════ */
     function getCookie(name) {
       try {
@@ -720,74 +554,75 @@
         );
         return match ? decodeURIComponent(match[1]) : null;
       } catch (e) {
-        console.warn('[getCookie] Failed to read cookie "' + name + '":', e);
         return null;
       }
     }
 
 
     /* ════════════════════════════════════════════════════════
-       SESSION GUARD
+       SESSION GUARD — mpSessionGuard
+       ────────────────────────────────────────────────────────
        Authentication resolution order:
-         1. Local dev bypass — localhost / 127.0.0.1 always passes
-         2. Wildcard cookie  — mp_session (set by dashboard OAuth)
-         3. localStorage     — auth_token (portal-native login)
-       If no auth signal is found, redirects to /login.html.
+         1. Local dev bypass — localhost / 127.0.0.1 always passes.
+         2. Wildcard cookie  — mp_session / mp_session_active.
+         3. localStorage     — auth_token.
+
+       CRITICAL: After verifying auth, the OAuth token fragment
+       (#access_token=ya29...) is cleared from the address bar
+       via history.replaceState. This prevents the browser from
+       appending the hash onto GAS 302 redirect URLs, which would
+       cause fatal CORS failures on every subsequent fetch.
     ════════════════════════════════════════════════════════ */
     function mpSessionGuard() {
       var isLocal = (
         window.location.hostname === 'localhost' ||
         window.location.hostname === '127.0.0.1'
       );
-      if (isLocal) {
-        console.log('[mpSessionGuard] Local environment. Guard bypassed.');
-        return;
-      }
 
-      var sessionCookie = getCookie('mp_session') || getCookie('mp_session_active');
+      if (!isLocal) {
+        var sessionCookie = getCookie('mp_session') || getCookie('mp_session_active');
+        var localToken    = null;
 
-      var localToken = null;
-      try {
-        localToken = localStorage.getItem('auth_token');
-      } catch (e) {
-        console.warn('[mpSessionGuard] localStorage read failed:', e);
-      }
+        try { localToken = localStorage.getItem('auth_token'); } catch (e) {}
 
-      /* Cookie -> localStorage sync: if the wildcard cookie is present but
-         localStorage has no token, write a sentinel so the rest of the
-         portal's JS sees a populated auth_token without a full login flow. */
-      if (sessionCookie && !localToken) {
-        try {
-          localStorage.setItem('auth_token', 'cookie_session');
-          localStorage.setItem('mp_beta_auth_time', Date.now().toString());
-          console.log('[mpSessionGuard] Wildcard cookie detected. localStorage synced.');
-        } catch (e) {
-          console.warn('[mpSessionGuard] localStorage sync write failed:', e);
+        /* Cookie → localStorage sync */
+        if (sessionCookie && !localToken) {
+          try {
+            localStorage.setItem('auth_token', 'cookie_session');
+            localStorage.setItem('mp_beta_auth_time', Date.now().toString());
+          } catch (e) {}
+          localToken = 'cookie_session';
         }
-        localToken = 'cookie_session';
-      }
-if (sessionCookie || localToken) {
-        console.log('[mpSessionGuard] Authenticated. Source: ' +
-          (sessionCookie ? 'mp_session cookie' : 'localStorage auth_token'));
-        
-        // Clear the OAuth hash token from the address bar to prevent redirect leakage
-        window.history.replaceState(null, null, window.location.pathname + window.location.search);
-        
-        return;
+
+        if (!sessionCookie && !localToken) {
+          console.error('[mpSessionGuard] No auth signal. Redirecting to login.');
+          var returnPath = encodeURIComponent(window.location.pathname + window.location.search);
+          /* Strip hash before redirect so the token is never leaked */
+          window.history.replaceState(null, null, window.location.pathname + window.location.search);
+          window.location.replace('/login.html?next=' + returnPath);
+          return;
+        }
       }
 
-      console.error('[mpSessionGuard] No auth signal found. Redirecting to login.');
-      var returnPath = encodeURIComponent(
+      /*
+       * Hash neutralization — runs unconditionally after auth passes.
+       * Replaces the current history entry with a clean URL (path +
+       * query only), silently dropping any #fragment the OAuth flow
+       * left in the address bar. This stops the browser from appending
+       * the token fragment to GAS redirect URLs.
+       */
+      window.history.replaceState(
+        null,
+        null,
         window.location.pathname + window.location.search
       );
-      window.location.replace('/login.html?next=' + returnPath);
+
+      console.log('[mpSessionGuard] Authenticated. Hash neutralized.');
     }
 
 
     /* ════════════════════════════════════════════════════════
        LOGOUT
-       Clears all auth-related keys, then redirects to /login.html.
-       Wired to the Sign Out button via onclick="logout()".
     ════════════════════════════════════════════════════════ */
     function logout() {
       try {
@@ -796,338 +631,314 @@ if (sessionCookie || localToken) {
         localStorage.removeItem('mp_beta_auth_time');
         localStorage.removeItem('mp_user_role');
         localStorage.clear();
-      } catch (e) {
-        console.warn('[logout] localStorage clear failed:', e);
-      }
+      } catch (e) {}
       window.location.replace('/login.html');
     }
 
 
     /* ════════════════════════════════════════════════════════
-       STAT CARD HYDRATION
-       Reads cached caseload summary counts from localStorage
-       and populates the three header stat cards. Falls back to
-       an em-dash when no cached data is present yet.
-    ════════════════════════════════════════════════════════ */
-    function hydrateStatCards() {
-      var studentCount = null;
-      var iepDue       = null;
-      var activeObs    = null;
+       NETWORK ENGINE — _gasPost(payload)
+       ────────────────────────────────────────────────────────
+       Single fetch helper for all GAS endpoint calls.
 
-      try {
-        studentCount = localStorage.getItem('cl_student_count');
-        iepDue       = localStorage.getItem('cl_iep_due_30d');
-        activeObs    = localStorage.getItem('cl_active_obs');
-      } catch (e) {
-        console.warn('[hydrateStatCards] localStorage read failed:', e);
+       URL hardening: GAS_WEBHOOK_URL is stripped of any runtime
+       fragment or query string before use. This prevents any
+       stale OAuth hash from being forwarded into the request URL,
+       which would cause the GAS server to reject the call or
+       trigger an unexpected redirect.
+
+       Content-Type 'text/plain;charset=utf-8' is required:
+       using 'application/json' triggers a CORS preflight OPTIONS
+       request that Apps Script cannot respond to, causing the
+       fetch to fail before doPost() even runs.
+
+       Returns a Promise resolving to the parsed JSON body, or
+       rejecting with an Error describing the failure.
+    ════════════════════════════════════════════════════════ */
+    function _gasPost(payload) {
+      /* Strip any fragment or query params that may have accumulated
+         at runtime so the request URL is always a clean /exec path. */
+      var cleanUrl = GAS_WEBHOOK_URL.split('#')[0].split('?')[0];
+
+      return fetch(cleanUrl, {
+        method:  'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body:    JSON.stringify(payload)
+      })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status + ' \u2014 ' + response.statusText);
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        if (data.result !== 'success') {
+          throw new Error(data.error || 'Apps Script returned result: "' + data.result + '"');
+        }
+        return data;
+      });
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       ROSTER STATE HELPERS
+    ════════════════════════════════════════════════════════ */
+    function _showRosterState(state) {
+      /* state: 'loading' | 'empty' | 'error' | 'data' */
+      var loading  = document.getElementById('rosterLoading');
+      var empty    = document.getElementById('rosterEmpty');
+      var error    = document.getElementById('rosterError');
+      var tableWrap= document.getElementById('rosterTableWrap');
+
+      if (loading)   loading.classList.toggle  ('hidden', state !== 'loading');
+      if (empty)     empty.classList.toggle    ('hidden', state !== 'empty');
+      if (error)     error.classList.toggle    ('hidden', state !== 'error');
+      if (tableWrap) tableWrap.classList.toggle('hidden', state !== 'data');
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       DATE UTILITIES
+    ════════════════════════════════════════════════════════ */
+    function _parseDate(raw) {
+      /* Accepts a JS Date object (from Sheets), ISO string, or
+         a US-format string "MM/DD/YYYY". Returns a Date or null. */
+      if (!raw) return null;
+      if (raw instanceof Date) return isNaN(raw.getTime()) ? null : raw;
+      var s = String(raw).trim();
+      if (!s) return null;
+      /* Try native parse first (ISO, RFC 2822) */
+      var d = new Date(s);
+      if (!isNaN(d.getTime())) return d;
+      /* US format MM/DD/YYYY */
+      var parts = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (parts) {
+        d = new Date(parseInt(parts[3]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        return isNaN(d.getTime()) ? null : d;
+      }
+      return null;
+    }
+
+    function _formatDate(raw) {
+      var d = _parseDate(raw);
+      if (!d) return '\u2014';
+      return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+    }
+
+    function _daysUntil(raw) {
+      var d = _parseDate(raw);
+      if (!d) return null;
+      var now  = new Date();
+      now.setHours(0, 0, 0, 0);
+      var then = new Date(d); then.setHours(0, 0, 0, 0);
+      return Math.round((then - now) / 86400000);
+    }
+
+    function _escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       DATA LOADER — loadRoster()
+       ────────────────────────────────────────────────────────
+       Dispatches { action:'getRoster' } to doPost.
+       Parses the 2D rows array against the schema indexes,
+       computes the three metric cards, then populates the
+       roster table DOM.
+    ════════════════════════════════════════════════════════ */
+    function loadRoster() {
+      _showRosterState('loading');
+
+      /* Disable Reload button while fetching */
+      var reloadBtn = document.getElementById('reloadBtn');
+      if (reloadBtn) reloadBtn.disabled = true;
+
+      _gasPost({ action: 'getRoster' })
+        .then(function (data) {
+          var rows = data.rows || [];
+          renderRoster(rows);
+        })
+        .catch(function (err) {
+          console.error('[loadRoster] Failed:', err);
+          _showRosterState('error');
+          var msgEl = document.getElementById('rosterErrorMsg');
+          if (msgEl) msgEl.textContent = err.message;
+        })
+        .finally(function () {
+          if (reloadBtn) reloadBtn.disabled = false;
+        });
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       RENDER ROSTER — renderRoster(rows)
+       ────────────────────────────────────────────────────────
+       rows[0] is the header row from the sheet — skipped.
+       rows[1..n] are student records mapped by COL_* indexes.
+
+       Computes:
+         • Total students count
+         • IEPs due within 30 days (IEP End Date ≤ today + 30)
+         • Active observations: placeholder (localStorage cache)
+
+       Builds one <tr> per student with an Edit/Track action
+       that calls routeToModification(studentId).
+    ════════════════════════════════════════════════════════ */
+    function renderRoster(rows) {
+      var tbody = document.getElementById('rosterTbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      /* Skip header row (index 0); filter out blank rows */
+      var students = (rows.length > 1 ? rows.slice(1) : []).filter(function (row) {
+        return row && (String(row[COL_FIRST] || '').trim() || String(row[COL_LAST] || '').trim());
+      });
+
+      if (!students.length) {
+        _showRosterState('empty');
+        _updateStatCards(0, 0);
+        return;
       }
 
+      /* ── Metric computation ─────────────────────────── */
+      var now30 = new Date();
+      now30.setHours(0, 0, 0, 0);
+      now30.setDate(now30.getDate() + 30);
+
+      var today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      var iepDueCount = 0;
+
+      students.forEach(function (row) {
+        var iepEnd = _parseDate(row[COL_IEP_END]);
+        if (iepEnd) {
+          iepEnd.setHours(0, 0, 0, 0);
+          /* Due = end date is within the next 30 days (or already past) */
+          if (iepEnd <= now30) iepDueCount++;
+        }
+      });
+
+      _updateStatCards(students.length, iepDueCount);
+
+      /* ── Build table rows ───────────────────────────── */
+      var fragment = document.createDocumentFragment();
+
+      students.forEach(function (row) {
+        var studentId  = String(row[COL_ID]         || '').trim();
+        var firstName  = String(row[COL_FIRST]      || '').trim();
+        var lastName   = String(row[COL_LAST]       || '').trim();
+        var disability = String(row[COL_DISABILITY] || '').trim();
+        var iepStart   = _formatDate(row[COL_IEP_START]);
+        var iepEnd     = _formatDate(row[COL_IEP_END]);
+
+        /* IEP end date proximity colouring */
+        var daysLeft  = _daysUntil(row[COL_IEP_END]);
+        var iepEndCls = (daysLeft !== null && daysLeft <= 30) ? 'iep-warn' : 'iep-ok';
+
+        var tr = document.createElement('tr');
+
+        /* Name */
+        var tdName = document.createElement('td');
+        tdName.className = 'td-name';
+        tdName.textContent = lastName && firstName
+          ? lastName + ', ' + firstName
+          : (lastName || firstName || '\u2014');
+        tr.appendChild(tdName);
+
+        /* ID / Tag */
+        var tdId = document.createElement('td');
+        tdId.className = 'td-tag';
+        tdId.textContent = studentId || '\u2014';
+        tr.appendChild(tdId);
+
+        /* Disability */
+        var tdDis = document.createElement('td');
+        tdDis.className = 'td-dis';
+        tdDis.textContent = disability || '\u2014';
+        tr.appendChild(tdDis);
+
+        /* IEP Window */
+        var tdIep = document.createElement('td');
+        tdIep.className = 'td-iep';
+        tdIep.innerHTML =
+          '<span class="iep-ok">' + _escapeHtml(iepStart) + '</span>' +
+          '<span class="text-slate-600 mx-1">&rarr;</span>' +
+          '<span class="' + iepEndCls + '">' + _escapeHtml(iepEnd) + '</span>';
+        tr.appendChild(tdIep);
+
+        /* Actions */
+        var tdAct = document.createElement('td');
+        var btn   = document.createElement('button');
+        btn.className = 'btn-action';
+        btn.setAttribute('aria-label', 'Edit or track ' + _escapeHtml(firstName + ' ' + lastName));
+        btn.innerHTML =
+          '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" ' +
+          'stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>' +
+          '<path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>' +
+          '</svg>' +
+          'Edit / Track';
+        /* Capture studentId in closure via dataset to avoid stale reference */
+        btn.dataset.studentId = studentId;
+        btn.addEventListener('click', function () {
+          routeToModification(this.dataset.studentId);
+        });
+        tdAct.appendChild(btn);
+        tr.appendChild(tdAct);
+
+        fragment.appendChild(tr);
+      });
+
+      tbody.appendChild(fragment);
+      _showRosterState('data');
+    }
+
+
+    /* ════════════════════════════════════════════════════════
+       STAT CARD UPDATER
+    ════════════════════════════════════════════════════════ */
+    function _updateStatCards(studentCount, iepDueCount) {
       var countEl = document.getElementById('statStudentCount');
       var iepEl   = document.getElementById('statIepDue');
       var obsEl   = document.getElementById('statObs');
 
-      if (countEl) countEl.textContent = studentCount !== null ? studentCount : '\u2014';
-      if (iepEl)   iepEl.textContent   = iepDue       !== null ? iepDue       : '\u2014';
-      if (obsEl)   obsEl.textContent   = activeObs    !== null ? activeObs    : '\u2014';
+      if (countEl) countEl.textContent = studentCount;
+      if (iepEl)   iepEl.textContent   = iepDueCount;
+
+      /* Observations: read from localStorage cache set by Data Utility */
+      var activeObs = null;
+      try { activeObs = localStorage.getItem('cl_active_obs'); } catch (e) {}
+      if (obsEl) obsEl.textContent = activeObs !== null ? activeObs : '0';
+
+      /* Persist counts for cross-page stat hydration */
+      try {
+        localStorage.setItem('cl_student_count', String(studentCount));
+        localStorage.setItem('cl_iep_due_30d',   String(iepDueCount));
+      } catch (e) {}
     }
 
 
     /* ════════════════════════════════════════════════════════
-       COLUMN INDEX MAP
-       Must match the appendRow() order in code.gs doPost:
-         col 0  submittedAt
-         col 1  (empty)
-         col 2  First Name
-         col 3  Last Name
-         col 4  (empty)
-         col 5  (empty)
-         col 6  Disability
-    ════════════════════════════════════════════════════════ */
-    var COL_FIRST_NAME = 2;
-    var COL_LAST_NAME  = 3;
-    var COL_DISABILITY = 6;
-
-
-    /* ════════════════════════════════════════════════════════
-       _gasPost(payload) — shared fetch helper [private]
+       TRAFFIC ROUTER — routeToModification(studentId)
        ────────────────────────────────────────────────────────
-       All requests to the GAS endpoint go through here.
-       Content-Type is 'text/plain;charset=utf-8' because
-       Apps Script does not handle CORS preflight (OPTIONS),
-       which 'application/json' would trigger. The body is
-       still valid JSON and is parsed server-side via
-       JSON.parse(e.postData.contents).
-       Returns a Promise that resolves to the parsed JSON body.
+       Navigates the browser to the dedicated modification and
+       progress-monitoring subview, passing the student's
+       unique identifier as a URL search parameter.
+       The receiving page (/modify-student.html) reads it via
+       new URLSearchParams(window.location.search).get('id').
     ════════════════════════════════════════════════════════ */
-function _gasPost(payload) {
-  // Strip any accidental hash or query fragments completely at runtime
-  var cleanUrl = GAS_WEBHOOK_URL.split('#')[0].split('?')[0];
-
-  return fetch(cleanUrl, {
-    method:  'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body:    JSON.stringify(payload)
-  })
-  .then(function (response) {
-    if (!response.ok) {
-      throw new Error('HTTP ' + response.status + ' \u2014 ' + response.statusText);
-    }
-    return response.json();
-  })
-  .then(function (data) {
-    if (data.result !== 'success') {
-      throw new Error(data.error || 'Apps Script returned result: ' + data.result);
-    }
-    return data;
-  });
-}
-
-
-    /* ════════════════════════════════════════════════════════
-       RENDER STUDENT ROSTER
-       ────────────────────────────────────────────────────────
-       Accepts the 2D array returned by code.gs doPost
-       { action:'getRoster' }: rows[0] is the header row
-       (skipped), rows[1..n] are data rows indexed by COL_*.
-
-       Also accepts an array of keyed objects produced by the
-       optimistic update path in addStudent(), so a single
-       re-render function handles both cases.
-    ════════════════════════════════════════════════════════ */
-    function renderStudentRoster(rows) {
-      var rosterGrid  = document.getElementById('rosterGrid');
-      var rosterEmpty = document.getElementById('rosterEmpty');
-      var rosterError = document.getElementById('rosterError');
-
-      if (!rosterGrid) {
-        console.warn('[renderStudentRoster] #rosterGrid not found in DOM.');
+    function routeToModification(studentId) {
+      if (!studentId) {
+        console.warn('[routeToModification] No student ID provided.');
         return;
       }
-
-      rosterGrid.innerHTML = '';
-      if (rosterError) rosterError.style.display = 'none';
-
-      /* Normalise: 2D array from doPost getRoster vs keyed objects
-         from optimistic add. Arrays-of-arrays have arrays as elements;
-         keyed-object arrays have plain objects as elements.           */
-      var students;
-      if (rows && rows.length > 0 && Array.isArray(rows[0])) {
-        /* 2D sheet data — row 0 is headers, skip it */
-        students = rows.slice(1).map(function (row) {
-          return {
-            'First Name': String(row[COL_FIRST_NAME] || '').trim(),
-            'Last Name':  String(row[COL_LAST_NAME]  || '').trim(),
-            'Disability': String(row[COL_DISABILITY]  || '').trim()
-          };
-        }).filter(function (s) {
-          return s['First Name'] || s['Last Name'];
-        });
-      } else {
-        students = rows || [];
-      }
-
-      if (!students.length) {
-        if (rosterEmpty) rosterEmpty.style.display = '';
-        return;
-      }
-
-      if (rosterEmpty) rosterEmpty.style.display = 'none';
-
-      /* Sync the Students stat card to the live count */
-      var countEl = document.getElementById('statStudentCount');
-      if (countEl) {
-        countEl.textContent = students.length;
-        try { localStorage.setItem('cl_student_count', String(students.length)); } catch (e) {}
-      }
-
-      students.forEach(function (student) {
-        var firstName  = student['First Name']  || 'N/A';
-        var lastName   = student['Last Name']   || 'N/A';
-        var disability = student['Disability']  || 'N/A';
-
-        var card = document.createElement('div');
-        card.className = 'panel student-card-data';
-        card.setAttribute('data-first-name', firstName);
-        card.setAttribute('data-last-name',  lastName);
-        card.setAttribute('data-disability', disability);
-        card.innerHTML =
-          '<p class="text-[0.95rem] font-semibold text-slate-100 leading-snug mb-1">' +
-            firstName + ' ' + lastName +
-          '</p>' +
-          '<p class="text-[0.8rem] text-slate-400">' + disability + '</p>';
-
-        rosterGrid.appendChild(card);
-      });
-    }
-
-
-    /* ════════════════════════════════════════════════════════
-       LOAD ROSTER
-       POSTs { action:'getRoster' } to doPost, then passes
-       the returned 2D rows array to renderStudentRoster().
-    ════════════════════════════════════════════════════════ */
-    function loadRoster() {
-      var rosterEmpty = document.getElementById('rosterEmpty');
-      var rosterError = document.getElementById('rosterError');
-      if (rosterEmpty) rosterEmpty.style.display = 'none';
-      if (rosterError) rosterError.style.display = 'none';
-
-      _gasPost({ action: 'getRoster' })
-        .then(function (data) {
-          renderStudentRoster(data.rows || []);
-        })
-        .catch(function (err) {
-          console.error('[loadRoster] Failed:', err);
-          if (rosterError) {
-            rosterError.style.display = '';
-            var msgEl = document.getElementById('rosterErrorMsg');
-            if (msgEl) msgEl.textContent = err.message;
-          } else {
-            if (rosterEmpty) rosterEmpty.style.display = '';
-          }
-        });
-    }
-
-
-    /* ════════════════════════════════════════════════════════
-       OPEN / CLOSE ADD STUDENT MODAL
-    ════════════════════════════════════════════════════════ */
-    function openAddStudentModal() {
-      var modal = document.getElementById('addStudentModal');
-      if (!modal) return;
-      _resetAddStudentModal();
-      modal.classList.remove('hidden');
-      setTimeout(function () {
-        var f = document.getElementById('asFirstName');
-        if (f) f.focus();
-      }, 50);
-    }
-
-    function closeAddStudentModal() {
-      var modal = document.getElementById('addStudentModal');
-      if (!modal) return;
-      modal.classList.add('hidden');
-      _resetAddStudentModal();
-    }
-
-
-    /* ════════════════════════════════════════════════════════
-       MODAL PRIVATE HELPERS
-    ════════════════════════════════════════════════════════ */
-    function _resetAddStudentModal() {
-      ['asFirstName', 'asLastName', 'asDisability'].forEach(function (id) {
-        var el = document.getElementById(id);
-        if (el) el.value = '';
-      });
-      var msg = document.getElementById('asStatusMsg');
-      if (msg) {
-        msg.textContent = '';
-        msg.className = 'hidden text-[0.8rem] mb-4';
-      }
-      _setAddStudentLoading(false);
-    }
-
-    function _setAddStudentLoading(isLoading) {
-      var saveBtn    = document.getElementById('asSaveBtn');
-      var saveBtnTxt = document.getElementById('asSaveBtnText');
-      var cancelBtn  = document.getElementById('asCancelBtn');
-      if (!saveBtn) return;
-      if (isLoading) {
-        saveBtn.disabled = true; saveBtn.style.opacity = '0.6'; saveBtn.style.cursor = 'not-allowed';
-        if (saveBtnTxt) saveBtnTxt.textContent = 'Saving\u2026';
-        if (cancelBtn)  cancelBtn.disabled = true;
-      } else {
-        saveBtn.disabled = false; saveBtn.style.opacity = '1'; saveBtn.style.cursor = 'pointer';
-        if (saveBtnTxt) saveBtnTxt.textContent = 'Save Student';
-        if (cancelBtn)  cancelBtn.disabled = false;
-      }
-    }
-
-    function _showAddStudentStatus(message, isError) {
-      var msg = document.getElementById('asStatusMsg');
-      if (!msg) return;
-      msg.textContent = message;
-      msg.className = 'text-[0.8rem] mb-4 ' + (isError ? 'text-red-400' : 'text-emerald-400');
-      msg.classList.remove('hidden');
-    }
-
-
-    /* ════════════════════════════════════════════════════════
-       HANDLE ADD STUDENT SUBMIT
-       Validates fields, then delegates to addStudent().
-    ════════════════════════════════════════════════════════ */
-    function handleAddStudentSubmit() {
-      var firstName  = ((document.getElementById('asFirstName')  || {}).value || '').trim();
-      var lastName   = ((document.getElementById('asLastName')   || {}).value || '').trim();
-      var disability = ((document.getElementById('asDisability') || {}).value || '').trim();
-
-      var missing = [];
-      if (!firstName)  missing.push('First Name');
-      if (!lastName)   missing.push('Last Name');
-      if (!disability) missing.push('Primary Disability');
-
-      if (missing.length > 0) {
-        _showAddStudentStatus('Please complete: ' + missing.join(', ') + '.', true);
-        var focusMap = {
-          'First Name':         'asFirstName',
-          'Last Name':          'asLastName',
-          'Primary Disability': 'asDisability'
-        };
-        var firstEl = document.getElementById(focusMap[missing[0]]);
-        if (firstEl) firstEl.focus();
-        return;
-      }
-
-      addStudent({
-        'First Name':  firstName,
-        'Last Name':   lastName,
-        'Disability':  disability,
-        'submittedAt': new Date().toISOString()
-      });
-    }
-
-
-    /* ════════════════════════════════════════════════════════
-       ADD STUDENT
-       ────────────────────────────────────────────────────────
-       POSTs the new student payload to doPost (default action).
-       On success:
-         1. Shows a confirmation message in the modal.
-         2. Optimistically prepends the new card to the roster
-            so the user sees it immediately.
-         3. After 1.6 s closes the modal and re-fetches the
-            full roster from Sheets to confirm persisted state.
-    ════════════════════════════════════════════════════════ */
-    function addStudent(studentData) {
-      _setAddStudentLoading(true);
-
-      _gasPost(studentData)
-        .then(function () {
-          _showAddStudentStatus('\u2713 Student record saved to caseload.', false);
-
-          /* Optimistic prepend */
-          var rosterGrid = document.getElementById('rosterGrid');
-          var existing = rosterGrid
-            ? Array.from(rosterGrid.querySelectorAll('.student-card-data')).map(function (el) {
-                return {
-                  'First Name': el.dataset.firstName  || '',
-                  'Last Name':  el.dataset.lastName   || '',
-                  'Disability': el.dataset.disability || ''
-                };
-              })
-            : [];
-          renderStudentRoster([studentData].concat(existing));
-
-          setTimeout(function () {
-            closeAddStudentModal();
-            loadRoster(); /* confirm persisted state from Sheets */
-          }, 1600);
-        })
-        .catch(function (err) {
-          console.error('[addStudent] Failed:', err);
-          _showAddStudentStatus('Save failed: ' + err.message, true);
-          _setAddStudentLoading(false);
-        });
+      window.location.href = '/modify-student.html?id=' + encodeURIComponent(studentId);
     }
 
 
@@ -1135,22 +946,8 @@ function _gasPost(payload) {
        BOOT — single DOMContentLoaded
     ════════════════════════════════════════════════════════ */
     document.addEventListener('DOMContentLoaded', function () {
-      mpSessionGuard();
-      hydrateStatCards();
-      loadRoster();
-    });
-
-
-    /* ════════════════════════════════════════════════════════
-       ESCAPE KEY — closes the Add Student modal
-    ════════════════════════════════════════════════════════ */
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') {
-        var modal = document.getElementById('addStudentModal');
-        if (modal && !modal.classList.contains('hidden')) {
-          closeAddStudentModal();
-        }
-      }
+      mpSessionGuard();   /* auth check + hash neutralization */
+      loadRoster();       /* fetch and render caseload        */
     });
 
   </script>
