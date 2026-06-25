@@ -477,8 +477,8 @@ var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfybyCFM13WQ2C3nP-gV5
 
       _showLoading();
 
-      var cleanUrl = GAS_WEBHOOK_URL.split('#').split('?');
-      fetch(cleanUrl, {
+      // Replace lines 480-481 with this clean call:
+fetch(GAS_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'getRoster' })
