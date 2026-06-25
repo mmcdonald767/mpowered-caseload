@@ -234,6 +234,22 @@
       <span class="text-accent">Student Record</span>
     </nav>
 
+    <!-- Adjacent Student Record Pagination Links Layout Row -->
+    <div class="flex items-center justify-between mb-4 fade-up delay-1">
+      <a id="nav-prev-btn" href="#" class="nav-link opacity-50 pointer-events-none">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Previous Student
+      </a>
+      <a id="nav-next-btn" href="#" class="nav-link opacity-50 pointer-events-none">
+        Next Student
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </a>
+    </div>
+
     <div id="loading-overlay" class="fade-up flex flex-col items-center justify-center py-24 gap-4">
       <svg class="spinner" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6c8fff" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
         <circle cx="12" cy="12" r="10" stroke="#1e2335"/>
@@ -335,8 +351,8 @@
   <script>
     'use strict';
 
-// Locate this block near the top of your script tag and swap in your verified ID:
-var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
+    var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
+    
     /* ── Alignment Schema Indices ── */
     var COL_ID         = 1;
     var COL_FIRST      = 2;
@@ -477,8 +493,7 @@ var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBl
 
       _showLoading();
 
-      // Replace lines 480-481 with this clean call:
-fetch(GAS_WEBHOOK_URL, {
+      fetch(GAS_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'getRoster' })
@@ -487,13 +502,43 @@ fetch(GAS_WEBHOOK_URL, {
       .then(function(data) {
         var rows = data.rows || [];
         var match = null;
+        var currentIndex = -1;
+
+        // Step 1: Find matching student row and capture context offset index
         for (var i = 0; i < rows.length; i++) {
           if (rows[i] && String(rows[i][COL_ID] || '').trim().toLowerCase() === studentId.toLowerCase()) {
             match = rows[i];
+            currentIndex = i;
             break;
           }
         }
+
         if (!match) { _showFallback('Profile Matrix Mismatch', 'The record lookup returned empty for identity reference key target.'); return; }
+
+        // Step 2: Grab references to the next/prev buttons
+        var prevBtn = document.getElementById('nav-prev-btn');
+        var nextBtn = document.getElementById('nav-next-btn');
+
+        // Handle Previous Row Navigation Pointers
+        if (currentIndex > 0 && rows[currentIndex - 1]) {
+          var prevId = String(rows[currentIndex - 1][COL_ID]).trim();
+          prevBtn.href = 'modify-student.html?id=' + encodeURIComponent(prevId);
+          prevBtn.classList.remove('opacity-50', 'pointer-events-none');
+        } else {
+          prevBtn.removeAttribute('href');
+          prevBtn.classList.add('opacity-50', 'pointer-events-none');
+        }
+
+        // Handle Next Row Navigation Pointers
+        if (currentIndex < rows.length - 1 && rows[currentIndex + 1]) {
+          var nextId = String(rows[currentIndex + 1][COL_ID]).trim();
+          nextBtn.href = 'modify-student.html?id=' + encodeURIComponent(nextId);
+          nextBtn.classList.remove('opacity-50', 'pointer-events-none');
+        } else {
+          nextBtn.removeAttribute('href');
+          nextBtn.classList.add('opacity-50', 'pointer-events-none');
+        }
+
         _populateStudent(match);
         _showContent();
       })
