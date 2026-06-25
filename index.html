@@ -952,12 +952,16 @@
     }
 
 
-    /* ════════════════════════════════════════════════════════
+/* ════════════════════════════════════════════════════════
        BOOT — single DOMContentLoaded
     ════════════════════════════════════════════════════════ */
     document.addEventListener('DOMContentLoaded', function () {
       mpSessionGuard();   /* auth check + hash neutralization */
-      loadRoster();       /* fetch and render caseload        */
+      
+      // Defer execution by 50ms to guarantee the browser clears the hash fragment completely
+      setTimeout(function() {
+        loadRoster();     /* fetch and render caseload        */
+      }, 50);
     });
 
   </script>
