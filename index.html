@@ -91,28 +91,29 @@
     }
 
     function loadRoster() {
-      _showRosterState('loading');
+  console.log('1. loadRoster started'); // Insert this at the very top
+  
+  _showRosterState('loading');
+  
+  _gasPost({ action: 'authCheck' })
+    .then(function(authData) {
+      console.log('2. Handshake received:', authData); // Insert this inside the .then
       
-      // Perform handshake
-      _gasPost({ action: 'authCheck' })
-        .then(function(authData) {
-          if(authData && authData.token) {
-            localStorage.setItem('auth_token', authData.token);
-            return _gasPost({ action: 'getRoster' });
-          } else {
-            throw new Error('Not authenticated');
-          }
-        })
-        .then(function (data) {
-          _showRosterState('data');
-          console.log('Roster loaded successfully');
-        })
-        .catch(function (err) {
-          console.error('[loadRoster] Auth failed:', err);
-          _showRosterState('error');
-          window.location.replace('https://www.mpowerededucation.com/index.html?next=' + encodeURIComponent(window.location.href));
-        });
-    }
+      if(authData && authData.token) {
+        localStorage.setItem('auth_token', authData.token);
+        return _gasPost({ action: 'getRoster' });
+      } else {
+        throw new Error('Not authenticated');
+      }
+    })
+    .catch(function(err) {
+      console.log('3. Error caught:', err); // Insert this inside the .catch
+      
+      console.error('[loadRoster] Auth failed:', err);
+      _showRosterState('error');
+      window.location.replace('https://www.mpowerededucation.com/index.html?next=' + encodeURIComponent(window.location.href));
+    });
+}
 
     function logout() {
       try { localStorage.clear(); } catch (e) {}
