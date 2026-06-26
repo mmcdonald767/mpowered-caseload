@@ -656,12 +656,15 @@
       return '';
     }
 
-    function _formatDateDisplay(ymd) {
-      if (!ymd) return '—';
-      var parts = ymd.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-      if (!parts) return ymd;
-      return parts + '/' + parts + '/' + parts;
-    }
+   /* Corrected Date Display Formatter */
+function _formatDateDisplay(ymd) {
+  if (!ymd) return '—';
+  var parts = ymd.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!parts) return ymd;
+  
+  // parts[0] is the whole string, [1] is YYYY, [2] is MM, [3] is DD
+  return parts[2] + '/' + parts[3] + '/' + parts[1];
+}
 
     function _buildCountdownChip(iepEndDateStr) {
       if (!iepEndDateStr) return '';
