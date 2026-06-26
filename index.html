@@ -593,8 +593,7 @@
           var returnPath = encodeURIComponent(window.location.pathname + window.location.search);
           /* Strip hash before redirect so the token is never leaked */
           window.history.replaceState(null, null, window.location.pathname + window.location.search);
-          window.location.replace('/login.html?next=' + returnPath);
-          return;
+window.location.replace('https://www.mpowerededucation.com/index.html?next=' + returnPath);          return;
         }
       }
 
@@ -626,7 +625,7 @@
         localStorage.removeItem('mp_user_role');
         localStorage.clear();
       } catch (e) {}
-      window.location.replace('/login.html');
+      window.location.replace('https://www.mpowerededucation.com/index.html');
     }
 
 
