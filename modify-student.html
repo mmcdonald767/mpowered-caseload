@@ -33,11 +33,9 @@
         <h1 id="display-name" class="text-xl font-bold">Loading...</h1>
       </div>
       <section id="sec-identity" class="panel mb-5">
-        <div class="section-heading">
-          <h2 class="text-base font-semibold">Student Identifiers</h2>
-        </div>
+        <h2 class="text-base font-semibold mb-2">Student Identifiers</h2>
         <div id="sec-identity-body">
-          <div class="read-view"><p id="rv-firstName">—</p></div>
+          <p id="rv-firstName">—</p>
         </div>
       </section>
     </div>
@@ -47,7 +45,6 @@
     'use strict';
     var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
     
-    // UI HELPER FUNCTIONS
     function _showLoading() {
       var el = document.getElementById('loading-overlay'); if (el) el.classList.remove('hidden');
       var content = document.getElementById('content-area'); if (content) content.classList.remove('visible');
@@ -64,7 +61,6 @@
       if (msg) document.getElementById('fallback-message').textContent = msg;
     }
 
-    // MAIN INITIALIZATION
     document.addEventListener('DOMContentLoaded', function () {
       var params = new URLSearchParams(window.location.search);
       var studentId = params.get('id');
@@ -81,19 +77,20 @@
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'getRoster' })
       })
-     .then(function(data) {
-        // Corrected Lookup: Target column index 1 (Column B in the CSV)
+      .then(function(res) { return res.json(); })
+      .then(function(data) {
         var match = (data.rows || []).find(function(r) { 
+          // Match index 1 (Column B)
           return String(r || '').trim().toLowerCase() === studentId.trim().toLowerCase(); 
         });
 
-        if (!match) {
-          _showFallback('Not Found', 'Student ID "' + studentId + '" not in ledger.');
-        } else {
-          // Display Name logic: Adjust index numbers based on your CSV's First/Last name columns
-          // For example, if First Name is C (2) and Last Name is D (3):
+        if (match) {
+          // Display Indices: 2 (First Name), 3 (Last Name)
           document.getElementById('display-name').textContent = (match || '') + ' ' + (match || '');
+          document.getElementById('rv-firstName').textContent = (match || 'Unknown');
           _showContent();
+        } else {
+          _showFallback('Not Found', 'Student ID "' + studentId + '" not in ledger.');
         }
       })
       .catch(function(err) {
