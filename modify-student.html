@@ -42,49 +42,56 @@
 
   <script>
     'use strict';
-    var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
+    
+    // Global execution guard
+    if (!window.mpowered_initialized) {
+        window.mpowered_initialized = true;
 
-    document.addEventListener('DOMContentLoaded', function () {
-      var params = new URLSearchParams(window.location.search);
-      var studentId = params.get('id');
+        var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
 
-      if (!studentId) {
-        document.getElementById('loading-overlay').classList.add('hidden');
-        document.getElementById('fallback-state').classList.add('visible');
-        return;
-      }
+        document.addEventListener('DOMContentLoaded', function () {
+          var params = new URLSearchParams(window.location.search);
+          var studentId = params.get('id');
 
-      fetch(GAS_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'getRoster' })
-      })
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
-        var rows = data.rows || [];
-        var searchId = studentId.trim().toLowerCase();
-        
-        var match = rows.find(function(r) { 
-          return String(r || '').replace(/["']/g, '').trim().toLowerCase() === searchId; 
+          if (!studentId) {
+            document.getElementById('loading-overlay').classList.add('hidden');
+            document.getElementById('fallback-state').classList.add('visible');
+            return;
+          }
+
+          fetch(GAS_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'getRoster' })
+          })
+          .then(function(res) { return res.json(); })
+          .then(function(data) {
+            var rows = data.rows || [];
+            var searchId = studentId.trim().toLowerCase();
+            
+            var match = rows.find(function(r) { 
+              return String(r || '').replace(/["']/g, '').trim().toLowerCase() === searchId; 
+            });
+
+            if (match) {
+              document.getElementById('display-name').textContent = (match || '') + ' ' + (match || '');
+              document.getElementById('rv-firstName').textContent = (match || 'Unknown');
+              
+              document.getElementById('loading-overlay').classList.add('hidden');
+              document.getElementById('content-area').classList.add('visible');
+            } else {
+              document.getElementById('loading-overlay').classList.add('hidden');
+              document.getElementById('fallback-state').classList.add('visible');
+              document.getElementById('fallback-message').textContent = 'Student ID "' + studentId + '" not in ledger.';
+            }
+          })
+          .catch(function(err) {
+            document.getElementById('loading-overlay').classList.add('hidden');
+            document.getElementById('fallback-state').classList.add('visible');
+            document.getElementById('fallback-message').textContent = err.message;
+          });
         });
-
-        if (match) {
-          document.getElementById('display-name').textContent = (match || '') + ' ' + (match || '');
-          document.getElementById('rv-firstName').textContent = (match || 'Unknown');
-          
-          document.getElementById('loading-overlay').classList.add('hidden');
-          document.getElementById('content-area').classList.add('visible');
-        } else {
-          document.getElementById('loading-overlay').classList.add('hidden');
-          document.getElementById('fallback-state').classList.add('visible');
-        }
-      })
-      .catch(function(err) {
-        document.getElementById('loading-overlay').classList.add('hidden');
-        document.getElementById('fallback-state').classList.add('visible');
-        document.getElementById('fallback-message').textContent = err.message;
-      });
-    });
+    }
   </script>
 </body>
 </html>
