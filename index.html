@@ -270,7 +270,18 @@
         return data;
       });
     }
+function _showRosterState(state) {
+  /* state: 'loading' | 'empty' | 'error' | 'data' */
+  var loading  = document.getElementById('rosterLoading');
+  var empty    = document.getElementById('rosterEmpty');
+  var error    = document.getElementById('rosterError');
+  var tableWrap= document.getElementById('rosterTableWrap');
 
+  if (loading)   loading.classList.toggle  ('hidden', state !== 'loading');
+  if (empty)     empty.classList.toggle    ('hidden', state !== 'empty');
+  if (error)     error.classList.toggle    ('hidden', state !== 'error');
+  if (tableWrap) tableWrap.classList.toggle('hidden', state !== 'data');
+}
    function loadRoster() {
   _showRosterState('loading');
 
