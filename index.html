@@ -271,27 +271,38 @@
       });
     }
 
-    function loadRoster() {
-  // First, verify auth
-  _gasPost({ action: 'authCheck' }).then(function(authData) {
+   function loadRoster() {
+  _showRosterState('loading');
+
+  // 1. Perform the handshake
+  _gasPost({ action: 'authCheck' })
+    .then(function(authData) {
       if(authData.token) {
-          localStorage.setItem('auth_token', authData.token); // Save the key
+        // 2. If backend confirms auth, store the token so the Guard passes
+        localStorage.setItem('auth_token', authData.token);
+        // 3. Now fetch the roster
+        return _gasPost({ action: 'getRoster' });
+      } else {
+        throw new Error('Not authenticated');
       }
-      return _gasPost({ action: 'getRoster' });
-  })
-  .then(function (data) {
-    var rows = data.rows || [];
-    renderRoster(rows);
-  })
-  .catch(function (err) {
-    console.error('Failed:', err);
-  });
+    })
+    .then(function (data) {
+      var rows = data.rows || [];
+      renderRoster(rows);
+    })
+    .catch(function (err) {
+      console.error('[loadRoster] Auth failed:', err);
+      _showRosterState('error');
+      // If we are definitely not auth'd, trigger the redirect to login
+      window.location.replace('https://www.mpowerededucation.com/index.html?next=' + encodeURIComponent(window.location.href));
+    });
 }
 
-    document.addEventListener('DOMContentLoaded', function () {
-      mpSessionGuard();
-      loadRoster();
-    });
+document.addEventListener('DOMContentLoaded', function () {
+  // We removed the automatic mpSessionGuard() call here 
+  // because loadRoster() now handles the auth handshake flow.
+  loadRoster();
+});
 
   </script>
 </body>
