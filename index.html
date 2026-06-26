@@ -272,16 +272,21 @@
     }
 
     function loadRoster() {
-      _gasPost({ action: 'getRoster' })
-        .then(function (data) {
-          document.getElementById('rosterLoading').classList.add('hidden');
-          document.getElementById('rosterTableWrap').classList.remove('hidden');
-          // (Render logic omitted for brevity, ensure your renderRoster is here)
-        })
-        .catch(function (err) {
-          document.getElementById('rosterLoading').textContent = 'Error: ' + err.message;
-        });
-    }
+  // First, verify auth
+  _gasPost({ action: 'authCheck' }).then(function(authData) {
+      if(authData.token) {
+          localStorage.setItem('auth_token', authData.token); // Save the key
+      }
+      return _gasPost({ action: 'getRoster' });
+  })
+  .then(function (data) {
+    var rows = data.rows || [];
+    renderRoster(rows);
+  })
+  .catch(function (err) {
+    console.error('Failed:', err);
+  });
+}
 
     document.addEventListener('DOMContentLoaded', function () {
       mpSessionGuard();
