@@ -170,23 +170,43 @@
         }
     }
 
-  function _showLoading() {
-      document.getElementById('loading-overlay').classList.remove('hidden');
-      document.getElementById('content-area').classList.remove('visible');
-      document.getElementById('fallback-state').classList.remove('visible');
+ function _showLoading() {
+      var el = document.getElementById('loading-overlay');
+      if (el) el.classList.remove('hidden');
+      
+      var content = document.getElementById('content-area');
+      if (content) content.classList.remove('visible');
+      
+      var fallback = document.getElementById('fallback-state');
+      if (fallback) fallback.classList.remove('visible');
     }
 
     function _showContent() {
-      document.getElementById('loading-overlay').classList.add('hidden');
-      document.getElementById('content-area').classList.add('visible');
+      var overlay = document.getElementById('loading-overlay');
+      if (overlay) overlay.classList.add('hidden');
+      
+      var content = document.getElementById('content-area');
+      if (content) content.classList.add('visible');
     }
 
     function _showFallback(title, msg) {
-      document.getElementById('loading-overlay').classList.add('hidden');
-      document.getElementById('content-area').classList.remove('visible');
-      document.getElementById('fallback-state').classList.add('visible');
-      if (title) document.getElementById('fallback-title').textContent = title;
-      if (msg)   document.getElementById('fallback-message').textContent = msg;
+      var overlay = document.getElementById('loading-overlay');
+      if (overlay) overlay.classList.add('hidden');
+      
+      var content = document.getElementById('content-area');
+      if (content) content.classList.remove('visible');
+      
+      var fallback = document.getElementById('fallback-state');
+      if (fallback) fallback.classList.add('visible');
+      
+      if (title) {
+        var fTitle = document.getElementById('fallback-title');
+        if (fTitle) fTitle.textContent = title;
+      }
+      if (msg) {
+        var fMsg = document.getElementById('fallback-message');
+        if (fMsg) fMsg.textContent = msg;
+      }
     }
    document.addEventListener('DOMContentLoaded', function () {
       var params    = new URLSearchParams(window.location.search);
