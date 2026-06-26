@@ -96,8 +96,17 @@
         });
 
         if (match) {
-          document.getElementById('display-name').textContent = (match || '') + ' ' + (match || '');
-          document.getElementById('rv-firstName').textContent = (match || 'Unknown');
+          console.log('Match identified, updating UI...');
+          
+          // Force update display-name
+          var nameEl = document.getElementById('display-name');
+          if (nameEl) nameEl.textContent = (match || '') + ' ' + (match || '');
+          
+          // Force update identity field
+          var idEl = document.getElementById('rv-firstName');
+          if (idEl) idEl.textContent = (match || 'Unknown');
+          
+          // Ensure we transition to the content view
           _showContent();
         } else {
           _showFallback('Not Found', 'Student ID "' + studentId + '" not in ledger.');
