@@ -18,7 +18,6 @@
 <body class="bg-surface-900 text-slate-100 min-h-screen flex flex-col">
 
   <main class="flex-1 max-w-3xl mx-auto w-full px-6 py-8" id="main-root">
-    
     <div id="loading-overlay" class="flex flex-col items-center justify-center py-24">
       <p class="font-mono text-xs text-slate-500">Retrieving student ledger record…</p>
     </div>
@@ -79,38 +78,18 @@
       })
       .then(function(res) { return res.json(); })
       .then(function(data) {
-       var match = rows.find(function(r) { 
-          // Remove double quotes, single quotes, and whitespace, then lowercase
+        var match = (data.rows || []).find(function(r) { 
+          // Match column B (index 1) with aggressive normalization
           var rowId = String(r || '').replace(/["']/g, '').trim().toLowerCase();
-          var searchId = studentId.trim().toLowerCase();
-          
-          console.log('Comparing:', "'" + rowId + "'", 'vs', "'" + searchId + "'");
-          return rowId === searchId; 
-        });
-
-        var match = rows.find(function(r) { 
-          // Debug: Log the value found in column B (index 1) for each row
-          var rowId = String(r || '').trim().toLowerCase();
-          console.log('Comparing against:', "'" + rowId + "'");
-          return rowId === searchId; 
+          return rowId === studentId.trim().toLowerCase(); 
         });
 
         if (match) {
-          console.log('Match identified, updating UI...');
-          
           document.getElementById('display-name').textContent = (match || '') + ' ' + (match || '');
           document.getElementById('rv-firstName').textContent = (match || 'Unknown');
-          
-          // Debugging the carousel: Wrap in try/catch to ensure it doesn't crash the script
-          try {
-            if (typeof _refreshCarouselState === 'function') {
-              _refreshCarouselState();
-            }
-          } catch (e) {
-            console.warn('Carousel refresh failed, continuing...', e);
-          }
-          
           _showContent();
+        } else {
+          _showFallback('Not Found', 'Student ID "' + studentId + '" not in ledger.');
         }
       })
       .catch(function(err) {
