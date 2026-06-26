@@ -48,6 +48,7 @@
   </script>
 
   <style>
+    /* ── Base Reset ─────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
     body {
@@ -62,6 +63,7 @@
     ::-webkit-scrollbar-track { background: #171b26; }
     ::-webkit-scrollbar-thumb { background: #2e3650; border-radius: 3px; }
 
+    /* ── Page-Load Animation Sequence ─────────────────────── */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(14px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -71,11 +73,43 @@
     .delay-2 { animation-delay: 0.13s; opacity: 0; }
     .delay-3 { animation-delay: 0.21s; opacity: 0; }
 
-    .panel { background: #171b26; border: 1px solid #1e2335; border-radius: 14px; padding: 1.75rem; }
+    @keyframes brandGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(108,143,255,0.3); }
+      50%       { box-shadow: 0 0 0 6px rgba(108,143,255,0); }
+    }
+    .brand-glow { animation: brandGlow 3s ease-in-out infinite; }
+
+    /* ── Panel Components ───────────────────────────────── */
+    .panel {
+      background: #171b26;
+      border: 1px solid #1e2335;
+      border-radius: 14px;
+      padding: 1.75rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .panel.is-editing {
+      border-color: rgba(108,143,255,0.3);
+      box-shadow: 0 0 0 1px rgba(108,143,255,0.08), 0 4px 24px rgba(0,0,0,0.4);
+    }
+
     .eyebrow { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #6c8fff; margin-bottom: 0.4rem; }
     .rule { border: none; border-top: 1px solid #1e2335; margin: 1.5rem 0; }
     .field-label { display: block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #6c8fff; margin-bottom: 0.4rem; }
 
+    /* ── Layout View Toggles ────────────────────────────── */
+    .read-view { display: block; }
+    .edit-view { display: none; }
+    .is-editing .read-view { display: none; }
+    .is-editing .edit-view { display: block; }
+
+    /* ── Static Text Value Displays ────────────────────── */
+    .read-label { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #4a5578; margin-bottom: 0.25rem; }
+    .read-value { font-size: 0.9rem; color: #e8ecf4; line-height: 1.55; word-break: break-word; }
+    .read-value.empty { color: #2e3650; font-style: italic; font-size: 0.82rem; }
+    .read-value.mono  { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: #7d8fb3; }
+    .read-tag { display: inline-flex; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; color: #6c8fff; background: rgba(108,143,255,0.08); border: 1px solid rgba(108,143,255,0.22); border-radius: 20px; padding: 0.15rem 0.65rem; letter-spacing: 0.04em; }
+
+    /* ── Form Interactive Controls ────────────────────────── */
     .field-input {
       width: 100%; background: #1e2335; border: 1px solid #252c42; border-radius: 8px;
       padding: 0.55rem 0.85rem; font-size: 0.875rem; font-family: 'Inter', sans-serif; color: #e8ecf4;
@@ -85,11 +119,17 @@
 
     .field-textarea {
       width: 100%; background: #1e2335; border: 1px solid #252c42; border-radius: 8px;
-      padding: 0.55rem 0.85rem; font-size: 0.875rem; font-family: 'Inter', sans-serif; color: #e8ecf4;
-      outline: none; resize: vertical; min-height: 80px; line-height: 1.6;
+      padding: 0.55rem 0.85rem; font-size: 0.875rem; font-family: 'Inter', sans-serif;
+      color: #e8ecf4; outline: none; resize: vertical; min-height: 80px; line-height: 1.6;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .field-textarea:focus { border-color: #6c8fff; box-shadow: 0 0 0 3px rgba(108,143,255,0.2); }
+    .field-input-inline { padding: 0.35rem 0.65rem; font-size: 0.8rem; width: 100%; max-width: 260px; margin-top: 0.25rem; }
 
+    input[type="date"].field-input::-webkit-calendar-picker-indicator { filter: invert(0.6) sepia(1) saturate(2) hue-rotate(190deg); cursor: pointer; opacity: 0.6; }
+    input[type="date"].field-input::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+
+    /* ── Control Buttons ──────────────────────────────────── */
     .btn-nav {
       display: inline-flex; align-items: center; gap: 0.4rem; background: transparent; color: #7d8fb3;
       font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 500;
@@ -117,6 +157,22 @@
     }
     .btn-ghost:hover { color: #c9d1e8; border-color: #252c42; background: #1e2335; }
 
+    .btn-edit-section {
+      display: inline-flex; align-items: center; gap: 0.35rem; background: transparent;
+      color: #4a5578; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; font-weight: 500;
+      border: 1px solid #252c42; border-radius: 7px; padding: 0.35rem 0.75rem; cursor: pointer;
+      transition: color 0.14s, border-color 0.14s, background 0.14s; flex-shrink: 0;
+    }
+    .btn-edit-section:hover { color: #6c8fff; border-color: rgba(108,143,255,0.4); background: rgba(108,143,255,0.06); }
+
+    .btn-lock-section {
+      display: inline-flex; align-items: center; gap: 0.35rem; background: rgba(108,143,255,0.1);
+      color: #6c8fff; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; font-weight: 600;
+      border: 1px solid rgba(108,143,255,0.35); border-radius: 7px; padding: 0.35rem 0.75rem;
+      cursor: pointer; transition: color 0.14s, border-color 0.14s; flex-shrink: 0;
+    }
+    .btn-lock-section:hover { background: rgba(108,143,255,0.18); border-color: rgba(108,143,255,0.55); }
+
     .btn-danger-ghost {
       display: inline-flex; align-items: center; gap: 0.35rem; background: transparent; color: #4a5578;
       font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 500;
@@ -128,8 +184,17 @@
     .btn-save { background: linear-gradient(135deg, #1a7a4a 0%, #34d399 100%); box-shadow: 0 2px 12px rgba(52,211,153,0.3); }
     .btn-save:hover:not(:disabled) { filter: brightness(1.08); box-shadow: 0 4px 20px rgba(52,211,153,0.45); }
 
+    /* ── Sub structures ───────────────────────────────────── */
     .goal-row { background: #1e2335; border: 1px solid #252c42; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; gap: 0.85rem; animation: goalSlideIn 0.22s ease forwards; }
-    @keyframes goalSlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .goal-read-card { background: #1e2335; border: 1px solid #252c42; border-radius: 10px; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.4rem; }
+    .goal-read-card .goal-num { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #6c8fff; }
+    .goal-read-card .goal-desc { font-size: 0.875rem; color: #e8ecf4; line-height: 1.6; }
+    .goal-read-card .goal-sdi-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #4a5578; margin-top: 0.35rem; }
+    .goal-read-card .goal-sdi { font-size: 0.82rem; color: #7d8fb3; line-height: 1.55; }
+
+    .acc-read-list { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .acc-chip { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 500; color: #c4cce0; background: #1e2335; border: 1px solid #252c42; border-radius: 6px; padding: 0.25rem 0.6rem; }
+    .acc-chip.none { color: #2e3650; font-style: italic; border-style: dashed; }
 
     .check-row { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.38rem 0.5rem; border-radius: 7px; cursor: pointer; transition: background 0.12s; }
     .check-row:hover { background: rgba(108,143,255,0.05); }
@@ -150,9 +215,7 @@
     .sub-group.hidden { display: none; }
     .field-input-inline { padding: 0.35rem 0.65rem; font-size: 0.8rem; width: 100%; max-width: 260px; margin-top: 0.25rem; }
 
-    .brand-glow { animation: brandGlow 3s ease-in-out infinite; }
-    @keyframes brandGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(108,143,255,0.3); } 50% { box-shadow: 0 0 0 6px rgba(108,143,255,0); } }
-
+    .section-heading { display: flex; items-center; justify-content: space-between; gap: 4px; margin-bottom: 1.25rem; }
     #loadingOverlay { position: fixed; inset: 0; z-index: 60; background: rgba(15,17,23,0.88); backdrop-filter: blur(4px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; }
     #loadingOverlay.hidden { display: none; }
     .spinner { width: 32px; height: 32px; border: 2px solid #252c42; border-top-color: #6c8fff; border-radius: 50%; animation: spin 0.75s linear infinite; }
@@ -161,7 +224,6 @@
     #fallbackPanel { display: none; }
     #fallbackPanel.visible { display: flex; }
     .save-bar { position: sticky; bottom: 0; background: linear-gradient(to top, #0f1117 75%, transparent); padding: 1.5rem 0 1.1rem; margin-top: 2.5rem; }
-    .section-heading { display: flex; items-center; justify-content: space-between; gap: 4px; margin-bottom: 1.25rem; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -229,143 +291,226 @@
 
     <form id="profileForm" novalidate onsubmit="return false;">
       
-      <section class="panel mb-5 fade-up delay-1">
+      <section id="sec-identity" class="panel mb-5 fade-up delay-1">
         <div class="section-heading">
           <div>
             <p class="eyebrow">Section 01 · Identity Matrix</p>
             <h2 class="text-[1rem] font-semibold text-slate-100">Student Profile</h2>
           </div>
+          <button type="button" class="btn-edit-section section-toggle" onclick="toggleSection('sec-identity')">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit Section
+          </button>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <label class="field-label" for="firstName">First Name</label>
-            <input id="firstName" name="firstName" type="text" class="field-input" placeholder="First name" required />
+
+        <div class="read-view">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="read-field"><p class="read-label">First Name</p><p id="rv-firstName" class="read-value">—</p></div>
+            <div class="read-field"><p class="read-label">Last Name</p>
+              <p id="rv-lastName" class="read-value">—</p>
+            </div>
+            <div class="read-field">
+              <p class="read-label">Tag / ID</p>
+              <p id="rv-studentTag" class="read-value">—</p>
+            </div>
           </div>
-          <div>
-            <label class="field-label" for="lastName">Last Name</label>
-            <input id="lastName" name="lastName" type="text" class="field-input" placeholder="Last name" required />
-          </div>
-          <div>
-            <label class="field-label" for="studentTag">Tag / ID <span class="ml-1 font-normal normal-case text-slate-500" style="font-size:0.67rem;">(non-personal)</span></label>
-            <input id="studentTag" name="studentTag" type="text" class="field-input" placeholder="e.g. ts-01" />
+        </div>
+
+        <div class="edit-view">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="field-label" for="firstName">First Name</label>
+              <input id="firstName" name="firstName" type="text" class="field-input" placeholder="First name" required />
+            </div>
+            <div>
+              <label class="field-label" for="lastName">Last Name</label>
+              <input id="lastName" name="lastName" type="text" class="field-input" placeholder="Last name" required />
+            </div>
+            <div>
+              <label class="field-label" for="studentTag">Tag / ID <span class="ml-1 font-normal normal-case text-slate-500" style="font-size:0.67rem;">(non-personal)</span></label>
+              <input id="studentTag" name="studentTag" type="text" class="field-input" placeholder="e.g. ts-01" />
+            </div>
           </div>
         </div>
       </section>
 
-      <section class="panel mb-5 fade-up delay-2">
+      <section id="sec-timeline" class="panel mb-5 fade-up delay-2">
         <div class="section-heading">
           <div>
             <p class="eyebrow">Section 02 · IEP Timeline</p>
             <h2 class="text-[1rem] font-semibold text-slate-100">Annual Review Dates</h2>
           </div>
+          <button type="button" class="btn-edit-section section-toggle" onclick="toggleSection('sec-timeline')">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit Section
+          </button>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label class="field-label" for="iepStart">IEP Start Date</label>
-            <input id="iepStart" name="iepStart" type="date" class="field-input" required />
+
+        <div class="read-view">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-3">
+            <div class="read-field"><p class="read-label">IEP Start Date</p><p id="rv-iepStart" class="read-value mono">—</p></div>
+            <div class="read-field"><p class="read-label">IEP End Date</p><p id="rv-iepEnd" class="read-value mono">—</p></div>
           </div>
-          <div>
-            <label class="field-label" for="iepEnd">IEP End Date</label>
-            <input id="iepEnd" name="iepEnd" type="date" class="field-input" required />
-          </div>
+          <div id="iepCountdownRead" class="hidden px-3.5 py-2.5 rounded-[8px] text-[0.8rem] font-mono" style="background:#1e2335;border:1px solid #252c42;"></div>
         </div>
-        <div id="iepCountdown" class="hidden mt-4 px-3.5 py-2.5 rounded-[8px] text-[0.8rem] font-mono" style="background:#1e2335;border:1px solid #252c42;"></div>
+
+        <div class="edit-view">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="field-label" for="iepStart">IEP Start Date</label>
+              <input id="iepStart" name="iepStart" type="date" class="field-input" required />
+            </div>
+            <div>
+              <label class="field-label" for="iepEnd">IEP End Date</label>
+              <input id="iepEnd" name="iepEnd" type="date" class="field-input" required />
+            </div>
+          </div>
+          <div id="iepCountdown" class="hidden mt-4 px-3.5 py-2.5 rounded-[8px] text-[0.8rem] font-mono" style="background:#1e2335;border:1px solid #252c42;"></div>
+        </div>
       </section>
 
-      <section class="panel mb-5 fade-up delay-2">
+      <section id="sec-disability" class="panel mb-5 fade-up delay-2">
         <div class="section-heading">
           <div>
             <p class="eyebrow">Section 03 · Primary Disability</p>
             <h2 class="text-[1rem] font-semibold text-slate-100">IDEA Disability Category</h2>
           </div>
+          <button type="button" class="btn-edit-section section-toggle" onclick="toggleSection('sec-disability')">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit Section
+          </button>
         </div>
-        <div>
+
+        <div class="read-view">
+          <div class="read-field"><p class="read-label">Disability Classification</p><p id="rv-primaryDisability" class="read-value">—</p></div>
+        </div>
+
+        <div class="edit-view">
           <label class="field-label" for="primaryDisability">Disability Classification</label>
           <input id="primaryDisability" name="primaryDisability" type="text" class="field-input" placeholder="e.g. Specific Learning Disability (SLD)" required />
         </div>
       </section>
 
-      <section class="panel mb-5 fade-up delay-3">
+      <section id="sec-goals" class="panel mb-5 fade-up delay-3">
         <div class="section-heading">
           <div>
             <p class="eyebrow">Section 04 · IEP Goals</p>
             <h2 class="text-[1rem] font-semibold text-slate-100">Measurable Annual Goals</h2>
           </div>
-          <button type="button" onclick="addGoalRow()" class="btn-ghost">+ Goal</button>
+          <div class="flex items-center gap-2">
+            <button type="button" id="addGoalBtn" class="btn-ghost hidden" onclick="addGoalRow()">+ Goal</button>
+            <button type="button" class="btn-edit-section section-toggle" onclick="toggleSection('sec-goals')">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              Edit Section
+            </button>
+          </div>
         </div>
-        <div id="goalsContainer" class="flex flex-col gap-3" role="list"></div>
-        <div id="goalsEmptyState" class="hidden text-center py-6 text-[0.82rem] text-slate-500">No goals added yet. Click <strong class="text-slate-300">+ Goal</strong> to begin.</div>
+
+        <div class="read-view">
+          <div id="goalsReadContainer" class="flex flex-col gap-3"></div>
+          <p id="goalsReadEmpty" class="hidden text-center py-6 text-[0.82rem] text-slate-500">No goals on record.</p>
+        </div>
+
+        <div class="edit-view">
+          <div id="goalsContainer" class="flex flex-col gap-3" role="list"></div>
+          <div id="goalsEmptyState" class="hidden text-center py-6 text-[0.82rem] text-slate-500">No goals added yet. Click <strong class="text-slate-300">+ Goal</strong> to begin.</div>
+        </div>
       </section>
 
-      <section class="panel mb-5 fade-up delay-3">
+      <section id="sec-supp" class="panel mb-5 fade-up delay-3">
         <div class="section-heading">
           <div>
             <p class="eyebrow">Section 05 · Supplemental Aids &amp; Services</p>
             <h2 class="text-[1rem] font-semibold text-slate-100">Instructional Supports</h2>
           </div>
+          <button type="button" class="btn-edit-section section-toggle" onclick="toggleSection('sec-supp')">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit Section
+          </button>
         </div>
-        <div>
+
+        <div class="read-view">
+          <div class="read-field"><p class="read-label">Supplemental Aids &amp; Services</p><p id="rv-supplementalAids" class="read-value">—</p></div>
+        </div>
+
+        <div class="edit-view">
           <label class="field-label" for="supplementalAids">Supplemental Aids &amp; Services</label>
           <textarea id="supplementalAids" name="supplementalAids" class="field-textarea" placeholder="List accommodations, modifications, and supplemental aids — e.g. extended time (1.5×), preferential seating, graphic organizers…"></textarea>
         </div>
       </section>
 
-      <section class="panel mb-5 fade-up delay-3">
+      <section id="sec-assessments" class="panel mb-5 fade-up delay-3">
         <div class="section-heading">
           <div>
             <p class="eyebrow">Section 06 · State Assessments</p>
             <h2 class="text-[1rem] font-semibold text-slate-100">Testing Accommodations</h2>
           </div>
+          <button type="button" class="btn-edit-section section-toggle" onclick="toggleSection('sec-assessments')">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit Section
+          </button>
         </div>
-        <fieldset>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
-            <div class="flex flex-col gap-0.5">
-              <div class="check-row"><input type="checkbox" id="acc-paraphrasing" name="stateAccommodations" value="paraphrasing" /><label for="acc-paraphrasing">Paraphrasing</label></div>
-              <div class="check-row"><input type="checkbox" id="acc-manipulatives" name="stateAccommodations" value="manipulatives" /><label for="acc-manipulatives">Manipulatives</label></div>
-              <div class="check-row"><input type="checkbox" id="acc-braille" name="stateAccommodations" value="braille" /><label for="acc-braille">Braille</label></div>
-              <div class="check-row"><input type="checkbox" id="acc-behavior-mod" name="stateAccommodations" value="reinforcement-behavior-mod" /><label for="acc-behavior-mod">Reinforcement and behavior modification</label></div>
-              
-              <div class="check-row"><input type="checkbox" id="acc-readers" name="stateAccommodations" value="readers" onchange="toggleSubGroup('readers-sub', this.checked)" /><label for="acc-readers">Readers <span class="text-slate-500">(Select one)</span></label></div>
-              <div id="readers-sub" class="sub-group hidden">
-                <div class="check-row"><input type="radio" id="acc-reader-online" name="readersType" value="online-text-reader" /><label for="acc-reader-online">Online/Text Reader</label></div>
-                <div class="check-row"><input type="radio" id="acc-reader-human" name="readersType" value="human-reader" /><label for="acc-reader-human">Human Reader</label></div>
+
+        <div class="read-view">
+          <div class="read-field">
+            <p class="read-label">Active Accommodations</p>
+            <div id="rv-accommodations" class="acc-read-list mt-1">
+              <span class="acc-chip none">None on record</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="edit-view">
+          <fieldset>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
+              <div class="flex flex-col gap-0.5">
+                <div class="check-row"><input type="checkbox" id="acc-paraphrasing" name="stateAccommodations" value="paraphrasing" /><label for="acc-paraphrasing">Paraphrasing</label></div>
+                <div class="check-row"><input type="checkbox" id="acc-manipulatives" name="stateAccommodations" value="manipulatives" /><label for="acc-manipulatives">Manipulatives</label></div>
+                <div class="check-row"><input type="checkbox" id="acc-braille" name="stateAccommodations" value="braille" /><label for="acc-braille">Braille</label></div>
+                <div class="check-row"><input type="checkbox" id="acc-behavior-mod" name="stateAccommodations" value="reinforcement-behavior-mod" /><label for="acc-behavior-mod">Reinforcement and behavior modification</label></div>
+                
+                <div class="check-row"><input type="checkbox" id="acc-readers" name="stateAccommodations" value="readers" onchange="toggleSubGroup('readers-sub', this.checked)" /><label for="acc-readers">Readers <span class="text-slate-500">(Select one)</span></label></div>
+                <div id="readers-sub" class="sub-group hidden">
+                  <div class="check-row"><input type="radio" id="acc-reader-online" name="readersType" value="online-text-reader" /><label for="acc-reader-online">Online/Text Reader</label></div>
+                  <div class="check-row"><input type="radio" id="acc-reader-human" name="readersType" value="human-reader" /><label for="acc-reader-human">Human Reader</label></div>
+                </div>
+
+                <div class="check-row"><input type="checkbox" id="acc-interpreters" name="stateAccommodations" value="interpreters" onchange="toggleSubGroup('interpreters-sub', this.checked)" /><label for="acc-interpreters">Interpreters <span class="text-slate-500">(Select one)</span></label></div>
+                <div id="interpreters-sub" class="sub-group hidden">
+                  <div class="check-row"><input type="radio" id="acc-interp-asl" name="interpretersType" value="asl" /><label for="acc-interp-asl">American Sign Language</label></div>
+                  <div class="check-row"><input type="radio" id="acc-interp-other-lang" name="interpretersType" value="other-language" /><label for="acc-interp-other-lang">Other Language, specify:</label></div>
+                  <input type="text" id="acc-interp-lang-specify" class="field-input field-input-inline bg-[#1e2335] border border-[#252c42] rounded px-2 py-1 text-xs" placeholder="Language…" />
+                </div>
               </div>
 
-              <div class="check-row"><input type="checkbox" id="acc-interpreters" name="stateAccommodations" value="interpreters" onchange="toggleSubGroup('interpreters-sub', this.checked)" /><label for="acc-interpreters">Interpreters <span class="text-slate-500">(Select one)</span></label></div>
-              <div id="interpreters-sub" class="sub-group hidden">
-                <div class="check-row"><input type="radio" id="acc-interp-asl" name="interpretersType" value="asl" /><label for="acc-interp-asl">American Sign Language</label></div>
-                <div class="check-row"><input type="radio" id="acc-interp-other-lang" name="interpretersType" value="other-language" /><label for="acc-interp-other-lang">Other Language, specify:</label></div>
-                <input type="text" id="acc-interp-lang-specify" class="field-input field-input-inline bg-[#1e2335] border border-[#252c42] rounded px-2 py-1 text-xs" placeholder="Language…" />
+              <div class="flex flex-col gap-0.5">
+                <div class="check-row"><input type="checkbox" id="acc-scribes" name="stateAccommodations" value="scribes" /><label for="acc-scribes">Scribes</label></div>
+                <div class="check-row"><input type="checkbox" id="acc-tech" name="stateAccommodations" value="use-of-technology" /><label for="acc-tech">Use of Technology</label></div>
+                <div class="check-row"><input type="checkbox" id="acc-large-print" name="stateAccommodations" value="large-print" /><label for="acc-large-print">Large Print</label></div>
+
+                <div class="check-row"><input type="checkbox" id="acc-ext-time" name="stateAccommodations" value="extended-time" onchange="toggleSubGroup('ext-time-sub', this.checked)" /><label for="acc-ext-time">Extended time <span class="text-slate-500">(Select one)</span></label></div>
+                <div id="ext-time-sub" class="sub-group hidden">
+                  <div class="check-row"><input type="radio" id="acc-time-half" name="extendedTimeType" value="time-and-a-half" /><label for="acc-time-half">Time and a Half</label></div>
+                  <div class="check-row"><input type="radio" id="acc-time-double" name="extendedTimeType" value="double-time" /><label for="acc-time-double">Double Time</label></div>
+                </div>
+
+                <div class="check-row"><input type="checkbox" id="acc-calculator" name="stateAccommodations" value="calculator" onchange="toggleSubGroup('acc-calc-sub', this.checked)" /><label for="acc-calculator">Calculator <span class="text-slate-500">(Select one)</span></label></div>
+                <div id="acc-calc-sub" class="sub-group hidden">
+                  <div class="check-row"><input type="radio" id="acc-calc-online" name="calculatorType" value="online-calculator" /><label for="acc-calc-online">Online Calculator</label></div>
+                  <div class="check-row"><input type="radio" id="acc-calc-handheld" name="calculatorType" value="handheld-calculator" /><label for="acc-calc-handheld">Handheld Calculator</label></div>
+                  <div class="check-row"><input type="radio" id="acc-calc-special" name="calculatorType" value="special-calculator" /><label for="acc-calc-special">Special Calculator, specify:</label></div>
+                  <input type="text" id="acc-calc-specify" class="field-input field-input-inline bg-[#1e2335] border border-[#252c42] rounded px-2 py-1 text-xs" placeholder="Calculator type…" />
+                </div>
               </div>
             </div>
 
-            <div class="flex flex-col gap-0.5">
-              <div class="check-row"><input type="checkbox" id="acc-scribes" name="stateAccommodations" value="scribes" /><label for="acc-scribes">Scribes</label></div>
-              <div class="check-row"><input type="checkbox" id="acc-tech" name="stateAccommodations" value="use-of-technology" /><label for="acc-tech">Use of Technology</label></div>
-              <div class="check-row"><input type="checkbox" id="acc-large-print" name="stateAccommodations" value="large-print" /><label for="acc-large-print">Large Print</label></div>
-
-              <div class="check-row"><input type="checkbox" id="acc-ext-time" name="stateAccommodations" value="extended-time" onchange="toggleSubGroup('ext-time-sub', this.checked)" /><label for="acc-ext-time">Extended time <span class="text-slate-500">(Select one)</span></label></div>
-              <div id="ext-time-sub" class="sub-group hidden">
-                <div class="check-row"><input type="radio" id="acc-time-half" name="extendedTimeType" value="time-and-a-half" /><label for="acc-time-half">Time and a Half</label></div>
-                <div class="check-row"><input type="radio" id="acc-time-double" name="extendedTimeType" value="double-time" /><label for="acc-time-double">Double Time</label></div>
-              </div>
-
-              <div class="check-row"><input type="checkbox" id="acc-calculator" name="stateAccommodations" value="calculator" onchange="toggleSubGroup('acc-calc-sub', this.checked)" /><label for="acc-calculator">Calculator <span class="text-slate-500">(Select one)</span></label></div>
-              <div id="acc-calc-sub" class="sub-group hidden">
-                <div class="check-row"><input type="radio" id="acc-calc-online" name="calculatorType" value="online-calculator" /><label for="acc-calc-online">Online Calculator</label></div>
-                <div class="check-row"><input type="radio" id="acc-calc-handheld" name="calculatorType" value="handheld-calculator" /><label for="acc-calc-handheld">Handheld Calculator</label></div>
-                <div class="check-row"><input type="radio" id="acc-calc-special" name="calculatorType" value="special-calculator" /><label for="acc-calc-special">Special Calculator, specify:</label></div>
-                <input type="text" id="acc-calc-specify" class="field-input field-input-inline bg-[#1e2335] border border-[#252c42] rounded px-2 py-1 text-xs" placeholder="Calculator type…" />
-              </div>
+            <div class="mt-2 flex flex-col gap-0.5">
+              <div class="check-row"><input type="checkbox" id="acc-small-group" name="stateAccommodations" value="small-group-testing" /><label for="acc-small-group">Small group testing</label></div>
+              <div class="check-row"><input type="checkbox" id="acc-other" name="stateAccommodations" value="other" onchange="toggleSubGroup('other-sub', this.checked)" /><label for="acc-other">Other, specify:</label></div>
+              <div id="other-sub" class="sub-group hidden"><input type="text" id="acc-other-specify" class="field-input mt-1" placeholder="Describe accommodation details…" /></div>
             </div>
-          </div>
-
-          <div class="mt-2 flex flex-col gap-0.5">
-            <div class="check-row"><input type="checkbox" id="acc-small-group" name="stateAccommodations" value="small-group-testing" /><label for="acc-small-group">Small group testing</label></div>
-            <div class="check-row"><input type="checkbox" id="acc-other" name="stateAccommodations" value="other" onchange="toggleSubGroup('other-sub', this.checked)" /><label for="acc-other">Other, specify:</label></div>
-            <div id="other-sub" class="sub-group hidden"><input type="text" id="acc-other-specify" class="field-input mt-1" placeholder="Describe accommodation details…" /></div>
-          </div>
-        </fieldset>
+          </fieldset>
+        </div>
       </section>
 
       <div class="save-bar fade-up delay-3">
@@ -416,6 +561,11 @@
     var _currentIdx  = -1;
     var _goalCounter = 0;
 
+    var SECTION_IDS = [
+      'sec-identity', 'sec-timeline', 'sec-disability',
+      'sec-goals', 'sec-supp', 'sec-assessments'
+    ];
+
     document.addEventListener('DOMContentLoaded', function () {
       var params  = new URLSearchParams(window.location.search);
       var idParam = (params.get('id') || '').trim();
@@ -437,6 +587,18 @@
       document.getElementById('pageTitle').textContent    = 'New Case Profile Intake';
       document.getElementById('pageSubtitle').textContent = 'Complete fields to introduce a new operational ledger student profile.';
       document.getElementById('carouselNav').classList.add('hidden');
+      
+      SECTION_IDS.forEach(function (id) {
+        var sec = document.getElementById(id);
+        if (!sec) return;
+        sec.classList.add('is-editing');
+        var btn = sec.querySelector('.section-toggle');
+        if (btn) btn.style.display = 'none';
+      });
+
+      var addBtn = document.getElementById('addGoalBtn');
+      if (addBtn) addBtn.classList.remove('hidden');
+
       addGoalRow();
     }
 
@@ -451,7 +613,6 @@
         return response.json();
       })
       .then(function (data) {
-        // Skip first row if array is raw 2D spreadsheet lines
         var rawRows = data.rows || [];
         if (rawRows.length > 0 && Array.isArray(rawRows) && typeof rawRows === 'string' && rawRows.toLowerCase().includes('time')) {
           _rosterRows = rawRows.slice(1);
@@ -459,10 +620,8 @@
           _rosterRows = rawRows;
         }
 
-        // Filter out completely blank lines
         _rosterRows = _rosterRows.filter(function(r) { return r && (r[COL_FIRST] || r[COL_LAST]); });
 
-        // Resolve row mapping context index using standard column offsets
         _currentIdx = _rosterRows.findIndex(function (r) {
           return String(r[COL_ID] || '').trim().toLowerCase() === _studentId.toLowerCase();
         });
@@ -492,6 +651,8 @@
         _currentIdx = (_currentIdx === len - 1) ? 0 : _currentIdx + 1;
       }
 
+      SECTION_IDS.forEach(function (id) { _lockSection(id); });
+
       _refreshCarouselState();
       _renderStudentRow(_rosterRows[_currentIdx]);
 
@@ -519,19 +680,36 @@
       var first = row[COL_FIRST] || '';
       var last  = row[COL_LAST] || '';
       var tag   = row[COL_ID] || '';
+      var dis   = row[COL_DISABILITY] || '';
+      var supp  = row[COL_SUPP_AIDS] || '';
 
       document.getElementById('pageTitle').textContent    = last + ', ' + first;
       document.getElementById('pageSubtitle').textContent = 'ID Code Reference Tag: ' + tag;
 
+      var iepStartFmt = _formatToDateInput(row[COL_IEP_START]);
+      var iepEndFmt   = _formatToDateInput(row[COL_IEP_END]);
+
       _setVal('firstName',         first);
       _setVal('lastName',          last);
-      _setVal('studentTag',         tag);
-      _setVal('iepStart',          row[COL_IEP_START]);
-      _setVal('iepEnd',            row[COL_IEP_END]);
-      _setVal('primaryDisability', row[COL_DISABILITY]);
-      _setVal('supplementalAids',  row[COL_SUPP_AIDS]);
+      _setVal('studentTag',        tag);
+      _setVal('iepStart',          iepStartFmt);
+      _setVal('iepEnd',            iepEndFmt);
+      _setVal('primaryDisability', dis);
+      _setVal('supplementalAids',  supp);
 
-      // Goal rendering mapping engine
+      _setReadVal('rv-firstName',         first || null);
+      _setReadVal('rv-lastName',          last || null);
+      
+      var tagEl = document.getElementById('rv-studentTag');
+      if (tagEl) {
+        tagEl.innerHTML = tag ? '<span class="read-tag">' + _escapeHtml(tag) + '</span>' : '<span class="read-value empty">—</span>';
+      }
+
+      _setReadVal('rv-iepStart',          _formatDateDisplay(iepStartFmt) || null);
+      _setReadVal('rv-iepEnd',            _formatDateDisplay(iepEndFmt) || null);
+      _setReadVal('rv-primaryDisability', dis || null);
+      _setReadVal('rv-supplementalAids',  supp || null, true);
+
       var goals = [];
       var rawGoals = row[COL_GOALS] || '';
       if (rawGoals) {
@@ -539,25 +717,189 @@
       }
       
       _goalCounter = 0;
-      var gc = document.getElementById('goalsContainer');
-      gc.innerHTML = '';
+      document.getElementById('goalsContainer').innerHTML = '';
       
       if (Array.isArray(goals) && goals.length > 0) {
         goals.forEach(function (g) { addGoalRow({ description: g.description || '', sdi: g.sdi || '' }); });
       } else {
         addGoalRow();
       }
+      _updateGoalsEmptyState();
+      _renderGoalsReadView(goals);
 
-      // Accommodation decoding logic block
       var accoms = null;
       var rawAccoms = row[COL_ACCOMS] || '';
       if (rawAccoms) {
         try { accoms = (typeof rawAccoms === 'string') ? JSON.parse(rawAccoms) : rawAccoms; } catch(e) { accoms = null; }
       }
       _applyAccommodations(accoms);
+      _renderAccommodationsReadView(accoms);
 
       _updateIepCountdown();
-      _updateGoalsEmptyState();
+    }
+
+    function _formatToDateInput(raw) {
+      if (!raw) return '';
+      var isoMatch = String(raw).match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (isoMatch) return isoMatch + '-' + isoMatch + '-' + isoMatch;
+
+      if (typeof raw === 'number' || /^\d{5}$/.test(String(raw))) {
+        var serial = parseInt(raw, 10);
+        var epoch  = new Date((serial - 25569) * 86400 * 1000);
+        return _dateToYMD(epoch);
+      }
+
+      var slashMatch = String(raw).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (slashMatch) {
+        return slashMatch + '-' + slashMatch.padStart(2, '0') + '-' + slashMatch.padStart(2, '0');
+      }
+
+      var parsed = new Date(raw);
+      if (!isNaN(parsed.getTime())) return _dateToYMD(parsed);
+      return '';
+    }
+
+    function _dateToYMD(d) {
+      return d.getUTCFullYear() + '-' + String(d.getUTCMonth() + 1).padStart(2, '0') + '-' + String(d.getUTCDate()).padStart(2, '0');
+    }
+
+    function _formatDateDisplay(ymd) {
+      if (!ymd || !/^\d{4}-\d{2}-\d{2}$/.test(ymd)) return ymd || '';
+      var parts  = ymd.split('-');
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return months[parseInt(parts, 10) - 1] + ' ' + parseInt(parts, 10) + ', ' + parts;
+    }
+
+    function toggleSection(sectionId) {
+      var sec = document.getElementById(sectionId);
+      if (!sec) return;
+      if (sec.classList.contains('is-editing')) {
+        _lockSection(sectionId);
+      } else {
+        _openSection(sectionId);
+      }
+    }
+
+    function _openSection(sectionId) {
+      var sec = document.getElementById(sectionId);
+      if (!sec) return;
+      sec.classList.add('is-editing');
+      _swapSectionBtn(sec, false);
+      if (sectionId === 'sec-goals') {
+        var addBtn = document.getElementById('addGoalBtn');
+        if (addBtn) addBtn.classList.remove('hidden');
+      }
+    }
+
+    function _lockSection(sectionId) {
+      var sec = document.getElementById(sectionId);
+      if (!sec) return;
+      sec.classList.remove('is-editing');
+      _syncReadView(sectionId);
+      _swapSectionBtn(sec, true);
+      if (sectionId === 'sec-goals') {
+        var addBtn = document.getElementById('addGoalBtn');
+        if (addBtn) addBtn.classList.add('hidden');
+        _renderGoalsReadView(_collectGoals());
+      }
+      if (sectionId === 'sec-assessments') {
+        _renderAccommodationsReadView(_collectStateAccommodations());
+      }
+    }
+
+    function _swapSectionBtn(sec, toEditMode) {
+      var btn = sec.querySelector('.section-toggle');
+      if (!btn) return;
+      if (toEditMode) {
+        btn.className = 'btn-edit-section section-toggle';
+        btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Edit Section';
+      } else {
+        btn.className = 'btn-lock-section section-toggle';
+        btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Done';
+      }
+    }
+
+    function _syncReadView(sectionId) {
+      if (sectionId === 'sec-identity') {
+        _setReadVal('rv-firstName', _getVal('firstName') || null);
+        _setReadVal('rv-lastName',  _getVal('lastName') || null);
+        var tag = _getVal('studentTag');
+        var tagEl = document.getElementById('rv-studentTag');
+        if (tagEl) tagEl.innerHTML = tag ? '<span class="read-tag">' + _escapeHtml(tag) + '</span>' : '<span class="read-value empty">—</span>';
+      }
+      if (sectionId === 'sec-timeline') {
+        _setReadVal('rv-iepStart', _formatDateDisplay(_getVal('iepStart')) || null);
+        _setReadVal('rv-iepEnd',   _formatDateDisplay(_getVal('iepEnd')) || null);
+        _syncReadCountdown();
+      }
+      if (sectionId === 'sec-disability') {
+        _setReadVal('rv-primaryDisability', _getVal('primaryDisability') || null);
+      }
+      if (sectionId === 'sec-supp') {
+        _setReadVal('rv-supplementalAids', _getVal('supplementalAids') || null, true);
+      }
+    }
+
+    function _syncReadCountdown() {
+      var src = document.getElementById('iepCountdown');
+      var dest = document.getElementById('iepCountdownRead');
+      if (!src || !dest) return;
+      if (src.classList.contains('hidden')) { dest.classList.add('hidden'); } else {
+        dest.textContent = src.textContent; dest.style.color = src.style.color;
+        dest.style.background = src.style.background; dest.style.borderColor = src.style.borderColor;
+        dest.classList.remove('hidden');
+      }
+    }
+
+    function _setReadVal(id, val, multiline) {
+      var el = document.getElementById(id); if (!el) return;
+      if (!val || !String(val).trim()) {
+        el.textContent = '—'; el.className = 'read-value empty';
+      } else if (multiline) {
+        el.textContent = val; el.className = 'read-value'; el.style.whiteSpace = 'pre-wrap';
+      } else {
+        el.textContent = val; el.className = 'read-value';
+      }
+    }
+
+    function _renderGoalsReadView(goals) {
+      var container = document.getElementById('goalsReadContainer');
+      var emptyEl   = document.getElementById('goalsReadEmpty');
+      if (!container) return;
+      container.innerHTML = '';
+      if (!goals || goals.length === 0) { if (emptyEl) emptyEl.classList.remove('hidden'); return; }
+      if (emptyEl) emptyEl.classList.add('hidden');
+
+      goals.forEach(function (g, i) {
+        var card = document.createElement('div');
+        card.className = 'goal-read-card';
+        card.innerHTML = '<p class="goal-num">Goal ' + (i + 1) + '</p>' +
+                         '<p class="goal-desc">' + (g.description ? _escapeHtml(g.description) : 'No description entered.') + '</p>' +
+                         (g.sdi ? '<p class="goal-sdi-label">SDI</p><p class="goal-sdi">' + _escapeHtml(g.sdi) + '</p>' : '');
+        container.appendChild(card);
+      });
+    }
+
+    function _renderAccommodationsReadView(accoms) {
+      var container = document.getElementById('rv-accommodations'); if (!container) return;
+      container.innerHTML = '';
+      var selections = (accoms && Array.isArray(accoms.selections)) ? accoms.selections : [];
+      if (selections.length === 0) { container.innerHTML = '<span class="acc-chip none">None on record</span>'; return; }
+
+      var labels = {
+        'paraphrasing': 'Paraphrasing', 'manipulatives': 'Manipulatives', 'braille': 'Braille',
+        'reinforcement-behavior-mod': 'Behavior Modification', 'readers': 'Readers', 'interpreters': 'Interpreters',
+        'scribes': 'Scribes', 'use-of-technology': 'Technology', 'large-print': 'Large Print',
+        'extended-time': 'Extended Time', 'calculator': 'Calculator', 'small-group-testing': 'Small Group Testing', 'other': 'Other'
+      };
+
+      selections.forEach(function (val) {
+        var chip = document.createElement('span'); chip.className = 'acc-chip'; chip.textContent = labels[val] || val; container.appendChild(chip);
+      });
+      if (accoms && accoms.readersType) { var c = document.createElement('span'); c.className = 'acc-chip opacity-65'; c.textContent = '↳ ' + accoms.readersType; container.appendChild(c); }
+      if (accoms && accoms.extendedTimeType) { var c = document.createElement('span'); c.className = 'acc-chip opacity-65'; c.textContent = '↳ ' + accoms.extendedTimeType; container.appendChild(c); }
+      if (accoms && accoms.calculatorType) { var c = document.createElement('span'); c.className = 'acc-chip opacity-65'; c.textContent = '↳ ' + accoms.calculatorType; container.appendChild(c); }
+      if (accoms && accoms.otherSpecify) { var c = document.createElement('span'); c.className = 'acc-chip opacity-65'; c.textContent = '↳ ' + accoms.otherSpecify; container.appendChild(c); }
     }
 
     function _applyAccommodations(accoms) {
@@ -613,6 +955,8 @@
         msgEl.style.color = '#f87171';
         msgEl.textContent = 'Please complete required columns: ' + missing.map(function (f) { return f.label; }).join(', ') + '.';
         msgEl.classList.remove('hidden');
+        var sectionMap = { firstName: 'sec-identity', lastName: 'sec-identity', iepStart: 'sec-timeline', iepEnd: 'sec-timeline', primaryDisability: 'sec-disability' };
+        if (sectionMap[missing.id]) _openSection(sectionMap[missing.id]);
         return;
       }
 
@@ -647,6 +991,7 @@
           if (_mode === 'new') {
             setTimeout(function() { window.location.href = 'dashboard.html'; }, 1500);
           } else {
+            SECTION_IDS.forEach(function (id) { _lockSection(id); });
             setTimeout(function () { msgEl.classList.add('hidden'); }, 3000);
           }
         } else {
@@ -754,8 +1099,10 @@
       banner.classList.remove('hidden');
     }
 
+    // Auth bypass stubs for sandbox environment mapping compliance
     function _hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
     function _showFallback(msg) { _hideLoading(); document.getElementById('fallbackMsg').textContent = msg; document.getElementById('fallbackPanel').classList.add('visible'); }
+    // Core sanitization filters 
     function _escapeHtml(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
     function _setVal(id, val) { var el = document.getElementById(id); if (el) el.value = val || ''; }
     function _getVal(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
