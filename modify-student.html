@@ -170,8 +170,24 @@
         }
     }
 
-    // [Additional helper functions (_showLoading, _showContent, _renderStudentRow, _saveRecord) go here...]
+  function _showLoading() {
+      document.getElementById('loading-overlay').classList.remove('hidden');
+      document.getElementById('content-area').classList.remove('visible');
+      document.getElementById('fallback-state').classList.remove('visible');
+    }
 
+    function _showContent() {
+      document.getElementById('loading-overlay').classList.add('hidden');
+      document.getElementById('content-area').classList.add('visible');
+    }
+
+    function _showFallback(title, msg) {
+      document.getElementById('loading-overlay').classList.add('hidden');
+      document.getElementById('content-area').classList.remove('visible');
+      document.getElementById('fallback-state').classList.add('visible');
+      if (title) document.getElementById('fallback-title').textContent = title;
+      if (msg)   document.getElementById('fallback-message').textContent = msg;
+    }
    document.addEventListener('DOMContentLoaded', function () {
       var params    = new URLSearchParams(window.location.search);
       var studentId = params.get('id') ? params.get('id').trim() : '';
