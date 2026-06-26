@@ -97,12 +97,14 @@
       })
       .then(function(res) { return res.json(); })
       .then(function(data) {
-        var match = (data.rows || []).find(function(r) { return r === studentId; });
+       // Target the first column (index 0) of the row array for comparison
+var match = (data.rows || []).find(function(r) { 
+  return String(r || '').trim().toLowerCase() === studentId.trim().toLowerCase(); 
+});
         if (!match) {
           _showFallback('Not Found', 'Student ID not in ledger.');
         } else {
-          document.getElementById('display-name').textContent = match + ' ' + match;
-          _showContent();
+document.getElementById('display-name').textContent = (match || '') + ' ' + (match || '');          _showContent();
         }
       })
       .catch(function(err) {
