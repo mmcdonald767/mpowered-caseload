@@ -43,61 +43,46 @@
   <script>
     'use strict';
     var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
-    
-    function _showLoading() {
-      var el = document.getElementById('loading-overlay'); if (el) el.classList.remove('hidden');
-      var content = document.getElementById('content-area'); if (content) content.classList.remove('visible');
-    }
-    function _showContent() {
-      var overlay = document.getElementById('loading-overlay'); if (overlay) overlay.classList.add('hidden');
-      var content = document.getElementById('content-area'); if (content) content.classList.add('visible');
-    }
-    function _showFallback(title, msg) {
-      var overlay = document.getElementById('loading-overlay'); if (overlay) overlay.classList.add('hidden');
-      var content = document.getElementById('content-area'); if (content) content.classList.remove('visible');
-      var fallback = document.getElementById('fallback-state'); if (fallback) fallback.classList.add('visible');
-      if (title) document.getElementById('fallback-title').textContent = title;
-      if (msg) document.getElementById('fallback-message').textContent = msg;
-    }
 
     document.addEventListener('DOMContentLoaded', function () {
       var params = new URLSearchParams(window.location.search);
       var studentId = params.get('id');
 
       if (!studentId) {
-        _showFallback('Missing ID', 'No student ID provided in URL.');
+        document.getElementById('loading-overlay').classList.add('hidden');
+        document.getElementById('fallback-state').classList.add('visible');
         return;
       }
-
-      _showLoading();
 
       fetch(GAS_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'getRoster' })
       })
-.then(function(res) { return res.json(); })
+      .then(function(res) { return res.json(); })
       .then(function(data) {
-        // 1. Properly define the 'rows' variable from the fetched data
-        var rows = data.rows || []; 
+        var rows = data.rows || [];
+        var searchId = studentId.trim().toLowerCase();
         
-        // 2. Perform the find operation using the defined 'rows'
         var match = rows.find(function(r) { 
-          var rowId = String(r || '').replace(/["']/g, '').trim().toLowerCase();
-          var searchId = studentId.trim().toLowerCase();
-          return rowId === searchId; 
+          return String(r || '').replace(/["']/g, '').trim().toLowerCase() === searchId; 
         });
 
         if (match) {
           document.getElementById('display-name').textContent = (match || '') + ' ' + (match || '');
           document.getElementById('rv-firstName').textContent = (match || 'Unknown');
-          _showContent();
+          
+          document.getElementById('loading-overlay').classList.add('hidden');
+          document.getElementById('content-area').classList.add('visible');
         } else {
-          _showFallback('Not Found', 'Student ID "' + studentId + '" not in ledger.');
+          document.getElementById('loading-overlay').classList.add('hidden');
+          document.getElementById('fallback-state').classList.add('visible');
         }
       })
       .catch(function(err) {
-        _showFallback('Data Retrieval Error', err.message);
+        document.getElementById('loading-overlay').classList.add('hidden');
+        document.getElementById('fallback-state').classList.add('visible');
+        document.getElementById('fallback-message').textContent = err.message;
       });
     });
   </script>
