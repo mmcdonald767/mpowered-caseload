@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Record — M-Powered Education</title>
-  <meta name="description" content="M-Powered Education — IEP Student Modification &amp; Progress Monitor" />
+  <title>Case Profile — M-Powered Education</title>
+  <meta name="description" content="M-Powered Education — Student Case Profile Editor" />
   <meta name="robots" content="noindex, nofollow" />
 
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236c8fff'/%3E%3Ctext x='16' y='22' text-anchor='middle' fill='white' font-family='Inter%2C sans-serif' font-weight='700' font-size='18'%3EM%3C/text%3E%3C/svg%3E" />
@@ -33,8 +33,6 @@
               glow:    'rgba(108,143,255,0.18)',
             },
             success: '#34d399',
-            warn:    '#f59e0b',
-            danger:  '#ef4444',
           },
           fontFamily: {
             sans: ['"Inter"', 'system-ui', 'sans-serif'],
@@ -54,7 +52,7 @@
     html, body { height: 100%; margin: 0; }
     body {
       background-color: #0f1117;
-      color: #e8ecf4;
+      color: #c9d1e8;
       font-family: 'Inter', system-ui, sans-serif;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
@@ -69,282 +67,330 @@
       to   { opacity: 1; transform: translateY(0); }
     }
     .fade-up { animation: fadeUp 0.45s ease forwards; }
-    .delay-1 { animation-delay: 0.07s; opacity: 0; }
-    .delay-2 { animation-delay: 0.15s; opacity: 0; }
-    .delay-3 { animation-delay: 0.23s; opacity: 0; }
-    .delay-4 { animation-delay: 0.31s; opacity: 0; }
+    .delay-1 { animation-delay: 0.05s; opacity: 0; }
+    .delay-2 { animation-delay: 0.13s; opacity: 0; }
+    .delay-3 { animation-delay: 0.21s; opacity: 0; }
 
-    @keyframes shimmer {
-      0%   { background-position: -400px 0; }
-      100% { background-position: 400px 0; }
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spinner { animation: spin 0.8s linear infinite; }
-
-    @keyframes brandGlow {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(108,143,255,0.3); }
-      50%       { box-shadow: 0 0 0 6px rgba(108,143,255,0); }
-    }
-    .brand-glow { animation: brandGlow 3s ease-in-out infinite; }
-
-    a:focus-visible, button:focus-visible {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(108,143,255,0.35);
-      border-radius: 9px;
-    }
-
-    .ferpa-badge {
-      display: inline-flex; align-items: center; gap: 0.3rem;
-      font-size: 0.65rem; font-weight: 600; letter-spacing: 0.06em;
-      text-transform: uppercase; color: #34d399;
-      border: 1px solid rgba(52,211,153,0.25); border-radius: 20px;
-      padding: 0.2rem 0.6rem; background: rgba(52,211,153,0.06);
-    }
-
-    .nav-link {
-      display: inline-flex; align-items: center; gap: 0.35rem;
-      font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; font-weight: 500; color: #7d8fb3;
-      border: 1px solid #252c42; border-radius: 7px; padding: 0.38rem 0.8rem;
-      text-decoration: none; cursor: pointer; background: transparent;
-      transition: color 0.15s, border-color 0.15s, background 0.15s;
-    }
-    .nav-link:hover { color: #e8ecf4; border-color: #6c8fff; background: rgba(108,143,255,0.07); }
-    .nav-link.active { color: #6c8fff; border-color: rgba(108,143,255,0.4); background: rgba(108,143,255,0.06); }
-    .nav-link.danger:hover { color: #ef4444; border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.06); }
-
-    .panel { background: #171b26; border: 1px solid #1e2335; border-radius: 16px; padding: 1.75rem; }
-    .eyebrow { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #6c8fff; font-family: 'JetBrains Mono', monospace; margin-bottom: 0.5rem; }
-
-    .countdown-chip { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; font-weight: 600; border-radius: 99px; padding: 0.3rem 0.85rem; }
-    .countdown-chip.urgent  { color: #ef4444; background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.25); }
-    .countdown-chip.warning { color: #f59e0b; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); }
-    .countdown-chip.ok      { color: #34d399; background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.25); }
-
-    .goal-card { background: #1e2335; border: 1px solid #252c42; border-radius: 12px; padding: 1.25rem 1.4rem; transition: border-color 0.2s, box-shadow 0.2s; }
-    .goal-card:hover { border-color: rgba(108,143,255,0.35); box-shadow: 0 0 0 1px rgba(108,143,255,0.08); }
-
-    .track-btn {
-      display: inline-flex; align-items: center; gap: 0.45rem; font-size: 0.73rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: #6c8fff;
-      background: rgba(108,143,255,0.08); border: 1px solid rgba(108,143,255,0.25); border-radius: 7px; padding: 0.38rem 0.85rem; cursor: pointer;
-      transition: background 0.15s, border-color 0.15s, color 0.15s; text-decoration: none;
-    }
-    .track-btn:hover { background: rgba(108,143,255,0.16); border-color: rgba(108,143,255,0.45); color: #a5baff; }
-
-    .acc-pill { display: inline-flex; align-items: center; font-size: 0.76rem; font-weight: 500; color: #c9d1e8; background: #1e2335; border: 1px solid #252c42; border-radius: 8px; padding: 0.35rem 0.75rem; }
+    .panel { background: #171b26; border: 1px solid #1e2335; border-radius: 14px; padding: 1.75rem; }
+    .eyebrow { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #6c8fff; margin-bottom: 0.4rem; }
     .rule { border: none; border-top: 1px solid #1e2335; margin: 1.5rem 0; }
+    .field-label { display: block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #6c8fff; margin-bottom: 0.4rem; }
 
-    .info-table { display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1.5rem; }
-    .info-table dt { font-size: 0.72rem; color: #4a5578; font-family: 'JetBrains Mono', monospace; white-space: nowrap; padding-top: 1px; }
-    .info-table dd { font-size: 0.84rem; color: #c9d1e8; font-weight: 500; }
-
-    #fallback-state { display: none; }
-    #fallback-state.visible { display: flex; }
-    #loading-overlay { display: flex; }
-    #loading-overlay.hidden { display: none; }
-    #content-area { display: none; }
-    #content-area.visible { display: block; }
-
-    @media (prefers-reduced-motion: reduce) {
-      .fade-up, .brand-glow, .spinner { animation: none; opacity: 1; }
+    .field-input {
+      width: 100%; background: #1e2335; border: 1px solid #252c42; border-radius: 8px;
+      padding: 0.55rem 0.85rem; font-size: 0.875rem; font-family: 'Inter', sans-serif; color: #e8ecf4;
+      outline: none; transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
+    .field-input:focus { border-color: #6c8fff; box-shadow: 0 0 0 3px rgba(108,143,255,0.2); }
+
+    .field-textarea {
+      width: 100%; background: #1e2335; border: 1px solid #252c42; border-radius: 8px;
+      padding: 0.55rem 0.85rem; font-size: 0.875rem; font-family: 'Inter', sans-serif; color: #e8ecf4;
+      outline: none; resize: vertical; min-height: 80px; line-height: 1.6;
+    }
+    .field-textarea:focus { border-color: #6c8fff; box-shadow: 0 0 0 3px rgba(108,143,255,0.2); }
+
+    .btn-nav {
+      display: inline-flex; align-items: center; gap: 0.4rem; background: transparent; color: #7d8fb3;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 500;
+      border: 1px solid #252c42; border-radius: 7px; padding: 0.4rem 0.85rem; cursor: pointer;
+      transition: color 0.14s, border-color 0.14s, background 0.14s;
+    }
+    .btn-nav:hover:not(:disabled) { color: #e8ecf4; border-color: #6c8fff; background: rgba(108,143,255,0.07); }
+    .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;
+      background: linear-gradient(135deg, #3b5bdb 0%, #6c8fff 100%); color: #fff;
+      font-weight: 600; font-size: 0.825rem; border: none; border-radius: 9px;
+      padding: 0.6rem 1.1rem; cursor: pointer; text-decoration: none;
+      box-shadow: 0 2px 12px rgba(60,91,219,0.35); transition: filter 0.12s, box-shadow 0.12s;
+    }
+    .btn-primary:hover:not(:disabled) { filter: brightness(1.1); box-shadow: 0 4px 20px rgba(60,91,219,0.55); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.4rem; background: transparent; color: #4a5578;
+      font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; font-weight: 500;
+      border: 1px solid #1e2335; border-radius: 7px; padding: 0.42rem 0.85rem; cursor: pointer;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .btn-ghost:hover { color: #c9d1e8; border-color: #252c42; background: #1e2335; }
+
+    .btn-danger-ghost {
+      display: inline-flex; align-items: center; gap: 0.35rem; background: transparent; color: #4a5578;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 500;
+      border: 1px solid #252c42; border-radius: 6px; padding: 0.3rem 0.6rem; cursor: pointer;
+      transition: color 0.14s, border-color 0.14s; flex-shrink: 0;
+    }
+    .btn-danger-ghost:hover { color: #f87171; border-color: rgba(248,113,113,0.4); background: rgba(248,113,113,0.05); }
+
+    .btn-save { background: linear-gradient(135deg, #1a7a4a 0%, #34d399 100%); box-shadow: 0 2px 12px rgba(52,211,153,0.3); }
+    .btn-save:hover:not(:disabled) { filter: brightness(1.08); box-shadow: 0 4px 20px rgba(52,211,153,0.45); }
+
+    .goal-row { background: #1e2335; border: 1px solid #252c42; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; gap: 0.85rem; animation: goalSlideIn 0.22s ease forwards; }
+    @keyframes goalSlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .check-row { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.38rem 0.5rem; border-radius: 7px; cursor: pointer; transition: background 0.12s; }
+    .check-row:hover { background: rgba(108,143,255,0.05); }
+    .check-row input[type="checkbox"], .check-row input[type="radio"] {
+      appearance: none; -webkit-appearance: none; width: 15px; height: 15px; border: 1.5px solid #2e3650;
+      border-radius: 4px; background: #1e2335; flex-shrink: 0; margin-top: 2px; cursor: pointer; position: relative;
+    }
+    .check-row input[type="radio"] { border-radius: 50%; }
+    .check-row input[type="checkbox"]:checked, .check-row input[type="radio"]:checked { border-color: #6c8fff; background: #6c8fff; }
+    .check-row input[type="radio"]:checked { box-shadow: inset 0 0 0 3px #1e2335; }
+    .check-row input[type="checkbox"]:checked::after {
+      content: ''; position: absolute; left: 3px; top: 0px; width: 5px; height: 9px;
+      border: 2px solid #fff; border-top: none; border-left: none; transform: rotate(45deg);
+    }
+    .check-row label { font-size: 0.85rem; color: #c4cce0; cursor: pointer; user-select: none; }
+    
+    .sub-group { padding-left: 1.25rem; border-left: 2px solid #252c42; margin-left: 0.6rem; margin-top: 0.25rem; display: flex; flex-direction: column; gap: 0.25rem; }
+    .sub-group.hidden { display: none; }
+    .field-input-inline { padding: 0.35rem 0.65rem; font-size: 0.8rem; width: 100%; max-width: 260px; margin-top: 0.25rem; }
+
+    .brand-glow { animation: brandGlow 3s ease-in-out infinite; }
+    @keyframes brandGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(108,143,255,0.3); } 50% { box-shadow: 0 0 0 6px rgba(108,143,255,0); } }
+
+    #loadingOverlay { position: fixed; inset: 0; z-index: 60; background: rgba(15,17,23,0.88); backdrop-filter: blur(4px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; }
+    #loadingOverlay.hidden { display: none; }
+    .spinner { width: 32px; height: 32px; border: 2px solid #252c42; border-top-color: #6c8fff; border-radius: 50%; animation: spin 0.75s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #fallbackPanel { display: none; }
+    #fallbackPanel.visible { display: flex; }
+    .save-bar { position: sticky; bottom: 0; background: linear-gradient(to top, #0f1117 75%, transparent); padding: 1.5rem 0 1.1rem; margin-top: 2.5rem; }
+    .section-heading { display: flex; items-center; justify-content: space-between; gap: 4px; margin-bottom: 1.25rem; }
   </style>
 </head>
-<body class="bg-surface-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col">
 
-  <script>
-    (function () {
-      'use strict';
-      if (window.location.hash && window.location.hash.length > 1) {
-        history.replaceState(null, '', window.location.pathname + window.location.search);
-      }
+  <div id="loadingOverlay" aria-live="polite" aria-label="Loading student record">
+    <div class="spinner"></div>
+    <span class="font-mono text-xs" style="color:#4a5578;">Fetching caseload data…</span>
+  </div>
 
-      var isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-      if (!isLocal) {
-        var match = document.cookie.match(/(?:^|;\s*)(mp_session|mp_session_active)=([^;]+)/);
-        var localToken = null;
-        try { localToken = localStorage.getItem('auth_token'); } catch (e) {}
+  <div id="fallbackPanel" class="fixed inset-0 z-50 flex items-center justify-center p-6" style="background:rgba(15,17,23,0.96);">
+    <div class="panel max-w-md w-full text-center">
+      <div class="mb-4 mx-auto w-12 h-12 rounded-full flex items-center justify-center" style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.3);">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <h2 class="text-[1rem] font-semibold text-slate-100">Handshake Failed</h2>
+      <p id="fallbackMsg" class="text-sm leading-relaxed text-slate-400 my-3">Could not retrieve caseload records.</p>
+      <div class="flex items-center justify-center gap-3">
+        <a href="dashboard.html" class="btn-ghost">← Back to Dashboard</a>
+        <button onclick="window.location.reload()" class="btn-primary">Retry</button>
+      </div>
+    </div>
+  </div>
 
-        if (!match && !localToken) {
-          var returnPath = encodeURIComponent(window.location.pathname + window.location.search);
-          window.location.replace('/login.html?next=' + returnPath);
-        }
-      }
-    })();
-  </script>
-
-  <header class="bg-surface-800 border-b border-surface-700 flex-shrink-0" role="banner">
-    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between flex-wrap gap-3">
-
-      <a href="https://www.mpowerededucation.com/dashboard.html" class="flex items-center gap-2.5 no-underline group" aria-label="M-Powered Education home">
-        <div class="brand-glow w-8 h-8 rounded-[8px] flex items-center justify-center flex-shrink-0"
-             style="background: linear-gradient(135deg, #3b5bdb, #6c8fff);">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/>
-          </svg>
+  <header class="bg-surface-800 border-b" style="border-color:#1e2335;">
+    <div class="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="brand-glow w-9 h-9 rounded-[9px] flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#3b5bdb,#6c8fff);">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.3"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         </div>
         <div>
-          <span class="block text-[0.95rem] font-bold tracking-tight leading-none mb-0.5 text-slate-100">M-Powered Education</span>
-          <span class="block text-[0.63rem] font-mono text-slate-500">SpEd Caseload Suite</span>
+          <span class="block text-[0.95rem] font-bold text-slate-100 tracking-tight leading-none mb-0.5">M-Powered Education</span>
+          <span class="block text-[0.68rem] font-mono" style="color:#2e3650;">case profile editor</span>
         </div>
-      </a>
-
-      <nav class="flex items-center gap-2 flex-wrap" aria-label="Main navigation">
-        <a href="https://www.mpowerededucation.com/dashboard.html" class="nav-link" aria-label="Go to Dashboard">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
-          </svg>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="dashboard.html" class="btn-ghost">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1"><polyline points="15 18 9 12 15 6"/></svg>
           Dashboard
         </a>
-        <a href="/" class="nav-link active" aria-label="Return to Caseload Portal" aria-current="page">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>
-          </svg>
-          Caseload Portal
-        </a>
-        <a href="https://data.mpowerededucation.com" class="nav-link" target="_blank" rel="noopener noreferrer" aria-label="Open Data Utility">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
-          Data Utility
-        </a>
-        <span class="ferpa-badge" title="FERPA compliant">
-          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
-          </svg>
-          FERPA
-        </span>
-        <button class="nav-link danger" onclick="logout()" aria-label="Sign out">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          Sign Out
-        </button>
-      </nav>
-
+        <span class="ferpa-badge">FERPA Protected</span>
+      </div>
     </div>
   </header>
 
-  <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8" role="main">
-
-    <nav class="fade-up mb-6 flex items-center gap-2 text-xs font-mono text-slate-500" aria-label="Breadcrumb">
-      <a href="/" class="hover:text-accent transition-colors">Caseload Portal</a>
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <polyline points="9 18 15 12 9 6"/>
-      </svg>
-      <span class="text-accent">Student Record</span>
-    </nav>
-
-    <!-- Adjacent Student Record Pagination Links Layout Row -->
-    <div class="flex items-center justify-between mb-4 fade-up delay-1">
-      <a id="nav-prev-btn" href="#" class="nav-link opacity-50 pointer-events-none">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
-        Previous Student
-      </a>
-      <a id="nav-next-btn" href="#" class="nav-link opacity-50 pointer-events-none">
-        Next Student
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="9 18 15 12 9 6"/>
-        </svg>
-      </a>
+  <main class="flex-1 max-w-5xl mx-auto w-full px-6 py-10" id="mainContent">
+    <div class="mb-8 fade-up delay-1">
+      <p class="font-mono text-xs font-semibold tracking-[0.1em] uppercase mb-2" style="color:#6c8fff;">Student Records</p>
+      <h1 id="pageTitle" class="text-2xl sm:text-3xl font-bold text-slate-100 tracking-tight mb-2">Case Profile</h1>
+      <p id="pageSubtitle" class="text-sm leading-relaxed" style="color:#4a5578;">Loading operations…</p>
     </div>
 
-    <div id="loading-overlay" class="fade-up flex flex-col items-center justify-center py-24 gap-4">
-      <svg class="spinner" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6c8fff" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="10" stroke="#1e2335"/>
-        <path d="M12 2a10 10 0 0110 10" stroke="#6c8fff"/>
-      </svg>
-      <p class="font-mono text-xs text-slate-500">Retrieving student structural ledger record…</p>
-    </div>
-
-    <div id="fallback-state" class="flex-col items-center justify-center py-24 gap-6 text-center">
-      <div class="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto bg-surface-800 border border-surface-700">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4a5578" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
+    <div id="carouselNav" class="hidden mb-8 fade-up delay-1">
+      <div class="flex items-center justify-between gap-4">
+        <button id="btnPrev" class="btn-nav" onclick="navigateStudent(-1)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Previous Student
+        </button>
+        <span id="carouselPosition" class="font-mono text-xs text-center flex-1" style="color:#4a5578;"></span>
+        <button id="btnNext" class="btn-nav" onclick="navigateStudent(1)">
+          Next Student
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
       </div>
-      <div>
-        <p class="font-semibold text-slate-100 mb-1" id="fallback-title">Student Missing</p>
-        <p class="text-sm max-w-sm mx-auto leading-relaxed text-slate-400" id="fallback-message">The target system was unable to pull a profile identifier.</p>
-      </div>
-      <a href="/" class="track-btn">Return to Caseload Portal</a>
     </div>
 
-    <div id="content-area">
-
-      <section class="panel fade-up delay-1 mb-6" aria-labelledby="student-name-heading">
-        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-5">
-          <div class="flex-1 min-w-0">
-            <p class="eyebrow">Active Case Profile</p>
-            <h1 id="student-name-heading" class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-100 leading-tight">
-              <span id="display-name">—</span>
-            </h1>
-            <div class="flex items-center gap-2 flex-wrap mt-2">
-              <span class="font-mono text-xs px-2.5 py-1 rounded-md bg-surface-800 text-accent border border-surface-700">
-                ID: <span id="display-tag">—</span>
-              </span>
-              <span class="font-mono text-xs px-2.5 py-1 rounded-md bg-surface-800 text-slate-300 border border-surface-700">
-                <span id="display-disability">—</span>
-              </span>
-            </div>
-          </div>
-
-          <div class="flex-shrink-0 w-full sm:w-auto">
-            <div class="panel bg-surface-800 border border-surface-700" style="padding:1.1rem 1.3rem; min-width:220px;">
-              <p class="eyebrow mb-2">IEP Lifecycle</p>
-              <dl class="info-table">
-                <dt>Initiated</dt>
-                <dd id="display-iep-start">—</dd>
-                <dt>Conclusion</dt>
-                <dd id="display-iep-end">—</dd>
-              </dl>
-              <div class="mt-3 pt-3 border-t border-surface-700" id="countdown-container"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel fade-up delay-2 mb-6" aria-labelledby="goals-heading">
-        <div class="flex items-center justify-between mb-5">
+    <form id="profileForm" novalidate onsubmit="return false;">
+      
+      <section class="panel mb-5 fade-up delay-1">
+        <div class="section-heading">
           <div>
-            <p class="eyebrow">IEP Goals</p>
-            <h2 id="goals-heading" class="text-base font-semibold text-slate-100">Annual Objectives</h2>
+            <p class="eyebrow">Section 01 · Identity Matrix</p>
+            <h2 class="text-[1rem] font-semibold text-slate-100">Student Profile</h2>
           </div>
-          <span class="font-mono text-xs px-2.5 py-1 rounded-md bg-surface-800 text-slate-400 border border-surface-700">
-            <span id="goals-count">0</span> tracked
-          </span>
         </div>
-
-        <div id="goals-container" class="flex flex-col gap-4"></div>
-        <div id="goals-empty" class="hidden flex flex-col items-center py-10 gap-2 text-center text-slate-500">
-          <p class="text-sm font-mono">No target goals detected on container record array mapping.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <label class="field-label" for="firstName">First Name</label>
+            <input id="firstName" name="firstName" type="text" class="field-input" placeholder="First name" required />
+          </div>
+          <div>
+            <label class="field-label" for="lastName">Last Name</label>
+            <input id="lastName" name="lastName" type="text" class="field-input" placeholder="Last name" required />
+          </div>
+          <div>
+            <label class="field-label" for="studentTag">Tag / ID <span class="ml-1 font-normal normal-case text-slate-500" style="font-size:0.67rem;">(non-personal)</span></label>
+            <input id="studentTag" name="studentTag" type="text" class="field-input" placeholder="e.g. ts-01" />
+          </div>
         </div>
       </section>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 fade-up delay-3">
-        <section class="panel" aria-labelledby="accommodations-heading">
-          <p class="eyebrow">Accommodations Ledger</p>
-          <h2 id="accommodations-heading" class="text-base font-semibold mb-4 text-slate-100">Testing &amp; Environmental</h2>
-          <div id="accommodations-container"></div>
-          <div id="accommodations-empty" class="hidden py-6 text-center text-slate-500 font-mono text-sm">Empty subset string matrix.</div>
-        </section>
+      <section class="panel mb-5 fade-up delay-2">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Section 02 · IEP Timeline</p>
+            <h2 class="text-[1rem] font-semibold text-slate-100">Annual Review Dates</h2>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="field-label" for="iepStart">IEP Start Date</label>
+            <input id="iepStart" name="iepStart" type="date" class="field-input" required />
+          </div>
+          <div>
+            <label class="field-label" for="iepEnd">IEP End Date</label>
+            <input id="iepEnd" name="iepEnd" type="date" class="field-input" required />
+          </div>
+        </div>
+        <div id="iepCountdown" class="hidden mt-4 px-3.5 py-2.5 rounded-[8px] text-[0.8rem] font-mono" style="background:#1e2335;border:1px solid #252c42;"></div>
+      </section>
 
-        <section class="panel" aria-labelledby="aids-heading">
-          <p class="eyebrow">Supplemental Matrix</p>
-          <h2 id="aids-heading" class="text-base font-semibold mb-4 text-slate-100">Instructional Supports</h2>
-          <div id="aids-container"></div>
-          <div id="aids-empty" class="hidden py-6 text-center text-slate-500 font-mono text-sm">Empty subset string matrix.</div>
-        </section>
+      <section class="panel mb-5 fade-up delay-2">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Section 03 · Primary Disability</p>
+            <h2 class="text-[1rem] font-semibold text-slate-100">IDEA Disability Category</h2>
+          </div>
+        </div>
+        <div>
+          <label class="field-label" for="primaryDisability">Disability Classification</label>
+          <input id="primaryDisability" name="primaryDisability" type="text" class="field-input" placeholder="e.g. Specific Learning Disability (SLD)" required />
+        </div>
+      </section>
+
+      <section class="panel mb-5 fade-up delay-3">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Section 04 · IEP Goals</p>
+            <h2 class="text-[1rem] font-semibold text-slate-100">Measurable Annual Goals</h2>
+          </div>
+          <button type="button" onclick="addGoalRow()" class="btn-ghost">+ Goal</button>
+        </div>
+        <div id="goalsContainer" class="flex flex-col gap-3" role="list"></div>
+        <div id="goalsEmptyState" class="hidden text-center py-6 text-[0.82rem] text-slate-500">No goals added yet. Click <strong class="text-slate-300">+ Goal</strong> to begin.</div>
+      </section>
+
+      <section class="panel mb-5 fade-up delay-3">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Section 05 · Supplemental Aids &amp; Services</p>
+            <h2 class="text-[1rem] font-semibold text-slate-100">Instructional Supports</h2>
+          </div>
+        </div>
+        <div>
+          <label class="field-label" for="supplementalAids">Supplemental Aids &amp; Services</label>
+          <textarea id="supplementalAids" name="supplementalAids" class="field-textarea" placeholder="List accommodations, modifications, and supplemental aids — e.g. extended time (1.5×), preferential seating, graphic organizers…"></textarea>
+        </div>
+      </section>
+
+      <section class="panel mb-5 fade-up delay-3">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Section 06 · State Assessments</p>
+            <h2 class="text-[1rem] font-semibold text-slate-100">Testing Accommodations</h2>
+          </div>
+        </div>
+        <fieldset>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
+            <div class="flex flex-col gap-0.5">
+              <div class="check-row"><input type="checkbox" id="acc-paraphrasing" name="stateAccommodations" value="paraphrasing" /><label for="acc-paraphrasing">Paraphrasing</label></div>
+              <div class="check-row"><input type="checkbox" id="acc-manipulatives" name="stateAccommodations" value="manipulatives" /><label for="acc-manipulatives">Manipulatives</label></div>
+              <div class="check-row"><input type="checkbox" id="acc-braille" name="stateAccommodations" value="braille" /><label for="acc-braille">Braille</label></div>
+              <div class="check-row"><input type="checkbox" id="acc-behavior-mod" name="stateAccommodations" value="reinforcement-behavior-mod" /><label for="acc-behavior-mod">Reinforcement and behavior modification</label></div>
+              
+              <div class="check-row"><input type="checkbox" id="acc-readers" name="stateAccommodations" value="readers" onchange="toggleSubGroup('readers-sub', this.checked)" /><label for="acc-readers">Readers <span class="text-slate-500">(Select one)</span></label></div>
+              <div id="readers-sub" class="sub-group hidden">
+                <div class="check-row"><input type="radio" id="acc-reader-online" name="readersType" value="online-text-reader" /><label for="acc-reader-online">Online/Text Reader</label></div>
+                <div class="check-row"><input type="radio" id="acc-reader-human" name="readersType" value="human-reader" /><label for="acc-reader-human">Human Reader</label></div>
+              </div>
+
+              <div class="check-row"><input type="checkbox" id="acc-interpreters" name="stateAccommodations" value="interpreters" onchange="toggleSubGroup('interpreters-sub', this.checked)" /><label for="acc-interpreters">Interpreters <span class="text-slate-500">(Select one)</span></label></div>
+              <div id="interpreters-sub" class="sub-group hidden">
+                <div class="check-row"><input type="radio" id="acc-interp-asl" name="interpretersType" value="asl" /><label for="acc-interp-asl">American Sign Language</label></div>
+                <div class="check-row"><input type="radio" id="acc-interp-other-lang" name="interpretersType" value="other-language" /><label for="acc-interp-other-lang">Other Language, specify:</label></div>
+                <input type="text" id="acc-interp-lang-specify" class="field-input field-input-inline bg-[#1e2335] border border-[#252c42] rounded px-2 py-1 text-xs" placeholder="Language…" />
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-0.5">
+              <div class="check-row"><input type="checkbox" id="acc-scribes" name="stateAccommodations" value="scribes" /><label for="acc-scribes">Scribes</label></div>
+              <div class="check-row"><input type="checkbox" id="acc-tech" name="stateAccommodations" value="use-of-technology" /><label for="acc-tech">Use of Technology</label></div>
+              <div class="check-row"><input type="checkbox" id="acc-large-print" name="stateAccommodations" value="large-print" /><label for="acc-large-print">Large Print</label></div>
+
+              <div class="check-row"><input type="checkbox" id="acc-ext-time" name="stateAccommodations" value="extended-time" onchange="toggleSubGroup('ext-time-sub', this.checked)" /><label for="acc-ext-time">Extended time <span class="text-slate-500">(Select one)</span></label></div>
+              <div id="ext-time-sub" class="sub-group hidden">
+                <div class="check-row"><input type="radio" id="acc-time-half" name="extendedTimeType" value="time-and-a-half" /><label for="acc-time-half">Time and a Half</label></div>
+                <div class="check-row"><input type="radio" id="acc-time-double" name="extendedTimeType" value="double-time" /><label for="acc-time-double">Double Time</label></div>
+              </div>
+
+              <div class="check-row"><input type="checkbox" id="acc-calculator" name="stateAccommodations" value="calculator" onchange="toggleSubGroup('acc-calc-sub', this.checked)" /><label for="acc-calculator">Calculator <span class="text-slate-500">(Select one)</span></label></div>
+              <div id="acc-calc-sub" class="sub-group hidden">
+                <div class="check-row"><input type="radio" id="acc-calc-online" name="calculatorType" value="online-calculator" /><label for="acc-calc-online">Online Calculator</label></div>
+                <div class="check-row"><input type="radio" id="acc-calc-handheld" name="calculatorType" value="handheld-calculator" /><label for="acc-calc-handheld">Handheld Calculator</label></div>
+                <div class="check-row"><input type="radio" id="acc-calc-special" name="calculatorType" value="special-calculator" /><label for="acc-calc-special">Special Calculator, specify:</label></div>
+                <input type="text" id="acc-calc-specify" class="field-input field-input-inline bg-[#1e2335] border border-[#252c42] rounded px-2 py-1 text-xs" placeholder="Calculator type…" />
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-2 flex flex-col gap-0.5">
+            <div class="check-row"><input type="checkbox" id="acc-small-group" name="stateAccommodations" value="small-group-testing" /><label for="acc-small-group">Small group testing</label></div>
+            <div class="check-row"><input type="checkbox" id="acc-other" name="stateAccommodations" value="other" onchange="toggleSubGroup('other-sub', this.checked)" /><label for="acc-other">Other, specify:</label></div>
+            <div id="other-sub" class="sub-group hidden"><input type="text" id="acc-other-specify" class="field-input mt-1" placeholder="Describe accommodation details…" /></div>
+          </div>
+        </fieldset>
+      </section>
+
+      <div class="save-bar fade-up delay-3">
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+          <p id="formValidationMsg" class="text-[0.8rem] hidden font-mono" style="color:#f87171;" role="alert" aria-live="assertive"></p>
+          <div class="flex items-center gap-3 ml-auto">
+            <a href="dashboard.html" class="btn-ghost">← Cancel</a>
+            <button type="button" onclick="handleSave()" class="btn-primary btn-save">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" class="mr-1"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save Record
+            </button>
+          </div>
+        </div>
       </div>
 
-    </div>
+    </form>
   </main>
 
-  <footer class="border-t border-surface-700 flex-shrink-0 mt-auto py-4 px-6 text-slate-600 text-xs font-mono" role="contentinfo">
-    <div class="max-w-7xl mx-auto flex items-center justify-between flex-wrap gap-3">
-      <span>&copy; 2026 M-Powered Education &middot; System Ledger</span>
-      <span class="ferpa-badge">FERPA Compliant</span>
+  <footer class="border-t" style="border-color:#1e2335;">
+    <div class="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <div class="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#3b5bdb,#6c8fff);"><span class="font-bold text-white select-none" style="font-size:9px;">M</span></div>
+        <span class="font-mono text-xs" style="color:#2e3650;">&copy; 2026 M-Powered Education</span>
+      </div>
+      <span class="font-mono text-xs" style="color:#2e3650;">v0.2.0</span>
     </div>
   </footer>
 
@@ -352,8 +398,8 @@
     'use strict';
 
     var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
-    
-    /* ── Alignment Schema Indices ── */
+
+    // Core alignment index mappings matching flat database structures
     var COL_ID         = 1;
     var COL_FIRST      = 2;
     var COL_LAST       = 3;
@@ -362,191 +408,359 @@
     var COL_DISABILITY = 6;
     var COL_SUPP_AIDS  = 7;
     var COL_GOALS      = 8;
-    var COL_ACCOM      = 9;
+    var COL_ACCOMS     = 9;
 
-    function _escapeHtml(str) {
-      if (str === null || str === undefined) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    }
-
-    function logout() {
-      try { localStorage.removeItem('auth_token'); localStorage.clear(); } catch (e) {}
-      window.location.replace('/login.html');
-    }
-
-    function _buildCountdownChip(iepEndDateStr) {
-      if (!iepEndDateStr) return '';
-      var endDate = new Date(iepEndDateStr);
-      var today = new Date();
-      today.setHours(0, 0, 0, 0);
-      endDate.setHours(0, 0, 0, 0);
-      var diffDays = Math.round((endDate - today) / 86400000);
-
-      var chipClass = 'ok', label = diffDays + ' days remaining';
-      if (diffDays < 0) { chipClass = 'urgent'; label = 'IEP Expired ' + Math.abs(diffDays) + ' days ago'; }
-      else if (diffDays <= 30) { chipClass = 'urgent'; label = 'Urgent: ' + diffDays + ' days remaining'; }
-      else if (diffDays <= 90) { chipClass = 'warning'; label = 'Warning: ' + diffDays + ' days to review'; }
-
-      return '<span class="countdown-chip ' + chipClass + '">' + _escapeHtml(label) + '</span>';
-    }
-
-    function _safeParseJSON(str) {
-      if (!str || typeof str !== 'string' || str.trim() === '') return null;
-      try { return JSON.parse(str); } catch (e) { return null; }
-    }
-
-    function _renderGoals(goalsRaw, studentTag) {
-      var container = document.getElementById('goals-container');
-      var emptyMsg = document.getElementById('goals-empty');
-      var countEl = document.getElementById('goals-count');
-      var goals = _safeParseJSON(goalsRaw) || [];
-
-      if (!Array.isArray(goals)) goals = goals ? [goals] : [];
-      countEl.textContent = goals.length;
-      if (!goals.length) { emptyMsg.classList.remove('hidden'); return; }
-
-      var html = '';
-      goals.forEach(function (goal, idx) {
-        var num = idx + 1;
-        var domain = _escapeHtml(goal.domain || goal.area || 'Objective');
-        var desc = _escapeHtml(goal.description || goal.goal || JSON.stringify(goal));
-        var target = _escapeHtml(goal.target || goal.criteria || '');
-
-        html += '<article class="goal-card"><div class="flex items-start justify-between gap-4 mb-2"><div>';
-        html += '<span class="font-mono text-xs px-2 py-0.5 rounded bg-surface-600 text-accent mr-2">Goal ' + num + '</span>';
-        html += '<span class="font-mono text-xs px-2 py-0.5 rounded bg-surface-600 text-slate-300">' + domain + '</span></div>';
-        html += '<button class="track-btn" onclick="launchTracker(\'' + _escapeHtml(studentTag) + '\', ' + idx + ')">Track Progress</button></div>';
-        html += '<p class="text-sm text-slate-300 mb-2">' + desc + '</p>';
-        if (target) html += '<div class="pt-2 mt-2 border-t border-surface-600 text-xs text-slate-400"><span class="font-mono text-slate-500">Target Criteria:</span> ' + target + '</div>';
-        html += '</article>';
-      });
-      container.innerHTML = html;
-    }
-
-    function _renderListBlock(rawValue, containerId, emptyId) {
-      var container = document.getElementById(containerId);
-      var emptyEl = document.getElementById(emptyId);
-      var parsed = _safeParseJSON(rawValue);
-      var items = [];
-
-      if (Array.isArray(parsed)) {
-        items = parsed.map(function(i) { return typeof i === 'string' ? i : (i.description || JSON.stringify(i)); });
-      } else if (typeof rawValue === 'string' && rawValue.trim()) {
-        items = rawValue.split('\n').map(function(s) { return s.trim(); }).filter(Boolean);
-      }
-
-      if (!items.length) { emptyEl.classList.remove('hidden'); return; }
-      var html = '<ul class="flex flex-col gap-1.5" role="list">';
-      items.forEach(function(item) { html += '<li class="acc-pill">' + _escapeHtml(item) + '</li>'; });
-      container.innerHTML = html + '</ul>';
-    }
-
-    function _populateStudent(row) {
-      var tag = row[COL_ID] || '';
-      var first = row[COL_FIRST] || '';
-      var last = row[COL_LAST] || '';
-      
-      document.title = (last ? last + ', ' + first : first) + ' — M-Powered';
-      document.getElementById('display-name').textContent = last && first ? last + ', ' + first : (last || first || 'Unknown Profile');
-      document.getElementById('display-tag').textContent = tag;
-      document.getElementById('display-disability').textContent = row[COL_DISABILITY] || 'Not specified';
-      document.getElementById('display-iep-start').textContent = row[COL_IEP_START] || '—';
-      document.getElementById('display-iep-end').textContent = row[COL_IEP_END] || '—';
-      document.getElementById('countdown-container').innerHTML = _buildCountdownChip(row[COL_IEP_END]);
-
-      _renderGoals(row[COL_GOALS], tag);
-      _renderListBlock(row[COL_ACCOM], 'accommodations-container', 'accommodations-empty');
-      _renderListBlock(row[COL_SUPP_AIDS], 'aids-container', 'aids-empty');
-    }
-
-    function _showLoading() {
-      document.getElementById('loading-overlay').classList.remove('hidden');
-      document.getElementById('content-area').classList.remove('visible');
-      document.getElementById('fallback-state').classList.remove('visible');
-    }
-
-    function _showContent() {
-      document.getElementById('loading-overlay').classList.add('hidden');
-      document.getElementById('content-area').classList.add('visible');
-    }
-
-    function _showFallback(title, msg) {
-      document.getElementById('loading-overlay').classList.add('hidden');
-      document.getElementById('content-area').classList.remove('visible');
-      document.getElementById('fallback-state').classList.add('visible');
-      if (title) document.getElementById('fallback-title').textContent = title;
-      if (msg) document.getElementById('fallback-message').textContent = msg;
-    }
-
-    function launchTracker(tag, idx) {
-      alert('Tracking Engine Stub Triggered\nStudent ID: ' + tag + '\nGoal Offset Index: ' + idx);
-    }
+    var _mode        = 'existing';
+    var _studentId   = null;
+    var _rosterRows  = [];
+    var _currentIdx  = -1;
+    var _goalCounter = 0;
 
     document.addEventListener('DOMContentLoaded', function () {
-      var params = new URLSearchParams(window.location.search);
-      var studentId = params.get('id') ? params.get('id').trim() : '';
+      var params  = new URLSearchParams(window.location.search);
+      var idParam = (params.get('id') || '').trim();
+      _studentId  = idParam;
+      _mode       = (idParam === 'new' || !idParam) ? 'new' : 'existing';
 
-      if (!studentId) {
-        _showFallback('Profile Parameter Missing', 'This structural subview mandates a valid matching alphanumeric query string (?id=...).');
-        return;
+      document.getElementById('iepStart').addEventListener('change', _updateIepCountdown);
+      document.getElementById('iepEnd').addEventListener('change', _updateIepCountdown);
+
+      if (_mode === 'new') {
+        _initNewMode();
+      } else {
+        _fetchRoster();
       }
+    });
 
-      _showLoading();
+    function _initNewMode() {
+      _hideLoading();
+      document.getElementById('pageTitle').textContent    = 'New Case Profile Intake';
+      document.getElementById('pageSubtitle').textContent = 'Complete fields to introduce a new operational ledger student profile.';
+      document.getElementById('carouselNav').classList.add('hidden');
+      addGoalRow();
+    }
 
+    function _fetchRoster() {
       fetch(GAS_WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'getRoster' })
       })
-      .then(function(res) { if (!res.ok) throw new Error('HTTP status field failure: ' + res.status); return res.json(); })
-      .then(function(data) {
-        var rows = data.rows || [];
-        var match = null;
-        var currentIndex = -1;
+      .then(function (response) {
+        if (!response.ok) throw new Error('HTTP status failure: ' + response.status);
+        return response.json();
+      })
+      .then(function (data) {
+        // Skip first row if array is raw 2D spreadsheet lines
+        var rawRows = data.rows || [];
+        if (rawRows.length > 0 && Array.isArray(rawRows) && typeof rawRows === 'string' && rawRows.toLowerCase().includes('time')) {
+          _rosterRows = rawRows.slice(1);
+        } else {
+          _rosterRows = rawRows;
+        }
 
-        // Step 1: Find matching student row and capture context offset index
-        for (var i = 0; i < rows.length; i++) {
-          if (rows[i] && String(rows[i][COL_ID] || '').trim().toLowerCase() === studentId.toLowerCase()) {
-            match = rows[i];
-            currentIndex = i;
-            break;
+        // Filter out completely blank lines
+        _rosterRows = _rosterRows.filter(function(r) { return r && (r[COL_FIRST] || r[COL_LAST]); });
+
+        // Resolve row mapping context index using standard column offsets
+        _currentIdx = _rosterRows.findIndex(function (r) {
+          return String(r[COL_ID] || '').trim().toLowerCase() === _studentId.toLowerCase();
+        });
+
+        if (_currentIdx === -1) {
+          throw new Error('Identity code marker mismatch inside roster index.');
+        }
+
+        document.getElementById('carouselNav').classList.remove('hidden');
+        _refreshCarouselState();
+        _renderStudentRow(_rosterRows[_currentIdx]);
+        _hideLoading();
+      })
+      .catch(function (err) {
+        console.error('[Engine Exception Handshake Fault]:', err);
+        _showFallback('Upstream communication drop: ' + err.message);
+      });
+    }
+
+    function navigateStudent(direction) {
+      var len = _rosterRows.length;
+      if (len < 2) return;
+
+      if (direction === -1) {
+        _currentIdx = (_currentIdx === 0) ? len - 1 : _currentIdx - 1;
+      } else {
+        _currentIdx = (_currentIdx === len - 1) ? 0 : _currentIdx + 1;
+      }
+
+      _refreshCarouselState();
+      _renderStudentRow(_rosterRows[_currentIdx]);
+
+      var newUrl = window.location.pathname + '?id=' + encodeURIComponent(_rosterRows[_currentIdx][COL_ID]);
+      history.replaceState(null, '', newUrl);
+    }
+
+    function _refreshCarouselState() {
+      var len     = _rosterRows.length;
+      var btnPrev = document.getElementById('btnPrev');
+      var btnNext = document.getElementById('btnNext');
+      var posEl   = document.getElementById('carouselPosition');
+
+      if (len < 2) {
+        btnPrev.disabled = true;
+        btnNext.disabled = true;
+      } else {
+        btnPrev.disabled = false;
+        btnNext.disabled = false;
+      }
+      if (posEl) posEl.textContent = 'Student ' + (_currentIdx + 1) + ' of ' + len;
+    }
+
+    function _renderStudentRow(row) {
+      var first = row[COL_FIRST] || '';
+      var last  = row[COL_LAST] || '';
+      var tag   = row[COL_ID] || '';
+
+      document.getElementById('pageTitle').textContent    = last + ', ' + first;
+      document.getElementById('pageSubtitle').textContent = 'ID Code Reference Tag: ' + tag;
+
+      _setVal('firstName',         first);
+      _setVal('lastName',          last);
+      _setVal('studentTag',         tag);
+      _setVal('iepStart',          row[COL_IEP_START]);
+      _setVal('iepEnd',            row[COL_IEP_END]);
+      _setVal('primaryDisability', row[COL_DISABILITY]);
+      _setVal('supplementalAids',  row[COL_SUPP_AIDS]);
+
+      // Goal rendering mapping engine
+      var goals = [];
+      var rawGoals = row[COL_GOALS] || '';
+      if (rawGoals) {
+        try { goals = (typeof rawGoals === 'string') ? JSON.parse(rawGoals) : rawGoals; } catch(e) { goals = []; }
+      }
+      
+      _goalCounter = 0;
+      var gc = document.getElementById('goalsContainer');
+      gc.innerHTML = '';
+      
+      if (Array.isArray(goals) && goals.length > 0) {
+        goals.forEach(function (g) { addGoalRow({ description: g.description || '', sdi: g.sdi || '' }); });
+      } else {
+        addGoalRow();
+      }
+
+      // Accommodation decoding logic block
+      var accoms = null;
+      var rawAccoms = row[COL_ACCOMS] || '';
+      if (rawAccoms) {
+        try { accoms = (typeof rawAccoms === 'string') ? JSON.parse(rawAccoms) : rawAccoms; } catch(e) { accoms = null; }
+      }
+      _applyAccommodations(accoms);
+
+      _updateIepCountdown();
+      _updateGoalsEmptyState();
+    }
+
+    function _applyAccommodations(accoms) {
+      document.querySelectorAll('input[name="stateAccommodations"]').forEach(function (cb) {
+        cb.checked = false;
+        var onchangeAttr = cb.getAttribute('onchange');
+        if (onchangeAttr) {
+          var match = onchangeAttr.match(/toggleSubGroup\('([^']+)'/);
+          if (match) toggleSubGroup(match, false);
+        }
+      });
+      document.querySelectorAll('input[name="readersType"], input[name="interpretersType"], input[name="extendedTimeType"], input[name="calculatorType"]').forEach(function (r) { r.checked = false; });
+      ['acc-interp-lang-specify', 'acc-calc-specify', 'acc-other-specify'].forEach(function (id) {
+        var el = document.getElementById(id); if (el) el.value = '';
+      });
+
+      if (!accoms || !Array.isArray(accoms.selections)) return;
+
+      accoms.selections.forEach(function (val) {
+        var cb = document.querySelector('input[name="stateAccommodations"][value="' + val + '"]');
+        if (cb) {
+          cb.checked = true;
+          var onchangeAttr = cb.getAttribute('onchange');
+          if (onchangeAttr) {
+            var match = onchangeAttr.match(/toggleSubGroup\('([^']+)'/);
+            if (match) toggleSubGroup(match, true);
           }
         }
-
-        if (!match) { _showFallback('Profile Matrix Mismatch', 'The record lookup returned empty for identity reference key target.'); return; }
-
-        // Step 2: Grab references to the next/prev buttons
-        var prevBtn = document.getElementById('nav-prev-btn');
-        var nextBtn = document.getElementById('nav-next-btn');
-
-        // Handle Previous Row Navigation Pointers
-        if (currentIndex > 0 && rows[currentIndex - 1]) {
-          var prevId = String(rows[currentIndex - 1][COL_ID]).trim();
-          prevBtn.href = 'modify-student.html?id=' + encodeURIComponent(prevId);
-          prevBtn.classList.remove('opacity-50', 'pointer-events-none');
-        } else {
-          prevBtn.removeAttribute('href');
-          prevBtn.classList.add('opacity-50', 'pointer-events-none');
-        }
-
-        // Handle Next Row Navigation Pointers
-        if (currentIndex < rows.length - 1 && rows[currentIndex + 1]) {
-          var nextId = String(rows[currentIndex + 1][COL_ID]).trim();
-          nextBtn.href = 'modify-student.html?id=' + encodeURIComponent(nextId);
-          nextBtn.classList.remove('opacity-50', 'pointer-events-none');
-        } else {
-          nextBtn.removeAttribute('href');
-          nextBtn.classList.add('opacity-50', 'pointer-events-none');
-        }
-
-        _populateStudent(match);
-        _showContent();
-      })
-      .catch(function(err) {
-        console.error('[Engine Exception Handshake Fault]:', err);
-        _showFallback('Upstream Service Fault', 'The cross-origin data stream dropped connection parameters.');
       });
-    });
+
+      if (accoms.readersType) { var r = document.querySelector('input[name="readersType"][value="' + accoms.readersType + '"]'); if (r) r.checked = true; }
+      if (accoms.interpreterType) { var r = document.querySelector('input[name="interpretersType"][value="' + accoms.interpreterType + '"]'); if (r) r.checked = true; }
+      if (accoms.interpreterLang) { var el = document.getElementById('acc-interp-lang-specify'); if (el) el.value = accoms.interpreterLang; }
+      if (accoms.extendedTimeType) { var r = document.querySelector('input[name="extendedTimeType"][value="' + accoms.extendedTimeType + '"]'); if (r) r.checked = true; }
+      if (accoms.calculatorType) { var r = document.querySelector('input[name="calculatorType"][value="' + accoms.calculatorType + '"]'); if (r) r.checked = true; }
+      if (accoms.calculatorSpecify) { var el = document.getElementById('acc-calc-specify'); if (el) el.value = accoms.calculatorSpecify; }
+      if (accoms.otherSpecify) { var el = document.getElementById('acc-other-specify'); if (el) el.value = accoms.otherSpecify; }
+    }
+
+    function handleSave() {
+      var msgEl = document.getElementById('formValidationMsg');
+      msgEl.classList.add('hidden');
+
+      var required = [
+        { id: 'firstName',         label: 'First Name' },
+        { id: 'lastName',          label: 'Last Name' },
+        { id: 'iepStart',          label: 'IEP Start Date' },
+        { id: 'iepEnd',            label: 'IEP End Date' },
+        { id: 'primaryDisability', label: 'Primary Disability' },
+      ];
+      var missing = required.filter(function (f) { var el = document.getElementById(f.id); return !el || !el.value.trim(); });
+      if (missing.length > 0) {
+        msgEl.style.color = '#f87171';
+        msgEl.textContent = 'Please complete required columns: ' + missing.map(function (f) { return f.label; }).join(', ') + '.';
+        msgEl.classList.remove('hidden');
+        return;
+      }
+
+      var payload = {
+        action: (_mode === 'new') ? 'addStudent' : 'updateStudent',
+        [COL_ID]:         (_mode === 'existing') ? _rosterRows[_currentIdx][COL_ID] : _getVal('studentTag'),
+        [COL_FIRST]:      _getVal('firstName'),
+        [COL_LAST]:       _getVal('lastName'),
+        [COL_IEP_START]:  _getVal('iepStart'),
+        [COL_IEP_END]:    _getVal('iepEnd'),
+        [COL_DISABILITY]: _getVal('primaryDisability'),
+        [COL_SUPP_AIDS]:  _getVal('supplementalAids'),
+        [COL_GOALS]:      JSON.stringify(_collectGoals()),
+        [COL_ACCOMS]:     JSON.stringify(_collectStateAccommodations()),
+        submittedAt:      new Date().toISOString()
+      };
+
+      var saveBtn = document.querySelector('.btn-save');
+      if (saveBtn) saveBtn.disabled = true;
+
+      fetch(GAS_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data && data.result === 'success') {
+          msgEl.style.color = '#34d399';
+          msgEl.textContent = '✓ Record changes securely compiled to execution ledger row.';
+          msgEl.classList.remove('hidden');
+          if (_mode === 'new') {
+            setTimeout(function() { window.location.href = 'dashboard.html'; }, 1500);
+          } else {
+            setTimeout(function () { msgEl.classList.add('hidden'); }, 3000);
+          }
+        } else {
+          throw new Error(data.error || 'Server processing constraint failure.');
+        }
+      })
+      .catch(function (err) {
+        msgEl.style.color = '#f87171';
+        msgEl.textContent = 'Transmission error: ' + err.message;
+        msgEl.classList.remove('hidden');
+      })
+      .finally(function() { if (saveBtn) saveBtn.disabled = false; });
+    }
+
+    function addGoalRow(prefill) {
+      _goalCounter++;
+      var id = _goalCounter;
+      var desc = prefill ? prefill.description : '';
+      var sdi = prefill ? prefill.sdi : '';
+
+      var row = document.createElement('div');
+      row.className = 'goal-row';
+      row.setAttribute('data-goal-id', id);
+      row.innerHTML =
+        '<div class="flex items-center justify-between gap-2 mb-0.5">' +
+          '<span class="eyebrow mb-0" style="color:#4a5578;">Goal ' + id + '</span>' +
+          '<button type="button" class="btn-danger-ghost" onclick="removeGoalRow(' + id + ')">× Remove</button>' +
+        '</div>' +
+        '<div>' +
+          '<label class="field-label" for="goalDesc-' + id + '">Goal Description</label>' +
+          '<textarea id="goalDesc-' + id + '" class="field-textarea" style="min-height:72px;" placeholder="By [date]…">' + _escapeHtml(desc) + '</textarea>' +
+        '</div>' +
+        '<div>' +
+          '<label class="field-label" for="goalSdi-' + id + '">SDI <span class="ml-1 font-normal normal-case text-slate-500" style="font-size:0.68rem;">(Specially Designed Instruction)</span></label>' +
+          '<textarea id="goalSdi-' + id + '" class="field-textarea" style="min-height:60px;" placeholder="Methods…">' + _escapeHtml(sdi) + '</textarea>' +
+        '</div>';
+
+      document.getElementById('goalsContainer').appendChild(row);
+      _updateGoalsEmptyState();
+    }
+
+    function removeGoalRow(id) {
+      var row = document.querySelector('[data-goal-id="' + id + '"]');
+      if (row && row.parentNode) row.parentNode.removeChild(row);
+      _updateGoalsEmptyState();
+    }
+
+    function _updateGoalsEmptyState() {
+      var c = document.getElementById('goalsContainer');
+      document.getElementById('goalsEmptyState').classList.toggle('hidden', c.children.length > 0);
+    }
+
+    function _collectGoals() {
+      var goals = [];
+      document.querySelectorAll('#goalsContainer [data-goal-id]').forEach(function (row) {
+        var id = row.getAttribute('data-goal-id');
+        goals.push({
+          id: id,
+          description: document.getElementById('goalDesc-' + id).value.trim(),
+          sdi: document.getElementById('goalSdi-' + id).value.trim()
+        });
+      });
+      return goals;
+    }
+
+    function _collectStateAccommodations() {
+      var checked = [];
+      document.querySelectorAll('input[name="stateAccommodations"]:checked').forEach(function (cb) { checked.push(cb.value); });
+      return {
+        selections: checked,
+        readersType: (_q('input[name="readersType"]:checked') || {}).value || null,
+        interpreterType: (_q('input[name="interpretersType"]:checked') || {}).value || null,
+        interpreterLang: _v('acc-interp-lang-specify'),
+        extendedTimeType: (_q('input[name="extendedTimeType"]:checked') || {}).value || null,
+        calculatorType: (_q('input[name="calculatorType"]:checked') || {}).value || null,
+        calculatorSpecify: _v('acc-calc-specify'),
+        otherSpecify: _v('acc-other-specify')
+      };
+    }
+
+    function toggleSubGroup(groupId, show) {
+      var g = document.getElementById(groupId); if (!g) return;
+      if (show) { g.classList.remove('hidden'); } else {
+        g.classList.add('hidden');
+        g.querySelectorAll('input[type="radio"]').forEach(function(r){r.checked=false;});
+        g.querySelectorAll('input[type="text"]').forEach(function(t){t.value='';});
+      }
+    }
+
+    function _updateIepCountdown() {
+      var endEl = document.getElementById('iepEnd');
+      var banner = document.getElementById('iepCountdown');
+      if (!endEl || !banner || !endEl.value) { if(banner) banner.classList.add('hidden'); return; }
+
+      var today = new Date(); today.setHours(0,0,0,0);
+      var endDate = new Date(endEl.value + 'T00:00:00');
+      var diffDays = Math.ceil((endDate - today) / 86400000);
+      var msg, color, bgColor, borderColor;
+
+      if (diffDays < 0) { msg = '⚠ IEP expired ' + Math.abs(diffDays) + ' days ago.'; color = '#f87171'; bgColor = 'rgba(248,113,113,0.06)'; borderColor = 'rgba(248,113,113,0.3)'; }
+      else if (diffDays <= 30) { msg = '⚡ ' + diffDays + ' days remaining until review milestone window context rules apply.'; color = '#f59e0b'; bgColor = 'rgba(245,158,11,0.06)'; borderColor = 'rgba(245,158,11,0.28)'; }
+      else { msg = '✓ ' + diffDays + ' calendar days remain active within lifecycle parameters.'; color = '#34d399'; bgColor = 'rgba(52,211,153,0.06)'; borderColor = 'rgba(52,211,153,0.22)'; }
+
+      banner.textContent = msg; banner.style.color = color; banner.style.background = bgColor; banner.style.borderColor = borderColor;
+      banner.classList.remove('hidden');
+    }
+
+    function _hideLoading() { document.getElementById('loadingOverlay').classList.add('hidden'); }
+    function _showFallback(msg) { _hideLoading(); document.getElementById('fallbackMsg').textContent = msg; document.getElementById('fallbackPanel').classList.add('visible'); }
+    function _escapeHtml(str) { return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+    function _setVal(id, val) { var el = document.getElementById(id); if (el) el.value = val || ''; }
+    function _getVal(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+    function _q(sel) { return document.querySelector(sel); }
+    function _v(id) { var el = document.getElementById(id); return (el && el.value && el.value.trim()) ? el.value.trim() : null; }
   </script>
 
 </body>
