@@ -79,11 +79,14 @@
       })
       .then(function(res) { return res.json(); })
       .then(function(data) {
-        var rows = data.rows || [];
-        var searchId = studentId.trim().toLowerCase();
-        
-        // Debug: Log what we are looking for
-        console.log('Searching for ID:', "'" + searchId + "'");
+       var match = rows.find(function(r) { 
+          // Remove double quotes, single quotes, and whitespace, then lowercase
+          var rowId = String(r || '').replace(/["']/g, '').trim().toLowerCase();
+          var searchId = studentId.trim().toLowerCase();
+          
+          console.log('Comparing:', "'" + rowId + "'", 'vs', "'" + searchId + "'");
+          return rowId === searchId; 
+        });
 
         var match = rows.find(function(r) { 
           // Debug: Log the value found in column B (index 1) for each row
