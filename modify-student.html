@@ -172,7 +172,57 @@
 
     // [Additional helper functions (_showLoading, _showContent, _renderStudentRow, _saveRecord) go here...]
 
-    document.addEventListener('DOMContentLoaded', function () { /* Fetch and initialization logic */ });
+   document.addEventListener('DOMContentLoaded', function () {
+      var params    = new URLSearchParams(window.location.search);
+      var studentId = params.get('id') ? params.get('id').trim() : '';
+
+      _mode = (studentId === 'new' || !studentId) ? 'new' : 'existing';
+
+      if (_mode === 'new') {
+        // ... (existing new student logic)
+        return;
+      }
+
+      _showLoading();
+
+      // Add a explicit timeout to the fetch logic
+      var controller = new AbortController();
+      var timeoutId = setTimeout(function() { controller.abort(); }, 10000); // 10s timeout
+
+      fetch(GAS_WEBHOOK_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body:    JSON.stringify({ action: 'getRoster' }),
+        signal:  controller.signal
+      })
+      .then(function(res) {
+        clearTimeout(timeoutId);
+        if (!res.ok) throw new Error('HTTP status failure: ' + res.status);
+        return res.json();
+      })
+      .then(function(data) {
+        var rawRows = data.rows || [];
+        _rosterRows = (rawRows.length > 0 && Array.isArray(rawRows[0]) && String(rawRows[0][0]).toLowerCase().includes('id')) ? rawRows.slice(1) : rawRows;
+        _rosterRows = _rosterRows.filter(function(r) { return r && (r[COL_FIRST] || r[COL_LAST]); });
+
+        _currentIdx = _rosterRows.findIndex(function (r) {
+          return String(r[COL_ID] || '').trim().toLowerCase() === studentId.toLowerCase();
+        });
+
+        if (_currentIdx === -1) {
+          throw new Error('Student ID "' + studentId + '" not found in ledger.');
+        }
+
+        document.getElementById('carouselNav').classList.remove('hidden');
+        _refreshCarouselState();
+        _renderStudentRow(_rosterRows[_currentIdx]);
+        _showContent();
+      })
+      .catch(function(err) {
+        console.error('[Engine Exception]:', err);
+        _showFallback('Data Retrieval Error', err.name === 'AbortError' ? 'Request timed out.' : err.message);
+      });
+    });
   </script>
 </body>
 </html>
