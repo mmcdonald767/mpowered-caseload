@@ -42,10 +42,8 @@
 
   <script>
     'use strict';
-    
     if (!window.mpowered_initialized) {
         window.mpowered_initialized = true;
-
         var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -72,12 +70,11 @@
               return String(r || '').replace(/["']/g, '').trim().toLowerCase() === searchId; 
             });
 
-            if (match) {
-              // Safe DOM updates with null-checks
+            if (match && Array.isArray(match)) {
               var nameEl = document.getElementById('display-name');
               var idEl = document.getElementById('rv-firstName');
-              var contentArea = document.getElementById('content-area');
               var loading = document.getElementById('loading-overlay');
+              var contentArea = document.getElementById('content-area');
 
               if (nameEl) nameEl.textContent = (match || '') + ' ' + (match || '');
               if (idEl) idEl.textContent = (match || 'Unknown');
@@ -85,14 +82,18 @@
               if (loading) loading.classList.add('hidden');
               if (contentArea) contentArea.classList.add('visible');
             } else {
-              document.getElementById('loading-overlay').classList.add('hidden');
-              document.getElementById('fallback-state').classList.add('visible');
-              document.getElementById('fallback-message').textContent = 'Student ID "' + studentId + '" not in ledger.';
+              var loading = document.getElementById('loading-overlay');
+              var fallback = document.getElementById('fallback-state');
+              if (loading) loading.classList.add('hidden');
+              if (fallback) fallback.classList.add('visible');
+              document.getElementById('fallback-message').textContent = 'Data error: Could not process record for "' + studentId + '".';
             }
           })
           .catch(function(err) {
-            document.getElementById('loading-overlay').classList.add('hidden');
-            document.getElementById('fallback-state').classList.add('visible');
+            var loading = document.getElementById('loading-overlay');
+            var fallback = document.getElementById('fallback-state');
+            if (loading) loading.classList.add('hidden');
+            if (fallback) fallback.classList.add('visible');
             document.getElementById('fallback-message').textContent = err.message;
           });
         });
