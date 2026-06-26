@@ -822,7 +822,7 @@
       row.className = 'goal-edit-row mt-2';
       row.setAttribute('data-goal-id', id);
 
-      row.innerHTML =
+row.innerHTML =
         '<div class="flex items-center justify-between gap-2 mb-2">' +
           '<span class="eyebrow mb-0">Goal ' + id + '</span>' +
           '<button type="button" class="btn-remove-goal" onclick="_removeGoalEditRow(' + id + ')">Remove</button>' +
@@ -838,7 +838,7 @@
           '</div>' +
           '<div>' +
             '<label class="field-label" for="goal-domain-' + id + '">Domain / Area</label>' +
-            <input id="goal-domain-' + id + '" type="text" class="field-input" value="' + _escapeHtml(dom) + '" />' +
+            '<input id="goal-domain-' + id + '" type="text" class="field-input" value="' + _escapeHtml(dom) + '" />' +
           '</div>' +
           '<div class="sm:col-span-2">' +
             '<label class="field-label" for="goal-crit-' + id + '">Target Criteria</label>' +
