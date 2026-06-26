@@ -83,7 +83,6 @@
       })
       .then(function(res) { return res.json(); })
       .then(function(data) {
-        // Corrected Lookup: Target column 0 for ID comparison
         var match = (data.rows || []).find(function(r) { 
           return String(r || '').trim().toLowerCase() === studentId.trim().toLowerCase(); 
         });
