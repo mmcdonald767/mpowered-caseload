@@ -58,24 +58,10 @@
     }
     function _showFallback(title, msg) {
       var overlay = document.getElementById('loading-overlay'); if (overlay) overlay.classList.add('hidden');
+      var content = document.getElementById('content-area'); if (content) content.classList.remove('visible');
       var fallback = document.getElementById('fallback-state'); if (fallback) fallback.classList.add('visible');
       if (title) document.getElementById('fallback-title').textContent = title;
       if (msg) document.getElementById('fallback-message').textContent = msg;
-    }
-
-    // DATA COLLECTION FUNCTIONS
-    function _collectGoalsFromEditRows() {
-      var goals = [];
-      document.querySelectorAll('#goals-edit-container [data-goal-id]').forEach(function(row) {
-        var id = row.getAttribute('data-goal-id');
-        var desc = (document.getElementById('goal-desc-' + id) || {}).value || '';
-        goals.push({ description: desc.trim() });
-      });
-      return goals;
-    }
-
-    function _collectStateAccommodations() {
-      return { selections: [] };
     }
 
     // MAIN INITIALIZATION
@@ -97,14 +83,18 @@
       })
       .then(function(res) { return res.json(); })
       .then(function(data) {
-       // Target the first column (index 0) of the row array for comparison
-var match = (data.rows || []).find(function(r) { 
-  return String(r || '').trim().toLowerCase() === studentId.trim().toLowerCase(); 
-});
+        // Corrected Lookup: Target column 0 for ID comparison
+        var match = (data.rows || []).find(function(r) { 
+          return String(r || '').trim().toLowerCase() === studentId.trim().toLowerCase(); 
+        });
+
         if (!match) {
-          _showFallback('Not Found', 'Student ID not in ledger.');
+          _showFallback('Not Found', 'Student ID "' + studentId + '" not in ledger.');
         } else {
-document.getElementById('display-name').textContent = (match || '') + ' ' + (match || '');          _showContent();
+          // Corrected Display: Target columns 1 (First Name) and 2 (Last Name)
+          document.getElementById('display-name').textContent = (match || '') + ' ' + (match || '');
+          document.getElementById('rv-firstName').textContent = (match || 'Unknown');
+          _showContent();
         }
       })
       .catch(function(err) {
