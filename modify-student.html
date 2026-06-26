@@ -98,18 +98,19 @@
         if (match) {
           console.log('Match identified, updating UI...');
           
-          // Force update display-name
-          var nameEl = document.getElementById('display-name');
-          if (nameEl) nameEl.textContent = (match || '') + ' ' + (match || '');
+          document.getElementById('display-name').textContent = (match || '') + ' ' + (match || '');
+          document.getElementById('rv-firstName').textContent = (match || 'Unknown');
           
-          // Force update identity field
-          var idEl = document.getElementById('rv-firstName');
-          if (idEl) idEl.textContent = (match || 'Unknown');
+          // Debugging the carousel: Wrap in try/catch to ensure it doesn't crash the script
+          try {
+            if (typeof _refreshCarouselState === 'function') {
+              _refreshCarouselState();
+            }
+          } catch (e) {
+            console.warn('Carousel refresh failed, continuing...', e);
+          }
           
-          // Ensure we transition to the content view
           _showContent();
-        } else {
-          _showFallback('Not Found', 'Student ID "' + studentId + '" not in ledger.');
         }
       })
       .catch(function(err) {
