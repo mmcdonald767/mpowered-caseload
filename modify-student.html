@@ -81,8 +81,8 @@
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'getRoster' })
       })
-      .then(function(res) { return res.json(); })
-      .then(function(data) {
+     .then(function(data) {
+        // Corrected Lookup: Target column index 1 (Column B in the CSV)
         var match = (data.rows || []).find(function(r) { 
           return String(r || '').trim().toLowerCase() === studentId.trim().toLowerCase(); 
         });
@@ -90,9 +90,9 @@
         if (!match) {
           _showFallback('Not Found', 'Student ID "' + studentId + '" not in ledger.');
         } else {
-          // Corrected Display: Target columns 1 (First Name) and 2 (Last Name)
+          // Display Name logic: Adjust index numbers based on your CSV's First/Last name columns
+          // For example, if First Name is C (2) and Last Name is D (3):
           document.getElementById('display-name').textContent = (match || '') + ' ' + (match || '');
-          document.getElementById('rv-firstName').textContent = (match || 'Unknown');
           _showContent();
         }
       })
