@@ -29,7 +29,7 @@
 
     <div id="content-area">
       <div class="panel mb-5">
-        <h1 id="display-name" class="text-xl font-bold">Loading...</h1>
+        <h1 id="display-name" class="text-xl font-bold"></h1>
       </div>
       <section id="sec-identity" class="panel mb-5">
         <h2 class="text-base font-semibold mb-2">Student Identifiers</h2>
@@ -43,7 +43,6 @@
   <script>
     'use strict';
     
-    // Global execution guard
     if (!window.mpowered_initialized) {
         window.mpowered_initialized = true;
 
@@ -74,11 +73,17 @@
             });
 
             if (match) {
-              document.getElementById('display-name').textContent = (match || '') + ' ' + (match || '');
-              document.getElementById('rv-firstName').textContent = (match || 'Unknown');
+              // Safe DOM updates with null-checks
+              var nameEl = document.getElementById('display-name');
+              var idEl = document.getElementById('rv-firstName');
+              var contentArea = document.getElementById('content-area');
+              var loading = document.getElementById('loading-overlay');
+
+              if (nameEl) nameEl.textContent = (match || '') + ' ' + (match || '');
+              if (idEl) idEl.textContent = (match || 'Unknown');
               
-              document.getElementById('loading-overlay').classList.add('hidden');
-              document.getElementById('content-area').classList.add('visible');
+              if (loading) loading.classList.add('hidden');
+              if (contentArea) contentArea.classList.add('visible');
             } else {
               document.getElementById('loading-overlay').classList.add('hidden');
               document.getElementById('fallback-state').classList.add('visible');
