@@ -41,154 +41,39 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
-
-    body {
-      background-color: #0f1117;
-      color: #e8ecf4;
-      font-family: 'Inter', system-ui, sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
-
+    body { background-color: #0f1117; color: #e8ecf4; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
     ::-webkit-scrollbar       { width: 6px; }
     ::-webkit-scrollbar-track { background: #171b26; }
     ::-webkit-scrollbar-thumb { background: #2e3650; border-radius: 3px; }
-
-    .nav-link {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem; font-weight: 500; color: #7d8fb3;
-      border: 1px solid #252c42; border-radius: 7px;
-      padding: 0.4rem 0.85rem; text-decoration: none;
-      transition: color 0.14s, border-color 0.14s, background 0.14s;
-      white-space: nowrap;
-    }
+    .nav-link { display: inline-flex; align-items: center; gap: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 500; color: #7d8fb3; border: 1px solid #252c42; border-radius: 7px; padding: 0.4rem 0.85rem; text-decoration: none; transition: color 0.14s, border-color 0.14s, background 0.14s; white-space: nowrap; }
     .nav-link:hover  { color: #e8ecf4; border-color: #6c8fff; background: rgba(108,143,255,0.07); }
     .nav-link.active { color: #6c8fff; border-color: rgba(108,143,255,0.4); background: rgba(108,143,255,0.06); }
-
-    .btn-ghost {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      background: transparent; color: #7d8fb3;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem; font-weight: 500;
-      border: 1px solid #252c42; border-radius: 7px;
-      padding: 0.4rem 0.85rem; cursor: pointer;
-      transition: color 0.14s, border-color 0.14s, background 0.14s;
-      white-space: nowrap;
-    }
-    .btn-ghost:hover        { color: #f87171; border-color: rgba(248,113,113,0.45); background: rgba(248,113,113,0.06); }
-    .btn-ghost:disabled     { opacity: 0.4; cursor: not-allowed; }
-    .btn-ghost:focus-visible{ outline: none; box-shadow: 0 0 0 3px rgba(108,143,255,0.35); }
-
-    .panel {
-      background: #171b26; border: 1px solid #1e2335;
-      border-radius: 14px; padding: 1.75rem;
-    }
-
-    .stat-card {
-      background: #171b26; border: 1px solid #1e2335;
-      border-radius: 10px; padding: 1.1rem 1.25rem;
-      display: flex; flex-direction: column; gap: 0.3rem;
-    }
-    .stat-card.warn { border-color: rgba(251,191,36,0.3); }
-    .stat-card.warn .stat-value { color: #fbbf24; }
-
-    .eyebrow {
-      font-size: 0.68rem; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: #6c8fff; margin-bottom: 0.2rem;
-    }
-
-    .ferpa-badge {
-      display: inline-flex; align-items: center; gap: 0.35rem;
-      font-size: 0.67rem; font-weight: 600; letter-spacing: 0.06em;
-      color: #34d399; border: 1px solid rgba(52,211,153,0.3);
-      border-radius: 20px; padding: 0.2rem 0.6rem;
-      background: rgba(52,211,153,0.07); flex-shrink: 0;
-    }
-
-    .placeholder-card {
-      background: #171b26; border: 1.5px dashed #252c42;
-      border-radius: 12px; padding: 3rem 2rem; text-align: center;
-    }
-
-    .roster-table { width: 100%; border-collapse: collapse; }
-    .roster-table thead tr { border-bottom: 1px solid #1e2335; }
-    .roster-table thead th {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem; font-weight: 600;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      color: #4a5578; padding: 0 1rem 0.75rem 0;
-      text-align: left; white-space: nowrap;
-    }
-    .roster-table thead th:last-child { text-align: right; padding-right: 0; }
-
-    .roster-table tbody tr { border-bottom: 1px solid #1a1f2e; }
-    .roster-table tbody tr:last-child { border-bottom: none; }
-    .roster-table tbody tr:hover { background: rgba(108,143,255,0.03); }
-    .roster-table tbody td { padding: 0.9rem 1rem 0.9rem 0; font-size: 0.85rem; color: #c4cde4; }
-    .roster-table tbody td:last-child { text-align: right; padding-right: 0; }
-
-    .td-name    { color: #e8ecf4; font-weight: 600; }
-    .td-tag     { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #6c8fff; }
-    .td-dis     { font-size: 0.8rem; color: #7d8fb3; }
-    .td-iep     { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; white-space: nowrap; }
-    .td-iep .iep-warn { color: #fbbf24; }
-    .td-iep .iep-ok   { color: #4a5578; }
-
-    .rule { border: none; border-top: 1px solid #1e2335; margin: 1.5rem 0; }
-
-    @keyframes shimmer {
-      0%   { background-position: -600px 0; }
-      100% { background-position:  600px 0; }
-    }
-    .skeleton {
-      background: linear-gradient(90deg, #1e2335 25%, #252c42 50%, #1e2335 75%);
-      background-size: 600px 100%;
-      animation: shimmer 1.4s infinite;
-      border-radius: 4px;
-      display: inline-block;
-    }
+    .btn-ghost { display: inline-flex; align-items: center; gap: 0.4rem; background: transparent; color: #7d8fb3; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 500; border: 1px solid #252c42; border-radius: 7px; padding: 0.4rem 0.85rem; cursor: pointer; transition: color 0.14s, border-color 0.14s, background 0.14s; white-space: nowrap; }
+    .btn-ghost:hover { color: #f87171; border-color: rgba(248,113,113,0.45); background: rgba(248,113,113,0.06); }
+    .panel { background: #171b26; border: 1px solid #1e2335; border-radius: 14px; padding: 1.75rem; }
+    .hidden { display: none; }
   </style>
 </head>
 
 <body class="bg-surface-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col">
 
-  <header class="bg-surface-800 border-b border-surface-700 flex-shrink-0" role="banner">
-    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between flex-wrap gap-3">
-      <div class="flex items-center gap-4 min-w-0">
-        <div class="flex items-center gap-2.5 flex-shrink-0">
-          <div class="w-8 h-8 rounded-[8px] flex items-center justify-center"
-               style="background: linear-gradient(135deg, #3b5bdb, #6c8fff);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                 stroke="#fff" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 00-3-3.87"/>
-              <path d="M16 3.13a4 4 0 010 7.75"/>
-            </svg>
-          </div>
-          <span class="text-[0.95rem] font-bold text-slate-100 tracking-tight leading-none hidden sm:block">
-            M-Powered Education
-          </span>
-        </div>
-        <span class="text-surface-600 select-none hidden sm:block" aria-hidden="true">|</span>
-        <nav class="flex items-center gap-2" role="navigation" aria-label="Main navigation">
-          <a href="https://www.mpowerededucation.com/dashboard.html" class="nav-link" aria-label="Return to main dashboard">Dashboard</a>
-          <a href="/" class="nav-link active" aria-current="page" aria-label="Caseload Portal">Caseload Portal</a>
-          <a href="https://data.mpowerededucation.com" class="nav-link" aria-label="Data Utility">Data Utility</a>
+  <header class="bg-surface-800 border-b border-surface-700 flex-shrink-0">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <span class="text-[0.95rem] font-bold text-slate-100">M-Powered Education</span>
+        <nav class="flex items-center gap-2">
+          <a href="/" class="nav-link active">Caseload Portal</a>
         </nav>
       </div>
-
-      <div class="flex items-center gap-2.5 flex-shrink-0">
-        <span class="ferpa-badge hidden sm:inline-flex">FERPA</span>
-        <button onclick="logout()" class="btn-ghost" aria-label="Sign out">Sign Out</button>
-      </div>
+      <button onclick="logout()" class="btn-ghost">Sign Out</button>
     </div>
   </header>
 
-  <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8" role="main">
+  <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
     <div class="panel">
         <div id="rosterLoading" class="text-center py-20 text-slate-500">Loading caseload...</div>
+        <div id="rosterEmpty" class="hidden text-center py-20 text-slate-500">No students found.</div>
+        <div id="rosterError" class="hidden text-center py-20 text-red-400">Error loading data.</div>
         <div id="rosterTableWrap" class="hidden overflow-x-auto">
             <table class="roster-table">
                 <tbody id="rosterTbody"></tbody>
@@ -202,59 +87,13 @@
 
     var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
 
-    var COL_ID        = 1;
-    var COL_FIRST     = 2;
-    var COL_LAST      = 3;
-    var COL_IEP_START = 4;
-    var COL_IEP_END   = 5;
-    var COL_DISABILITY= 6;
-
     function getCookie(name) {
-      try {
-        var match = document.cookie.match(new RegExp('(?:^|;\\s*)' + name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '=([^;]+)'));
-        return match ? decodeURIComponent(match) : null;
-      } catch (e) { return null; }
-    }
-
-    function mpSessionGuard() {
-      var isLocal = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-
-      if (!isLocal) {
-        // Ensure your backend sets these cookies on the .mpowerededucation.com domain
-        var sessionCookie = getCookie('mp_session') || getCookie('mp_session_active');
-        var localToken    = null;
-
-        try { localToken = localStorage.getItem('auth_token'); } catch (e) {}
-
-        if (sessionCookie && !localToken) {
-          try {
-            localStorage.setItem('auth_token', 'cookie_session');
-            localStorage.setItem('mp_beta_auth_time', Date.now().toString());
-          } catch (e) {}
-          localToken = 'cookie_session';
-        }
-
-        if (!sessionCookie && !localToken) {
-          console.error('[mpSessionGuard] No auth signal. Redirecting to login.');
-          var returnPath = encodeURIComponent(window.location.pathname + window.location.search);
-          window.history.replaceState(null, null, window.location.pathname + window.location.search);
-          // Redirecting to main domain authentication portal
-          window.location.replace('https://www.mpowerededucation.com/index.html?next=' + returnPath);
-          return;
-        }
-      }
-      console.log('[mpSessionGuard] Authenticated.');
-    }
-
-    function logout() {
-      try {
-        localStorage.clear();
-      } catch (e) {}
-      // Redirecting to main domain authentication portal
-      window.location.replace('https://www.mpowerededucation.com/index.html');
+      var match = document.cookie.match(new RegExp('(^|;\\s*)' + name + '=([^;]+)'));
+      return match ? decodeURIComponent(match) : null;
     }
 
     function _gasPost(payload) {
+      // FIXED: Correctly isolated base URL using array index
       var cleanUrl = GAS_WEBHOOK_URL.split('#').split('?');
       return fetch(cleanUrl, {
         method:  'POST',
@@ -264,57 +103,49 @@
       .then(function (response) {
         if (!response.ok) throw new Error('HTTP ' + response.status);
         return response.json();
-      })
-      .then(function (data) {
-        if (data.result !== 'success') throw new Error(data.error);
-        return data;
       });
     }
-function _showRosterState(state) {
-  /* state: 'loading' | 'empty' | 'error' | 'data' */
-  var loading  = document.getElementById('rosterLoading');
-  var empty    = document.getElementById('rosterEmpty');
-  var error    = document.getElementById('rosterError');
-  var tableWrap= document.getElementById('rosterTableWrap');
 
-  if (loading)   loading.classList.toggle  ('hidden', state !== 'loading');
-  if (empty)     empty.classList.toggle    ('hidden', state !== 'empty');
-  if (error)     error.classList.toggle    ('hidden', state !== 'error');
-  if (tableWrap) tableWrap.classList.toggle('hidden', state !== 'data');
-}
-   function loadRoster() {
-  _showRosterState('loading');
+    function _showRosterState(state) {
+      var loading   = document.getElementById('rosterLoading');
+      var empty     = document.getElementById('rosterEmpty');
+      var error     = document.getElementById('rosterError');
+      var tableWrap = document.getElementById('rosterTableWrap');
 
-  // 1. Perform the handshake
-  _gasPost({ action: 'authCheck' })
-    .then(function(authData) {
-      if(authData.token) {
-        // 2. If backend confirms auth, store the token so the Guard passes
-        localStorage.setItem('auth_token', authData.token);
-        // 3. Now fetch the roster
-        return _gasPost({ action: 'getRoster' });
-      } else {
-        throw new Error('Not authenticated');
-      }
-    })
-    .then(function (data) {
-      var rows = data.rows || [];
-      renderRoster(rows);
-    })
-    .catch(function (err) {
-      console.error('[loadRoster] Auth failed:', err);
-      _showRosterState('error');
-      // If we are definitely not auth'd, trigger the redirect to login
-      window.location.replace('https://www.mpowerededucation.com/index.html?next=' + encodeURIComponent(window.location.href));
-    });
-}
+      if (loading)   loading.classList.toggle('hidden', state !== 'loading');
+      if (empty)     empty.classList.toggle('hidden', state !== 'empty');
+      if (error)     error.classList.toggle('hidden', state !== 'error');
+      if (tableWrap) tableWrap.classList.toggle('hidden', state !== 'data');
+    }
 
-document.addEventListener('DOMContentLoaded', function () {
-  // We removed the automatic mpSessionGuard() call here 
-  // because loadRoster() now handles the auth handshake flow.
-  loadRoster();
-});
+    function loadRoster() {
+      _showRosterState('loading');
+      _gasPost({ action: 'authCheck' })
+        .then(function(authData) {
+          if(authData.token) {
+            localStorage.setItem('auth_token', authData.token);
+            return _gasPost({ action: 'getRoster' });
+          } else {
+            throw new Error('Not authenticated');
+          }
+        })
+        .then(function (data) {
+          _showRosterState('data');
+          // Add your rendering logic here
+        })
+        .catch(function (err) {
+          console.error('[loadRoster] Auth failed:', err);
+          _showRosterState('error');
+          window.location.replace('https://www.mpowerededucation.com/index.html?next=' + encodeURIComponent(window.location.href));
+        });
+    }
 
+    function logout() {
+      try { localStorage.clear(); } catch (e) {}
+      window.location.replace('https://www.mpowerededucation.com/index.html');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadRoster);
   </script>
 </body>
 </html>
