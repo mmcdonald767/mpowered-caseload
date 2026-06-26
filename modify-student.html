@@ -79,13 +79,20 @@
       })
       .then(function(res) { return res.json(); })
       .then(function(data) {
-        var match = (data.rows || []).find(function(r) { 
-          // Match index 1 (Column B)
-          return String(r || '').trim().toLowerCase() === studentId.trim().toLowerCase(); 
+        var rows = data.rows || [];
+        var searchId = studentId.trim().toLowerCase();
+        
+        // Debug: Log what we are looking for
+        console.log('Searching for ID:', "'" + searchId + "'");
+
+        var match = rows.find(function(r) { 
+          // Debug: Log the value found in column B (index 1) for each row
+          var rowId = String(r || '').trim().toLowerCase();
+          console.log('Comparing against:', "'" + rowId + "'");
+          return rowId === searchId; 
         });
 
         if (match) {
-          // Display Indices: 2 (First Name), 3 (Last Name)
           document.getElementById('display-name').textContent = (match || '') + ' ' + (match || '');
           document.getElementById('rv-firstName').textContent = (match || 'Unknown');
           _showContent();
