@@ -76,12 +76,16 @@
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'getRoster' })
       })
-      .then(function(res) { return res.json(); })
+.then(function(res) { return res.json(); })
       .then(function(data) {
-        var match = (data.rows || []).find(function(r) { 
-          // Match column B (index 1) with aggressive normalization
+        // 1. Properly define the 'rows' variable from the fetched data
+        var rows = data.rows || []; 
+        
+        // 2. Perform the find operation using the defined 'rows'
+        var match = rows.find(function(r) { 
           var rowId = String(r || '').replace(/["']/g, '').trim().toLowerCase();
-          return rowId === studentId.trim().toLowerCase(); 
+          var searchId = studentId.trim().toLowerCase();
+          return rowId === searchId; 
         });
 
         if (match) {
