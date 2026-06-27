@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Caseload Management Portal &mdash; M-Powered Education</title>
+  <title>Caseload Management Portal — M-Powered Education</title>
   <meta name="robots" content="noindex, nofollow" />
+  <link rel="icon" href="data:,">
 
   <script src="https://cdn.tailwindcss.com"></script>
-
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -16,10 +16,13 @@
         extend: {
           colors: {
             surface: { 900: '#0f1117', 800: '#171b26', 700: '#1e2335', 600: '#252c42', 500: '#2e3650' },
-            accent: { DEFAULT: '#6c8fff', soft: '#3b5bdb' },
+            accent:  { DEFAULT: '#6c8fff', soft: '#3b5bdb' },
             success: '#34d399',
           },
-          fontFamily: { sans: ['"Inter"', 'system-ui', 'sans-serif'], mono: ['"JetBrains Mono"', 'monospace'] },
+          fontFamily: {
+            sans: ['"Inter"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
         }
       }
     }
@@ -32,8 +35,43 @@
     *, *::before, *::after { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; }
     body { background-color: #0f1117; color: #e8ecf4; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+
     .panel { background: #171b26; border: 1px solid #1e2335; border-radius: 14px; padding: 1.75rem; }
-    .hidden { display: none; }
+    .hidden { display: none !important; }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: transparent; color: #7d8fb3;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 500;
+      border: 1px solid #252c42; border-radius: 7px; padding: 0.4rem 0.85rem;
+      cursor: pointer; transition: color 0.14s, border-color 0.14s;
+    }
+    .btn-ghost:hover { color: #f87171; border-color: rgba(248,113,113,0.45); }
+
+    .btn-action {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: rgba(108,143,255,0.08); color: #6c8fff;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
+      border: 1px solid rgba(108,143,255,0.25); border-radius: 6px;
+      padding: 0.3rem 0.75rem; cursor: pointer; white-space: nowrap;
+      transition: background 0.14s, border-color 0.14s;
+    }
+    .btn-action:hover { background: rgba(108,143,255,0.16); border-color: rgba(108,143,255,0.5); }
+
+    .roster-table { width: 100%; border-collapse: collapse; }
+    .roster-table thead th {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase; color: #4a5578;
+      padding: 0 1rem 0.75rem 0; text-align: left; border-bottom: 1px solid #1e2335;
+    }
+    .roster-table thead th:last-child { text-align: right; padding-right: 0; }
+    .roster-table tbody tr { border-bottom: 1px solid #1a1f2e; transition: background 0.1s; }
+    .roster-table tbody tr:last-child { border-bottom: none; }
+    .roster-table tbody tr:hover { background: rgba(108,143,255,0.03); }
+    .roster-table tbody td { padding: 0.9rem 1rem 0.9rem 0; font-size: 0.85rem; color: #c4cde4; vertical-align: middle; }
+    .roster-table tbody td:last-child { text-align: right; padding-right: 0; }
+    .td-name { color: #e8ecf4; font-weight: 600; }
+    .td-tag  { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #6c8fff; }
   </style>
 </head>
 
@@ -41,85 +79,240 @@
 
   <header class="bg-surface-800 border-b border-surface-700">
     <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-      <span class="text-[0.95rem] font-bold">M-Powered Education</span>
+      <span class="text-[0.95rem] font-bold">M-Powered Education — Caseload Portal</span>
       <button onclick="logout()" class="btn-ghost">Sign Out</button>
     </div>
   </header>
 
   <main class="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
     <div class="panel">
-        <div id="rosterLoading" class="text-center py-20 text-slate-500">Loading caseload...</div>
-        <div id="rosterEmpty" class="hidden text-center py-20 text-slate-500">No students found.</div>
-        <div id="rosterError" class="hidden text-center py-20 text-red-400">Error loading data.</div>
-        <div id="rosterTableWrap" class="hidden overflow-x-auto">
-            <table class="roster-table">
-                <tbody id="rosterTbody"></tbody>
-            </table>
-        </div>
+
+      <!-- Loading -->
+      <div id="rosterLoading" class="text-center py-20 text-slate-500 font-mono text-sm">
+        Loading caseload…
+      </div>
+
+      <!-- Empty -->
+      <div id="rosterEmpty" class="hidden text-center py-20 text-slate-500 text-sm">
+        No students found on the roster.
+      </div>
+
+      <!-- Error -->
+      <div id="rosterError" class="hidden text-center py-20">
+        <p class="text-red-400 text-sm font-semibold mb-1">Failed to load caseload</p>
+        <p id="rosterErrorMsg" class="text-slate-500 text-xs mb-4"></p>
+        <button class="btn-ghost" onclick="loadRoster()">Retry</button>
+      </div>
+
+      <!-- Roster table -->
+      <div id="rosterTableWrap" class="hidden overflow-x-auto">
+        <table class="roster-table" aria-label="Active student caseload">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">ID / Tag</th>
+              <th scope="col">Disability</th>
+              <th scope="col">IEP Window</th>
+              <th scope="col" style="text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rosterTbody">
+            <!-- Rows injected by renderRoster() -->
+          </tbody>
+        </table>
+      </div>
+
     </div>
   </main>
 
   <script>
     'use strict';
 
+    // ── Configuration ────────────────────────────────────────────
     var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
 
+    // Column schema — must match Code.gs sheet layout
+    var COL_ID         = 1;
+    var COL_FIRST      = 2;
+    var COL_LAST       = 3;
+    var COL_IEP_START  = 4;
+    var COL_IEP_END    = 5;
+    var COL_DISABILITY = 6;
+
+    // ── GAS POST helper ──────────────────────────────────────────
+    // Strips any fragment/query from the exec URL before sending.
+    // Uses text/plain to avoid CORS preflight (OPTIONS), which GAS
+    // cannot respond to and which causes the request to fail before
+    // doPost() ever runs.
     function _gasPost(payload) {
-      // FIXED: Correctly isolate the base URL by accessing array index [0]
       var cleanUrl = GAS_WEBHOOK_URL.split('#')[0].split('?')[0];
       return fetch(cleanUrl, {
         method:  'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body:    JSON.stringify(payload)
       })
-      .then(function (response) {
-        if (!response.ok) throw new Error('HTTP ' + response.status);
-        return response.json();
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status + ' — ' + res.statusText);
+        return res.json();
+      })
+      .then(function (data) {
+        // Surface GAS-level errors (result !== 'success') as thrown errors
+        // so the catch() in loadRoster() handles them uniformly.
+        if (data.result !== 'success') {
+          throw new Error(data.error || 'GAS returned result: "' + data.result + '"');
+        }
+        return data;
       });
     }
 
+    // ── UI state helper ──────────────────────────────────────────
     function _showRosterState(state) {
-      var loading   = document.getElementById('rosterLoading');
-      var empty     = document.getElementById('rosterEmpty');
-      var error     = document.getElementById('rosterError');
-      var tableWrap = document.getElementById('rosterTableWrap');
-
-      if (loading)   loading.classList.toggle('hidden', state !== 'loading');
-      if (empty)     empty.classList.toggle('hidden', state !== 'empty');
-      if (error)     error.classList.toggle('hidden', state !== 'error');
-      if (tableWrap) tableWrap.classList.toggle('hidden', state !== 'data');
+      var ids = ['rosterLoading', 'rosterEmpty', 'rosterError', 'rosterTableWrap'];
+      var map = { loading: 'rosterLoading', empty: 'rosterEmpty', error: 'rosterError', data: 'rosterTableWrap' };
+      ids.forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', id !== map[state]);
+      });
     }
 
+    // ── Roster loader ────────────────────────────────────────────
+    // Two-step flow:
+    //   1. authCheck  — verifies the GAS deployment is reachable and
+    //                   public (a 302 here means wrong deployment settings).
+    //   2. getRoster  — fetches the full 2D rows array.
+    //
+    // FIX: the roster data returned by getRoster is now passed through
+    // to renderRoster() instead of being silently discarded.
     function loadRoster() {
       _showRosterState('loading');
-      
-      // Perform handshake
+
       _gasPost({ action: 'authCheck' })
-        .then(function(authData) {
-          if(authData && authData.token) {
-            localStorage.setItem('auth_token', authData.token);
-            return _gasPost({ action: 'getRoster' });
-          } else {
-            throw new Error('Not authenticated');
-          }
+        .then(function (authData) {
+          // Persist the session token for future cross-page use
+          try { localStorage.setItem('auth_token', authData.token || 'verified'); } catch (e) {}
+          return _gasPost({ action: 'getRoster' });
         })
         .then(function (data) {
-          _showRosterState('data');
-          console.log('Roster loaded successfully');
+          // FIX: data.rows was previously dropped here — now passed to renderRoster
+          var rows = Array.isArray(data.rows) ? data.rows : [];
+          renderRoster(rows);
         })
         .catch(function (err) {
-          console.error('[loadRoster] Auth failed:', err);
+          console.error('[loadRoster] Failed:', err);
           _showRosterState('error');
-          window.location.replace('https://www.mpowerededucation.com/index.html?next=' + encodeURIComponent(window.location.href));
+          var msgEl = document.getElementById('rosterErrorMsg');
+          if (msgEl) msgEl.textContent = err.message || 'Unknown error';
+          // Do NOT redirect here — show the error state instead.
+          // A redirect to the login page on a fetch failure causes an
+          // infinite loop if the GAS endpoint itself is misconfigured.
         });
     }
 
+    // ── Roster renderer ──────────────────────────────────────────
+    function renderRoster(rows) {
+      var tbody = document.getElementById('rosterTbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      // Row 0 is the sheet header — skip it; filter blank rows
+      var students = (rows.length > 1 ? rows.slice(1) : []).filter(function (row) {
+        return row && (String(row[COL_FIRST] || '').trim() || String(row[COL_LAST] || '').trim());
+      });
+
+      if (!students.length) {
+        _showRosterState('empty');
+        return;
+      }
+
+      var fragment = document.createDocumentFragment();
+
+      students.forEach(function (row) {
+        var studentId  = String(row[COL_ID]         || '').trim();
+        var firstName  = String(row[COL_FIRST]      || '').trim();
+        var lastName   = String(row[COL_LAST]       || '').trim();
+        var disability = String(row[COL_DISABILITY] || '').trim();
+        var iepStart   = _formatDate(row[COL_IEP_START]);
+        var iepEnd     = _formatDate(row[COL_IEP_END]);
+
+        var tr = document.createElement('tr');
+
+        // Name
+        var tdName = document.createElement('td');
+        tdName.className = 'td-name';
+        tdName.textContent = lastName && firstName
+          ? lastName + ', ' + firstName
+          : (lastName || firstName || '—');
+        tr.appendChild(tdName);
+
+        // ID tag
+        var tdId = document.createElement('td');
+        tdId.className = 'td-tag';
+        tdId.textContent = studentId || '—';
+        tr.appendChild(tdId);
+
+        // Disability
+        var tdDis = document.createElement('td');
+        tdDis.style.fontSize = '0.8rem';
+        tdDis.style.color = '#7d8fb3';
+        tdDis.textContent = disability || '—';
+        tr.appendChild(tdDis);
+
+        // IEP window
+        var tdIep = document.createElement('td');
+        tdIep.style.fontFamily = "'JetBrains Mono', monospace";
+        tdIep.style.fontSize = '0.72rem';
+        tdIep.textContent = iepStart + ' → ' + iepEnd;
+        tr.appendChild(tdIep);
+
+        // Actions
+        var tdAct = document.createElement('td');
+        var btn = document.createElement('button');
+        btn.className = 'btn-action';
+        btn.textContent = 'Edit / Track';
+        btn.dataset.studentId = studentId;
+        btn.addEventListener('click', function () {
+          if (this.dataset.studentId) {
+            window.location.href = '/modify-student.html?id=' + encodeURIComponent(this.dataset.studentId);
+          }
+        });
+        tdAct.appendChild(btn);
+        tr.appendChild(tdAct);
+
+        fragment.appendChild(tr);
+      });
+
+      tbody.appendChild(fragment);
+      _showRosterState('data');
+    }
+
+    // ── Date utilities ───────────────────────────────────────────
+    function _formatDate(raw) {
+      if (!raw) return '—';
+      if (raw instanceof Date) return isNaN(raw.getTime()) ? '—' : _dateStr(raw);
+      var s = String(raw).trim();
+      var d = new Date(s);
+      if (!isNaN(d.getTime())) return _dateStr(d);
+      var parts = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (parts) {
+        d = new Date(parseInt(parts[3]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        return isNaN(d.getTime()) ? '—' : _dateStr(d);
+      }
+      return s || '—';
+    }
+
+    function _dateStr(d) {
+      return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+    }
+
+    // ── Logout ───────────────────────────────────────────────────
     function logout() {
       try { localStorage.clear(); } catch (e) {}
       window.location.replace('https://www.mpowerededucation.com/index.html');
     }
 
+    // ── Boot ─────────────────────────────────────────────────────
     document.addEventListener('DOMContentLoaded', loadRoster);
   </script>
+
 </body>
 </html>
