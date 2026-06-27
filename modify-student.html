@@ -78,13 +78,16 @@
 
     // ─── UPDATED Column schema to match index.html/Code.gs ───
     var COL = {
-      ID:         1,
-      FIRST_NAME: 2,
-      LAST_NAME:  3,
-      IEP_START:  4,
-      IEP_END:    5,
-      DISABILITY: 6
-    };
+  ID:             1,
+  FIRST_NAME:     2,
+  LAST_NAME:      3,
+  IEP_START:      4,
+  IEP_END:        5,
+  DISABILITY:     6,
+  SUPPLEMENTAL:   7, // Added
+  GOALS:          8, // Added
+  ACCOMMODATIONS: 9  // Added
+};
 
     document.addEventListener('DOMContentLoaded', function () {
       var params    = new URLSearchParams(window.location.search);
