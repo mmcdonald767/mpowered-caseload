@@ -84,6 +84,20 @@
       border-color: rgba(108,143,255,0.6); box-shadow: 0 0 0 3px rgba(108,143,255,0.12);
     }
 
+    /* ── Select — inherits field-input look; arrow recoloured for dark bg ── */
+    select.field-input {
+      appearance: none; -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a5578' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.65rem center;
+      padding-right: 2rem;
+      cursor: pointer;
+    }
+    select.field-input:focus {
+      border-color: rgba(108,143,255,0.6); box-shadow: 0 0 0 3px rgba(108,143,255,0.12);
+    }
+    select.field-input option { background: #171b26; color: #e8ecf4; }
+
     /* ── Goal cards (view state) ── */
     .goal-card {
       background: rgba(255,255,255,0.03); border: 1px solid #1e2335;
@@ -100,13 +114,11 @@
 
     /* ── Goal rows (edit state) ── */
     .goal-edit-row {
-      display: flex; flex-direction: column;
-      gap: 0.5rem; margin-bottom: 1.25rem;
+      display: grid; grid-template-columns: 1fr 1fr auto;
+      gap: 0.5rem; margin-bottom: 0.5rem; align-items: start;
     }
-    .goal-edit-row .field-textarea { width: 100%; }
-    .goal-edit-row-header {
-      display: flex; align-items: center; justify-content: space-between;
-    }
+    @media (max-width: 560px) { .goal-edit-row { grid-template-columns: 1fr; } }
+    .goal-edit-row .field-input { width: 100%; }
     .btn-remove {
       align-self: center; flex-shrink: 0; background: transparent; border: 1px solid #252c42;
       color: #4a5578; border-radius: 6px; padding: 0.32rem 0.55rem;
@@ -232,7 +244,25 @@
           <div class="field"><span class="field-label">Supplemental Aids</span><span class="field-value" id="rv-supplemental"></span></div>
         </div>
         <div class="field-grid" id="edit-academic" style="display:none;">
-          <div class="field"><label class="field-label" for="in-disability">Disability</label><input class="field-input" id="in-disability" type="text" /></div>
+          <div class="field">
+            <label class="field-label" for="in-disability">Disability</label>
+            <select class="field-input" id="in-disability">
+              <option value="">— Select a category —</option>
+              <option value="Specific Learning Disability">Specific Learning Disability</option>
+              <option value="Speech or Language Impairment">Speech or Language Impairment</option>
+              <option value="Other Health Impairment">Other Health Impairment</option>
+              <option value="Autism">Autism</option>
+              <option value="Developmental Delay">Developmental Delay (ages 3–9)</option>
+              <option value="Intellectual Disability">Intellectual Disability</option>
+              <option value="Emotional Disturbance">Emotional Disturbance</option>
+              <option value="Multiple Disabilities">Multiple Disabilities</option>
+              <option value="Hearing Impairment">Hearing Impairment (including deafness)</option>
+              <option value="Orthopedic Impairment">Orthopedic Impairment</option>
+              <option value="Traumatic Brain Injury">Traumatic Brain Injury</option>
+              <option value="Visual Impairment">Visual Impairment (including blindness)</option>
+              <option value="Deaf-Blindness">Deaf-Blindness</option>
+            </select>
+          </div>
           <div class="field"><label class="field-label" for="in-iepStart">IEP Start</label><input class="field-input" id="in-iepStart" type="text" placeholder="YYYY-MM-DD" /></div>
           <div class="field"><label class="field-label" for="in-iepEnd">IEP End</label><input class="field-input" id="in-iepEnd" type="text" placeholder="YYYY-MM-DD" /></div>
           <div class="field"><label class="field-label" for="in-supplemental">Supplemental Aids</label><input class="field-input" id="in-supplemental" type="text" /></div>
@@ -263,6 +293,12 @@
 
         <!-- Edit state -->
         <div id="edit-goals" style="display:none;">
+          <!-- Column headers for the two input columns -->
+          <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:0.5rem; margin-bottom:0.35rem; padding:0 0.1rem;">
+            <span class="field-label">Goal</span>
+            <span class="field-label">SDI</span>
+            <span></span>
+          </div>
           <div id="goal-rows" style="margin-bottom:0.75rem;"></div>
           <button class="btn btn-edit" onclick="App.addGoalRow('', '')" style="font-size:0.65rem;">
             + Add Goal &amp; SDI Pair
@@ -675,15 +711,17 @@
       var row = document.createElement('div');
       row.className = 'goal-edit-row';
 
-      // ── Header: "Goal N" label + remove button ─────────────
-      var header = document.createElement('div');
-      header.className = 'goal-edit-row-header';
+      var descInput = document.createElement('input');
+      descInput.type = 'text';
+      descInput.className = 'field-input goal-input';
+      descInput.placeholder = 'Goal description…';
+      descInput.value = _esc(desc);   // safe: .value, not innerHTML
 
-      var goalNum = container.children.length + 1;
-      var numLabel = document.createElement('span');
-      numLabel.className = 'field-label';
-      numLabel.textContent = 'Goal ' + goalNum;
-      header.appendChild(numLabel);
+      var sdiInput = document.createElement('input');
+      sdiInput.type = 'text';
+      sdiInput.className = 'field-input sdi-input';
+      sdiInput.placeholder = 'Specially Designed Instruction…';
+      sdiInput.value = _esc(sdi);     // safe: .value, not innerHTML
 
       var removeBtn = document.createElement('button');
       removeBtn.type = 'button';
@@ -691,39 +729,10 @@
       removeBtn.title = 'Remove this goal';
       removeBtn.textContent = '×';
       removeBtn.onclick = function () { container.removeChild(row); };
-      header.appendChild(removeBtn);
-
-      row.appendChild(header);
-
-      // ── Goal description textarea ───────────────────────────
-      var descLabel = document.createElement('span');
-      descLabel.className = 'field-label';
-      descLabel.textContent = 'Description';
-      row.appendChild(descLabel);
-
-      var descInput = document.createElement('textarea');
-      descInput.className = 'field-textarea goal-input';
-      descInput.placeholder = 'Goal description…';
-      descInput.rows = 5;
-      descInput.value = _esc(desc);
 
       row.appendChild(descInput);
-
-      // ── SDI textarea ────────────────────────────────────────
-      var sdiLabel = document.createElement('span');
-      sdiLabel.className = 'field-label';
-      sdiLabel.style.marginTop = '0.4rem';
-      sdiLabel.textContent = 'SDI (Specially Designed Instruction)';
-      row.appendChild(sdiLabel);
-
-      var sdiInput = document.createElement('textarea');
-      sdiInput.className = 'field-textarea sdi-input';
-      sdiInput.placeholder = 'Specially Designed Instruction…';
-      sdiInput.rows = 5;
-      sdiInput.value = _esc(sdi);
-
       row.appendChild(sdiInput);
-
+      row.appendChild(removeBtn);
       container.appendChild(row);
       descInput.focus();
     }
