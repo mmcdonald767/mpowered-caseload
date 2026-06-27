@@ -11,6 +11,7 @@
     .btn { cursor: pointer; padding: 0.35rem 0.8rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600; border: 1px solid transparent; }
     .btn-edit { background: rgba(108,143,255,0.1); color: #6c8fff; }
     .btn-save { background: rgba(52,211,153,0.1); color: #34d399; }
+    .goal-item { background: rgba(255,255,255,0.03); border: 1px solid #1e2335; padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem; }
     .goal-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
     .field-input { background: #0f1117; border: 1px solid #252c42; padding: 0.5rem; width: 100%; color: #fff; border-radius: 6px; }
     #content-area { display: none; }
@@ -27,7 +28,7 @@
       </div>
       
       <div id="view-goals">
-        <ul id="goals-list" class="space-y-3"></ul>
+        <div id="goals-list" class="space-y-3"></div>
       </div>
 
       <div id="edit-goals" style="display:none;">
@@ -39,8 +40,8 @@
   </main>
 
   <script>
-    var COL = { GOALS: 9 }; // Ensure this matches your sheet
-    var _record = [];
+    var COL = { GOALS: 9 };
+    var _record = []; 
 
     window.App = (function() {
       return {
@@ -76,11 +77,24 @@
                 sdi: row.querySelector('.sdi-input').value
               };
             });
-            console.log("Saving unified goals:", merged);
-            // Here you would trigger _gasPost with updates[COL.GOALS] = JSON.stringify(merged);
+            // Update _record and trigger _gasPost here
+            _record[COL.GOALS] = JSON.stringify(merged);
+            App.renderGoals(merged);
           }
           document.getElementById('view-' + panel).style.display = 'block';
           document.getElementById('edit-' + panel).style.display = 'none';
+        },
+
+        renderGoals: function(goals) {
+          var list = document.getElementById('goals-list');
+          list.innerHTML = goals.length ? '' : '<p class="text-gray-500 italic">No goals recorded.</p>';
+          goals.forEach(function(g) {
+            var div = document.createElement('div');
+            div.className = 'goal-item';
+            div.innerHTML = `<p class="font-semibold text-sm">Goal: ${g.description}</p>
+                             <p class="text-xs text-blue-400 mt-1">SDI: ${g.sdi}</p>`;
+            list.appendChild(div);
+          });
         }
       };
     })();
