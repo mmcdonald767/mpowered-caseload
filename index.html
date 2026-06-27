@@ -45,39 +45,44 @@
     .site-header-inner {
       max-width: 1280px; margin: 0 auto;
       padding: 0 1.5rem;
-      height: 52px;
+      height: 56px;
       display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
     }
+    /* Brand: logo mark + wordmark */
     .site-brand {
-      font-size: 0.9rem; font-weight: 700; color: #e8ecf4;
-      white-space: nowrap; flex-shrink: 0;
-      text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.55rem;
+      font-size: 0.95rem; font-weight: 700; color: #e8ecf4;
+      white-space: nowrap; flex-shrink: 0; text-decoration: none;
     }
+    .site-logo { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; flex-shrink: 0; }
+    .site-logo-fallback { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg,#3b5bdb 0%,#6c8fff 100%); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
     .site-nav { display: flex; align-items: center; gap: 0.25rem; }
+    /* nav-link: +17% → 0.82rem */
     .nav-link {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 600;
       color: #7d8fb3; text-decoration: none;
-      padding: 0.35rem 0.75rem; border-radius: 6px;
+      padding: 0.35rem 0.8rem; border-radius: 6px;
       transition: color 0.13s, background 0.13s;
     }
     .nav-link:hover  { color: #e8ecf4; background: rgba(255,255,255,0.05); }
     .nav-link.active { color: #6c8fff; background: rgba(108,143,255,0.1); }
+    /* nav-link-primary: +18% → 0.8rem */
     .nav-link-primary {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 600;
       color: #34d399; text-decoration: none;
       border: 1px solid rgba(52,211,153,0.3); border-radius: 6px;
-      padding: 0.32rem 0.75rem;
+      padding: 0.32rem 0.8rem;
       background: rgba(52,211,153,0.07);
       transition: background 0.13s, border-color 0.13s;
       white-space: nowrap;
     }
     .nav-link-primary:hover { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.55); }
     .nav-divider { width: 1px; height: 18px; background: #252c42; margin: 0 0.5rem; flex-shrink: 0; }
-
+    /* btn-ghost: +17% → 0.84rem */
     .btn-ghost {
       display: inline-flex; align-items: center; gap: 0.4rem;
       background: transparent; color: #7d8fb3;
-      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 500;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.84rem; font-weight: 500;
       border: 1px solid #252c42; border-radius: 7px; padding: 0.4rem 0.85rem;
       cursor: pointer; transition: color 0.14s, border-color 0.14s;
     }
@@ -119,13 +124,18 @@
   <header class="site-header" role="banner">
     <div class="site-header-inner">
 
-      <a href="/index.html" class="site-brand" aria-label="M-Powered Education home">
+      <!-- Logo mark + wordmark -->
+      <a href="https://caseload.mpowerededucation.com/" class="site-brand" aria-label="M-Powered Education home">
+        <img src="/assets/m-powered-logo.svg"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"
+             class="site-logo" alt="M-Powered logo" />
+        <span class="site-logo-fallback" style="display:none;" aria-hidden="true">M</span>
         M-Powered Education
       </a>
 
       <nav class="site-nav" aria-label="Site navigation">
-        <a href="/index.html"                    class="nav-link active" aria-current="page">Dashboard</a>
-        <a href="/modify-student.html?id=new"    class="nav-link-primary">+ New Student</a>
+        <a href="https://caseload.mpowerededucation.com/" class="nav-link active" aria-current="page">Dashboard</a>
+        <a href="/modify-student.html?id=new"             class="nav-link-primary">+ New Student</a>
         <div class="nav-divider" role="separator" aria-hidden="true"></div>
         <button onclick="logout()" class="btn-ghost" aria-label="Sign out">Sign Out</button>
       </nav>

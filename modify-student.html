@@ -16,18 +16,51 @@
 
     /* ── Shared nav ── */
     .site-header { background: #171b26; border-bottom: 1px solid #1e2335; position: sticky; top: 0; z-index: 50; }
-    .site-header-inner { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
-    .site-brand { font-size: 0.9rem; font-weight: 700; color: #e8ecf4; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
+    .site-header-inner { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; height: 56px; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+
+    /* Brand: logo mark + wordmark side by side */
+    .site-brand { display: inline-flex; align-items: center; gap: 0.55rem; font-size: 0.95rem; font-weight: 700; color: #e8ecf4; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
+    .site-logo { width: 28px; height: 28px; border-radius: 7px; object-fit: cover; flex-shrink: 0; }
+    /* Fallback SVG logo shown when the PNG isn't available yet */
+    .site-logo-fallback { width: 28px; height: 28px; border-radius: 7px; background: linear-gradient(135deg,#3b5bdb 0%,#6c8fff 100%); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+
     .site-nav { display: flex; align-items: center; gap: 0.25rem; }
-    .nav-link { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; color: #7d8fb3; text-decoration: none; padding: 0.35rem 0.75rem; border-radius: 6px; transition: color 0.13s, background 0.13s; }
+
+    /* nav-link: +17% from 0.7rem → 0.82rem */
+    .nav-link { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 600; color: #7d8fb3; text-decoration: none; padding: 0.35rem 0.8rem; border-radius: 6px; transition: color 0.13s, background 0.13s; }
     .nav-link:hover  { color: #e8ecf4; background: rgba(255,255,255,0.05); }
     .nav-link.active { color: #6c8fff; background: rgba(108,143,255,0.1); }
-    .nav-link-primary { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600; color: #34d399; text-decoration: none; border: 1px solid rgba(52,211,153,0.3); border-radius: 6px; padding: 0.32rem 0.75rem; background: rgba(52,211,153,0.07); transition: background 0.13s, border-color 0.13s; white-space: nowrap; }
+
+    /* nav-link-primary: +18% from 0.68rem → 0.8rem */
+    .nav-link-primary { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; font-weight: 600; color: #34d399; text-decoration: none; border: 1px solid rgba(52,211,153,0.3); border-radius: 6px; padding: 0.32rem 0.8rem; background: rgba(52,211,153,0.07); transition: background 0.13s, border-color 0.13s; white-space: nowrap; }
     .nav-link-primary:hover  { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.55); }
     .nav-link-primary.active { background: rgba(52,211,153,0.18); border-color: rgba(52,211,153,0.6); }
+
     .nav-divider { width: 1px; height: 18px; background: #252c42; margin: 0 0.5rem; flex-shrink: 0; }
-    .btn-ghost { display: inline-flex; align-items: center; gap: 0.4rem; background: transparent; color: #7d8fb3; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 500; border: 1px solid #252c42; border-radius: 7px; padding: 0.4rem 0.85rem; cursor: pointer; transition: color 0.14s, border-color 0.14s; }
+
+    /* btn-ghost: +17% from 0.72rem → 0.84rem */
+    .btn-ghost { display: inline-flex; align-items: center; gap: 0.4rem; background: transparent; color: #7d8fb3; font-family: 'JetBrains Mono', monospace; font-size: 0.84rem; font-weight: 500; border: 1px solid #252c42; border-radius: 7px; padding: 0.4rem 0.85rem; cursor: pointer; transition: color 0.14s, border-color 0.14s; }
     .btn-ghost:hover { color: #f87171; border-color: rgba(248,113,113,0.45); }
+
+    /* Delete button — danger variant of btn-ghost */
+    .btn-delete { display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(248,113,113,0.06); color: #f87171; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; border: 1px solid rgba(248,113,113,0.28); border-radius: 7px; padding: 0.4rem 0.85rem; cursor: pointer; transition: background 0.14s, border-color 0.14s, color 0.14s; white-space: nowrap; }
+    .btn-delete:hover { background: rgba(248,113,113,0.14); border-color: rgba(248,113,113,0.6); color: #fca5a5; }
+    .btn-delete:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ── Delete confirmation modal ── */
+    #delete-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: none; align-items: center; justify-content: center; z-index: 200; padding: 1.5rem; backdrop-filter: blur(2px); }
+    #delete-modal-backdrop.open { display: flex; }
+    #delete-modal { background: #171b26; border: 1px solid rgba(248,113,113,0.35); border-radius: 14px; padding: 1.75rem 2rem; max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.6); animation: modalIn 0.18s ease forwards; }
+    @keyframes modalIn { from { opacity:0; transform:scale(0.96) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    #delete-modal h2 { font-size: 1rem; font-weight: 700; color: #f87171; margin: 0 0 0.5rem; }
+    #delete-modal p  { font-size: 0.85rem; color: #7d8fb3; line-height: 1.55; margin: 0 0 1.25rem; }
+    #delete-modal strong { color: #e8ecf4; }
+    .modal-btn-row { display: flex; gap: 0.65rem; justify-content: flex-end; flex-wrap: wrap; }
+    #delete-confirm-btn { background: #f87171; color: #0f1117; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 700; padding: 0.5rem 1.1rem; border-radius: 7px; cursor: pointer; transition: background 0.13s; }
+    #delete-confirm-btn:hover { background: #fca5a5; }
+    #delete-confirm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    #delete-cancel-btn  { background: transparent; color: #7d8fb3; border: 1px solid #252c42; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 600; padding: 0.5rem 1.1rem; border-radius: 7px; cursor: pointer; transition: color 0.13s, border-color 0.13s; }
+    #delete-cancel-btn:hover { color: #e8ecf4; border-color: #4a5578; }
 
     /* ── Caseload nav arrows ── */
     .nav-arrow { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: rgba(108,143,255,0.06); color: #7d8fb3; border: 1px solid #252c42; border-radius: 6px; cursor: pointer; font-size: 0.85rem; line-height: 1; transition: color 0.13s, background 0.13s, border-color 0.13s; flex-shrink: 0; text-decoration: none; user-select: none; }
@@ -106,13 +139,20 @@
   <!-- ═══ SHARED NAV ═══ -->
   <header class="site-header" role="banner">
     <div class="site-header-inner">
-      <a href="/index.html" class="site-brand" aria-label="M-Powered Education home">M-Powered Education</a>
+      <!-- Logo mark + wordmark -->
+      <a href="https://caseload.mpowerededucation.com/" class="site-brand" aria-label="M-Powered Education home">
+        <img src="/assets/m-powered-logo.svg"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"
+             class="site-logo" alt="M-Powered logo" />
+        <span class="site-logo-fallback" style="display:none;" aria-hidden="true">M</span>
+        M-Powered Education
+      </a>
 
       <nav class="site-nav" aria-label="Site navigation">
-        <!-- Workspace link (new) -->
-        <a href="/index.html"  class="nav-link" id="nav-workspace">Workspace</a>
-        <!-- Dashboard link -->
-        <a href="/caseload.html" class="nav-link" id="nav-dashboard">Dashboard</a>
+        <!-- Workspace link -->
+        <a href="https://caseload.mpowerededucation.com/" class="nav-link" id="nav-workspace">Workspace</a>
+        <!-- Dashboard link — root URL, not /caseload.html -->
+        <a href="https://caseload.mpowerededucation.com/" class="nav-link" id="nav-dashboard">Dashboard</a>
         <a href="/modify-student.html?id=new" class="nav-link-primary" id="nav-new-student">+ New Student</a>
 
         <div class="nav-divider" role="separator" aria-hidden="true"></div>
@@ -148,9 +188,22 @@
 
       <!-- Name header -->
       <div class="panel" style="margin-bottom:1.25rem;">
-        <p style="font-family:'JetBrains Mono',monospace; font-size:0.63rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#4a5578; margin-bottom:0.35rem;">Student Record</p>
-        <h1 id="display-name" style="font-size:1.35rem; font-weight:700; margin:0;"></h1>
-        <p id="display-id"    style="font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:#4a5578; margin:0.2rem 0 0;"></p>
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+          <div>
+            <p style="font-family:'JetBrains Mono',monospace; font-size:0.63rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#4a5578; margin-bottom:0.35rem;">Student Record</p>
+            <h1 id="display-name" style="font-size:1.35rem; font-weight:700; margin:0;"></h1>
+            <p id="display-id"    style="font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:#4a5578; margin:0.2rem 0 0;"></p>
+          </div>
+          <!-- Delete Student — only shown for existing (non-new) records; JS reveals it -->
+          <button id="btn-delete-student"
+                  class="btn-delete"
+                  style="display:none; align-self:flex-start; margin-top:0.2rem;"
+                  onclick="App.showDeleteModal()"
+                  aria-label="Delete this student record">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+            Delete Student
+          </button>
+        </div>
       </div>
 
       <!-- PANEL: Student Identifiers -->
@@ -291,6 +344,27 @@
   </main>
 
   <div id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ══ Delete Student confirmation modal ══════════════════════════
+       Shown by App.showDeleteModal(). Sends action:'deleteStudent'
+       to the GAS backend and redirects to the dashboard on success.
+       FERPA note: only the opaque DatabaseID is sent — no PII.
+  ════════════════════════════════════════════════════════════════ -->
+  <div id="delete-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+    <div id="delete-modal">
+      <h2 id="delete-modal-title">⚠ Delete Student Record?</h2>
+      <p>
+        This will <strong>permanently remove</strong> the record for
+        <strong id="delete-modal-name">this student</strong>
+        from your Google Sheet. This action cannot be undone.
+      </p>
+      <div class="modal-btn-row">
+        <button id="delete-cancel-btn"  onclick="App.hideDeleteModal()">Cancel</button>
+        <button id="delete-confirm-btn" onclick="App.confirmDelete()">Yes, delete permanently</button>
+      </div>
+      <p id="delete-modal-status" style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#f87171;margin:0.75rem 0 0;min-height:1rem;"></p>
+    </div>
+  </div>
 
   <script>
   'use strict';
@@ -732,6 +806,10 @@
 
       renderGoals(parseGoals(row[COL.GOALS]));
       renderAccommodations(parseAccommodations(row[COL.ACCOMMODATIONS]));
+
+      // Reveal the Delete button only for saved (non-new) records
+      var delBtn = document.getElementById('btn-delete-student');
+      if (delBtn) delBtn.style.display = _isNew ? 'none' : 'inline-flex';
     }
 
     // ── Panel show / hide ──────────────────────────────────────────
@@ -962,6 +1040,71 @@
 
     function normalise(v) { return String(v||'').replace(/^["'\s]+|["'\s]+$/g,'').toLowerCase(); }
 
+    // ── Delete student ─────────────────────────────────────────────
+    // showDeleteModal: populates the student name in the modal body
+    // (FERPA note: this is display only — the actual delete call uses
+    // the opaque DatabaseID, not the name).
+    function showDeleteModal() {
+      var fn = _record ? String(_record[COL.FIRST_NAME]||'').trim() : '';
+      var ln = _record ? String(_record[COL.LAST_NAME] ||'').trim() : '';
+      var name = [fn, ln].filter(Boolean).join(' ') || 'this student';
+      var nameEl = document.getElementById('delete-modal-name');
+      if (nameEl) nameEl.textContent = name;
+      var statusEl = document.getElementById('delete-modal-status');
+      if (statusEl) statusEl.textContent = '';
+      var confirmBtn = document.getElementById('delete-confirm-btn');
+      if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = 'Yes, delete permanently'; }
+      var backdrop = document.getElementById('delete-modal-backdrop');
+      if (backdrop) backdrop.classList.add('open');
+      // Trap focus on cancel button
+      var cancelBtn = document.getElementById('delete-cancel-btn');
+      if (cancelBtn) cancelBtn.focus();
+    }
+
+    function hideDeleteModal() {
+      var backdrop = document.getElementById('delete-modal-backdrop');
+      if (backdrop) backdrop.classList.remove('open');
+    }
+
+    // confirmDelete: sends action:'deleteStudent' to GAS backend.
+    // On success, redirects to the caseload dashboard.
+    // Only the opaque DatabaseID is transmitted — no PII crosses the wire.
+    function confirmDelete() {
+      if (!_studentId || _isNew) return;
+      var confirmBtn = document.getElementById('delete-confirm-btn');
+      var statusEl   = document.getElementById('delete-modal-status');
+      if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.textContent = 'Deleting…'; }
+      if (statusEl)   statusEl.textContent = '';
+
+      _gasPost({ action: 'deleteStudent', studentId: _studentId })
+      .then(function() {
+        // Brief success message before redirect
+        if (statusEl) { statusEl.style.color = '#34d399'; statusEl.textContent = 'Record deleted. Redirecting…'; }
+        setTimeout(function() {
+          window.location.replace('https://caseload.mpowerededucation.com/');
+        }, 900);
+      })
+      .catch(function(err) {
+        console.error('[confirmDelete]', err);
+        if (statusEl) statusEl.textContent = 'Delete failed: ' + (err.message || 'unknown error');
+        if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.textContent = 'Yes, delete permanently'; }
+      });
+    }
+
+    // Close modal on backdrop click (not on modal box click)
+    document.addEventListener('DOMContentLoaded', function() {
+      var backdrop = document.getElementById('delete-modal-backdrop');
+      if (backdrop) {
+        backdrop.addEventListener('click', function(e) {
+          if (e.target === backdrop) hideDeleteModal();
+        });
+      }
+      // Close on Escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') hideDeleteModal();
+      });
+    });
+
     // ── Boot ───────────────────────────────────────────────────────
     function init() {
       var params = new URLSearchParams(window.location.search);
@@ -1025,9 +1168,12 @@
       savePanel:       savePanel,
       addGoalRow:      addGoalRow,
       navigateStudent: navigateStudent,
+      showDeleteModal: showDeleteModal,
+      hideDeleteModal: hideDeleteModal,
+      confirmDelete:   confirmDelete,
       logout: function() {
         try { localStorage.clear(); } catch(e) {}
-        window.location.replace('https://www.mpowerededucation.com/index.html');
+        window.location.replace('https://caseload.mpowerededucation.com/');
       },
       init: init
     };
