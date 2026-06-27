@@ -85,34 +85,42 @@
     }
 
     function renderList(id, rawData) {
-      var container = document.getElementById(id);
-      if (!container) return;
-      container.innerHTML = '';
-      
-      var items = [];
-      try {
-        // Handle both stringified JSON and pre-parsed objects
-        if (typeof rawData === 'string') {
-          items = JSON.parse(rawData || '[]');
-        } else if (Array.isArray(rawData)) {
-          items = rawData;
-        }
-      } catch (e) {
-        container.innerHTML = '<li class="text-xs text-red-400">Error parsing data.</li>';
-        return;
-      }
-
-      if (items.length === 0) {
-        container.innerHTML = '<li class="text-xs text-slate-500 italic">No data recorded.</li>';
-      } else {
-        items.forEach(function(item) {
-          var li = document.createElement('li');
-          li.className = 'text-sm text-slate-300 bg-slate-800/50 p-3 rounded-lg border border-slate-700';
-          li.textContent = item;
-          container.appendChild(li);
-        });
-      }
+  var container = document.getElementById(id);
+  if (!container) return;
+  container.innerHTML = '';
+  
+  var items = [];
+  try {
+    // 1. If it's a JSON string, parse it.
+    if (typeof rawData === 'string') {
+      items = JSON.parse(rawData || '[]');
+    } 
+    // 2. If it's already an object/array, use it.
+    else {
+      items = rawData;
     }
+
+    // 3. CRITICAL: Force items to be an empty array if it's not an array at all
+    if (!Array.isArray(items)) {
+      items = [];
+    }
+  } catch (e) {
+    container.innerHTML = '<li class="text-xs text-red-400">Error parsing list data.</li>';
+    return;
+  }
+
+  if (items.length === 0) {
+    container.innerHTML = '<li class="text-xs text-slate-500 italic">No data recorded.</li>';
+  } else {
+    items.forEach(function(item) {
+      var li = document.createElement('li');
+      li.className = 'text-sm text-slate-300 bg-slate-800/50 p-3 rounded-lg border border-slate-700';
+      // Ensure we render the item as a string
+      li.textContent = (typeof item === 'object') ? JSON.stringify(item) : item;
+      container.appendChild(li);
+    });
+  }
+}
 
     function showState(state) {
       document.getElementById('loading-overlay').classList.toggle('visible', state === 'loading');
