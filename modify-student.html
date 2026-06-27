@@ -100,11 +100,13 @@
 
     /* ── Goal rows (edit state) ── */
     .goal-edit-row {
-      display: grid; grid-template-columns: 1fr 1fr auto;
-      gap: 0.5rem; margin-bottom: 0.5rem; align-items: start;
+      display: flex; flex-direction: column;
+      gap: 0.5rem; margin-bottom: 1.25rem;
     }
-    @media (max-width: 560px) { .goal-edit-row { grid-template-columns: 1fr; } }
-    .goal-edit-row .field-input { width: 100%; }
+    .goal-edit-row .field-textarea { width: 100%; }
+    .goal-edit-row-header {
+      display: flex; align-items: center; justify-content: space-between;
+    }
     .btn-remove {
       align-self: center; flex-shrink: 0; background: transparent; border: 1px solid #252c42;
       color: #4a5578; border-radius: 6px; padding: 0.32rem 0.55rem;
@@ -261,12 +263,6 @@
 
         <!-- Edit state -->
         <div id="edit-goals" style="display:none;">
-          <!-- Column headers for the two input columns -->
-          <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:0.5rem; margin-bottom:0.35rem; padding:0 0.1rem;">
-            <span class="field-label">Goal</span>
-            <span class="field-label">SDI</span>
-            <span></span>
-          </div>
           <div id="goal-rows" style="margin-bottom:0.75rem;"></div>
           <button class="btn btn-edit" onclick="App.addGoalRow('', '')" style="font-size:0.65rem;">
             + Add Goal &amp; SDI Pair
@@ -679,17 +675,15 @@
       var row = document.createElement('div');
       row.className = 'goal-edit-row';
 
-      var descInput = document.createElement('input');
-      descInput.type = 'text';
-      descInput.className = 'field-input goal-input';
-      descInput.placeholder = 'Goal description…';
-      descInput.value = _esc(desc);   // safe: .value, not innerHTML
+      // ── Header: "Goal N" label + remove button ─────────────
+      var header = document.createElement('div');
+      header.className = 'goal-edit-row-header';
 
-      var sdiInput = document.createElement('input');
-      sdiInput.type = 'text';
-      sdiInput.className = 'field-input sdi-input';
-      sdiInput.placeholder = 'Specially Designed Instruction…';
-      sdiInput.value = _esc(sdi);     // safe: .value, not innerHTML
+      var goalNum = container.children.length + 1;
+      var numLabel = document.createElement('span');
+      numLabel.className = 'field-label';
+      numLabel.textContent = 'Goal ' + goalNum;
+      header.appendChild(numLabel);
 
       var removeBtn = document.createElement('button');
       removeBtn.type = 'button';
@@ -697,10 +691,39 @@
       removeBtn.title = 'Remove this goal';
       removeBtn.textContent = '×';
       removeBtn.onclick = function () { container.removeChild(row); };
+      header.appendChild(removeBtn);
+
+      row.appendChild(header);
+
+      // ── Goal description textarea ───────────────────────────
+      var descLabel = document.createElement('span');
+      descLabel.className = 'field-label';
+      descLabel.textContent = 'Description';
+      row.appendChild(descLabel);
+
+      var descInput = document.createElement('textarea');
+      descInput.className = 'field-textarea goal-input';
+      descInput.placeholder = 'Goal description…';
+      descInput.rows = 5;
+      descInput.value = _esc(desc);
 
       row.appendChild(descInput);
+
+      // ── SDI textarea ────────────────────────────────────────
+      var sdiLabel = document.createElement('span');
+      sdiLabel.className = 'field-label';
+      sdiLabel.style.marginTop = '0.4rem';
+      sdiLabel.textContent = 'SDI (Specially Designed Instruction)';
+      row.appendChild(sdiLabel);
+
+      var sdiInput = document.createElement('textarea');
+      sdiInput.className = 'field-textarea sdi-input';
+      sdiInput.placeholder = 'Specially Designed Instruction…';
+      sdiInput.rows = 5;
+      sdiInput.value = _esc(sdi);
+
       row.appendChild(sdiInput);
-      row.appendChild(removeBtn);
+
       container.appendChild(row);
       descInput.focus();
     }
