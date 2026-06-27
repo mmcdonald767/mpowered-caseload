@@ -246,6 +246,7 @@
 
   var _record    = null;
   var _studentId = null;
+  var _isNew     = false;
   var _editing   = { identity: false, academic: false, goals: false, accommodations: false };
 
   // ── Network ───────────────────────────────────────────────────
@@ -301,7 +302,7 @@
   }
 
   function listToText(items) {
-    return items.map(function(i) { return typeof i === 'object' ? JSON.stringify(i) : String(i); }).join('\n');
+    return items.map(function(i) { return unpackItem(i); }).join('\n');
   }
 
   function textToList(text) {
@@ -309,43 +310,55 @@
   }
 
   // ── Render ────────────────────────────────────────────────────
-  function renderListView(ulId, items) {
-  var ul = document.getElementById(ulId);
-  if (!ul) return;
-  ul.innerHTML = '';
-  
-  if (!items || items.length === 0) {
-    var empty = document.createElement('li');
-    empty.className = 'list-view-empty';
-    empty.textContent = 'No entries recorded.';
-    ul.appendChild(empty);
-  } else {
-    items.forEach(function(item) {
-      var li = document.createElement('li');
-      li.className = 'list-view-item';
-      
-      // Intelligent Unpacking:
-      if (typeof item === 'object') {
-        // If it's a goal object, show the description
-        if (item.description) {
-          li.textContent = item.description;
-        } 
-        // If it's an accommodation object, show the selections
-        else if (item.selections && Array.isArray(item.selections)) {
-          li.textContent = item.selections.length > 0 ? item.selections.join(', ') : 'No selections';
-        } 
-        // Fallback for other objects
-        else {
-          li.textContent = JSON.stringify(item);
-        }
+  function unpackItem(item) {
+    if (item === null || item === undefined) return '';
+    // Try to parse if it's a JSON string (e.g. stored as '{"id":1,"description":"..."}')
+    if (typeof item === 'string') {
+      var trimmed = item.trim();
+      if (trimmed.charAt(0) === '{' || trimmed.charAt(0) === '[') {
+        try { item = JSON.parse(trimmed); } catch(e) { return trimmed; }
       } else {
-        // Fallback for simple strings
-        li.textContent = String(item);
+        return trimmed;
       }
-      ul.appendChild(li);
-    });
+    }
+    // Now handle plain objects
+    if (typeof item === 'object' && !Array.isArray(item)) {
+      // Goal-style: { id, description, ... }
+      if (item.description) return String(item.description);
+      // Accommodation-style: { selections: [...] }
+      if (item.selections && Array.isArray(item.selections)) {
+        return item.selections.length > 0 ? item.selections.join(', ') : 'No selections';
+      }
+      // Any other object with a label or name field
+      if (item.label) return String(item.label);
+      if (item.name)  return String(item.name);
+      if (item.text)  return String(item.text);
+      // Last resort: join all string values
+      var vals = Object.values(item).filter(function(v) { return typeof v === 'string' || typeof v === 'number'; });
+      return vals.length > 0 ? vals.join(' — ') : '(empty entry)';
+    }
+    if (Array.isArray(item)) return item.join(', ');
+    return String(item);
   }
-}
+
+  function renderListView(ulId, items) {
+    var ul = document.getElementById(ulId);
+    if (!ul) return;
+    ul.innerHTML = '';
+    if (!items || items.length === 0) {
+      var empty = document.createElement('li');
+      empty.className = 'list-view-empty';
+      empty.textContent = 'No entries recorded.';
+      ul.appendChild(empty);
+    } else {
+      items.forEach(function(item) {
+        var li = document.createElement('li');
+        li.className = 'list-view-item';
+        li.textContent = unpackItem(item);
+        ul.appendChild(li);
+      });
+    }
+  }
 
   function populateView(row) {
     var fn = String(row[COL.FIRST_NAME] || '').trim();
@@ -364,15 +377,27 @@
   }
 
   // ── Edit / cancel ─────────────────────────────────────────────
+  // Panels whose view-div is a <ul> (list panels) vs a field-grid <div>
+  var _listPanels = { goals: true, accommodations: true };
+
+  function _showView(panel)  {
+    var el = document.getElementById('view-' + panel);
+    if (!el) return;
+    el.style.display = _listPanels[panel] ? '' : 'grid';
+  }
+  function _hideView(panel)  {
+    var el = document.getElementById('view-' + panel);
+    if (el) el.style.display = 'none';
+  }
+
   function editPanel(panel) {
     if (_editing[panel]) return;
     _editing[panel] = true;
     document.getElementById('panel-' + panel).classList.add('is-editing');
-    var viewEl = document.getElementById('view-' + panel);
     var editEl = document.getElementById('edit-' + panel);
     var footEl = document.getElementById('footer-' + panel);
-    if (viewEl) viewEl.style.display = 'none';
-    if (editEl) editEl.style.display = '';
+    _hideView(panel);
+    if (editEl) editEl.style.display = 'block';
     if (footEl) footEl.style.display = 'flex';
     setPanelStatus(panel, '', '');
 
@@ -399,10 +424,9 @@
   function _closePanel(panel) {
     _editing[panel] = false;
     document.getElementById('panel-' + panel).classList.remove('is-editing');
-    var viewEl = document.getElementById('view-' + panel);
     var editEl = document.getElementById('edit-' + panel);
     var footEl = document.getElementById('footer-' + panel);
-    if (viewEl) viewEl.style.display = '';
+    _showView(panel);
     if (editEl) editEl.style.display = 'none';
     if (footEl) footEl.style.display = 'none';
     setPanelStatus(panel, '', '');
@@ -435,15 +459,34 @@
   }
 
   function saveRecord(studentId, updates, panel, saveBtn, cancelBtn) {
-    _gasPost({ action: 'updateStudent', studentId: studentId, updates: updates })
-    .then(function() {
-      Object.keys(updates).forEach(function(col) { _record[parseInt(col, 10)] = updates[col]; });
+    // Merge updates into _record so the in-memory state is current
+    Object.keys(updates).forEach(function(col) { _record[parseInt(col, 10)] = updates[col]; });
+
+    var payload = _isNew
+      ? { action: 'addStudent', student: _record }
+      : { action: 'updateStudent', studentId: studentId, updates: updates };
+
+    _gasPost(payload)
+    .then(function(data) {
+      // If the server returned the new ID, adopt it so subsequent panels use updateStudent
+      if (_isNew) {
+        _isNew = false;
+        if (data.studentId) {
+          _studentId = data.studentId;
+          _record[COL.ID] = _studentId;
+        }
+        // Re-label buttons back to normal
+        document.querySelectorAll('.btn-save').forEach(function(btn) {
+          btn.textContent = 'Save changes';
+        });
+      }
       populateView(_record);
       _closePanel(panel);
       showToast('Saved successfully', 'success');
     })
     .catch(function(err) {
       console.error('[saveRecord]', err);
+      // Roll back the optimistic merge on failure
       setPanelStatus(panel, 'Save failed — ' + (err.message || 'unknown error'), '#f87171');
       showToast('Save failed', 'error');
     })
@@ -464,6 +507,21 @@
     if (!_studentId || !_studentId.trim()) {
       showState('error');
       setText('fallback-message', 'No student ID in URL. Use ?id=<studentId>');
+      return;
+    }
+
+    // ── New Student Mode ─────────────────────────────────────────
+    if (_studentId.toLowerCase() === 'new') {
+      _isNew  = true;
+      _record = new Array(10).fill('');   // blank row matching COL indices
+      document.title = 'New Student — M-Powered Education';
+      setText('display-name', 'New Student');
+      setText('display-id',   'Unsaved record');
+      // Relabel every "Save changes" button to "Add student" for clarity
+      document.querySelectorAll('.btn-save').forEach(function(btn) {
+        btn.textContent = 'Add student';
+      });
+      showState('data');
       return;
     }
 
