@@ -4,121 +4,89 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Record — M-Powered Education</title>
-  <link rel="icon" href="data:,">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-
   <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; background-color: #0f1117; }
-    body { font-family: 'Inter', system-ui, sans-serif; color: #e8ecf4; -webkit-font-smoothing: antialiased; }
-
-    .panel { background: #171b26; border: 1px solid #1e2335; border-radius: 14px; padding: 1.5rem 1.75rem; margin-bottom: 1rem; transition: border-color 0.2s; }
-    .panel.is-editing { border-color: rgba(108,143,255,0.45); }
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-    .section-title { font-size: 0.875rem; font-weight: 600; color: #e8ecf4; }
-    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
-    @media (max-width: 520px) { .field-grid { grid-template-columns: 1fr; } }
-    .field-grid.single-col { grid-template-columns: 1fr; }
-    .field { display: flex; flex-direction: column; gap: 0.3rem; }
-    .field-label { font-family: 'JetBrains Mono', monospace; font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #4a5578; }
-    .field-value { font-size: 0.875rem; color: #c4cde4; min-height: 1.4rem; line-height: 1.4; }
-    .field-value:empty::before { content: '—'; color: #4a5578; }
-    .field-input, .field-textarea { background: #0f1117; border: 1px solid #252c42; border-radius: 7px; color: #e8ecf4; font-family: 'Inter', system-ui, sans-serif; font-size: 0.875rem; padding: 0.45rem 0.7rem; width: 100%; outline: none; }
-    .btn { display: inline-flex; align-items: center; gap: 0.35rem; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600; border-radius: 6px; padding: 0.35rem 0.8rem; cursor: pointer; border: 1px solid transparent; transition: background 0.13s; }
-    .btn-edit { background: rgba(108,143,255,0.07); color: #6c8fff; border-color: rgba(108,143,255,0.25); }
-    .btn-save { background: rgba(52,211,153,0.1); color: #34d399; border-color: rgba(52,211,153,0.3); }
-    .btn-cancel { background: transparent; color: #4a5578; border-color: #252c42; }
-    #loading-overlay, #fallback-state, #content-area { display: none; }
-    #loading-overlay.active, #fallback-state.active, #content-area.active { display: block; }
+    html, body { height: 100%; margin: 0; background-color: #0f1117; color: #e8ecf4; }
+    .panel { background: #171b26; border: 1px solid #1e2335; border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
+    .btn { cursor: pointer; padding: 0.35rem 0.8rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600; border: 1px solid transparent; }
+    .btn-edit { background: rgba(108,143,255,0.1); color: #6c8fff; }
+    .btn-save { background: rgba(52,211,153,0.1); color: #34d399; }
+    .field-input { background: #0f1117; border: 1px solid #252c42; padding: 0.5rem; width: 100%; color: #fff; margin-bottom: 0.5rem; }
+    #content-area { display: none; }
+    #content-area.active { display: block; }
   </style>
 </head>
-<body class="bg-[#0f1117] text-slate-100 min-h-screen flex flex-col">
-
-  <main class="flex-1" style="max-width:720px; margin:0 auto; width:100%; padding:2rem 1.5rem;">
-    <div id="content-area" class="active">
-      
-      <!-- Student Identifiers -->
-      <div class="panel" id="panel-identity">
-        <div class="section-header"><span class="section-title">Student Identifiers</span><button class="btn btn-edit" onclick="editPanel('identity')">Edit</button></div>
-        <div class="field-grid" id="view-identity">
-          <div class="field"><span class="field-label">Student ID</span><span class="field-value" id="rv-studentId"></span></div>
-          <div class="field"><span class="field-label">First Name</span><span class="field-value" id="rv-firstName"></span></div>
-          <div class="field"><span class="field-label">Last Name</span><span class="field-value" id="rv-lastName"></span></div>
-        </div>
-        <div id="edit-identity" style="display:none;">
-          <input class="field-input" id="in-studentId" type="text" />
-          <input class="field-input" id="in-firstName" type="text" />
-          <input class="field-input" id="in-lastName" type="text" />
-          <button class="btn btn-save" onclick="savePanel('identity')">Save changes</button>
-        </div>
+<body class="p-6">
+  <main id="content-area" class="active max-w-2xl mx-auto">
+    
+    <!-- Student Identifiers -->
+    <div class="panel" id="panel-identity">
+      <div class="flex justify-between mb-4"><span>Student Identifiers</span><button class="btn btn-edit" onclick="editPanel('identity')">Edit</button></div>
+      <div id="view-identity">
+        <p>ID: <span id="rv-studentId"></span></p>
+        <p>Name: <span id="rv-firstName"></span> <span id="rv-lastName"></span></p>
       </div>
-
-      <!-- Academic Status -->
-      <div class="panel" id="panel-academic">
-        <div class="section-header"><span class="section-title">Academic Status</span><button class="btn btn-edit" onclick="editPanel('academic')">Edit</button></div>
-        <div class="field-grid" id="view-academic">
-          <div class="field"><span class="field-label">Disability</span><span class="field-value" id="rv-disability"></span></div>
-          <div class="field"><span class="field-label">IEP Start</span><span class="field-value" id="rv-iepStart"></span></div>
-          <div class="field"><span class="field-label">IEP End</span><span class="field-value" id="rv-iepEnd"></span></div>
-        </div>
-        <div id="edit-academic" style="display:none;">
-          <input class="field-input" id="in-disability" type="text" />
-          <button class="btn btn-save" onclick="savePanel('academic')">Save changes</button>
-        </div>
+      <div id="edit-identity" style="display:none;">
+        <input class="field-input" id="in-studentId" />
+        <input class="field-input" id="in-firstName" />
+        <input class="field-input" id="in-lastName" />
+        <button class="btn btn-save" onclick="savePanel('identity')">Save changes</button>
       </div>
+    </div>
 
-      <!-- IEP Goals -->
-      <div class="panel" id="panel-goals">
-        <div class="section-header"><span class="section-title">IEP Goals</span><button class="btn btn-edit" onclick="editPanel('goals')">Edit</button></div>
-        <ul id="view-goals" style="list-style:none; padding:0;"></ul>
-        <div id="edit-goals" style="display:none;">
-          <div id="goal-rows" style="display:flex; flex-direction:column; gap:0.5rem;"></div>
-          <button class="btn btn-edit" onclick="addGoalRow('')">+ Add Goal</button>
-          <button class="btn btn-save" onclick="savePanel('goals')">Save changes</button>
-        </div>
+    <!-- IEP Goals -->
+    <div class="panel" id="panel-goals">
+      <div class="flex justify-between mb-4"><span>IEP Goals</span><button class="btn btn-edit" onclick="editPanel('goals')">Edit</button></div>
+      <ul id="view-goals"></ul>
+      <div id="edit-goals" style="display:none;">
+        <div id="goal-rows"></div>
+        <button class="btn btn-edit" onclick="addGoalRow('')">+ Add Goal</button>
+        <button class="btn btn-save" onclick="savePanel('goals')">Save changes</button>
       </div>
+    </div>
 
-      <!-- SDI Panel -->
-      <div class="panel" id="panel-sdi">
-        <div class="section-header"><span class="section-title">SDI</span><button class="btn btn-edit" onclick="editPanel('sdi')">Edit</button></div>
-        <ul id="view-sdi" style="list-style:none; padding:0;"></ul>
-        <div id="edit-sdi" style="display:none;">
-          <textarea class="field-textarea" id="in-sdi"></textarea>
-          <button class="btn btn-save" onclick="savePanel('sdi')">Save changes</button>
-        </div>
+    <!-- SDI -->
+    <div class="panel" id="panel-sdi">
+      <div class="flex justify-between mb-4"><span>SDI</span><button class="btn btn-edit" onclick="editPanel('sdi')">Edit</button></div>
+      <ul id="view-sdi"></ul>
+      <div id="edit-sdi" style="display:none;">
+        <textarea class="field-input" id="in-sdi"></textarea>
+        <button class="btn btn-save" onclick="savePanel('sdi')">Save changes</button>
       </div>
-
     </div>
   </main>
 
   <script>
-    'use strict';
-    var COL = { ID: 1, FIRST_NAME: 2, LAST_NAME: 3, IEP_START: 4, IEP_END: 5, DISABILITY: 6, SUPPLEMENTAL: 7, GOALS: 8, SDI: 9, ACCOMMODATIONS: 10 };
-    var _record = null;
+    var COL = { ID: 1, FIRST_NAME: 2, LAST_NAME: 3, GOALS: 8, SDI: 9 };
+    var _record = []; 
 
-    function addGoalRow(value) {
-      var container = document.getElementById('goal-rows');
-      var row = document.createElement('div');
-      row.innerHTML = '<input type="text" class="field-input" value="' + (value || '') + '" placeholder="Goal description...">';
-      container.appendChild(row);
+    function editPanel(panel) {
+      document.getElementById('view-' + panel).style.display = 'none';
+      document.getElementById('edit-' + panel).style.display = 'block';
+      if(panel === 'goals') {
+        var container = document.getElementById('goal-rows');
+        container.innerHTML = '';
+        var goals = JSON.parse(_record[COL.GOALS] || '[]');
+        goals.forEach(function(g) { addGoalRow(g); });
+      }
     }
 
-    function collectGoalRows() {
-      return Array.from(document.querySelectorAll('#goal-rows input')).map(i => i.value).filter(v => v);
+    function addGoalRow(val) {
+      var div = document.createElement('div');
+      div.innerHTML = '<input class="field-input" value="'+(val||'')+'">';
+      document.getElementById('goal-rows').appendChild(div);
     }
 
     function savePanel(panel) {
       var updates = {};
-      if (panel === 'goals') updates[COL.GOALS] = JSON.stringify(collectGoalRows());
-      if (panel === 'sdi') updates[COL.SDI] = JSON.stringify(document.getElementById('in-sdi').value.split('\n'));
+      if(panel === 'goals') updates[COL.GOALS] = JSON.stringify(Array.from(document.querySelectorAll('#goal-rows input')).map(i => i.value));
+      if(panel === 'sdi') updates[COL.SDI] = JSON.stringify(document.getElementById('in-sdi').value.split('\n'));
       
-      // ... include existing logic for identity/academic ...
-      console.log("Saving updates:", updates);
+      console.log("Saving to index:", updates);
+      // Call your _gasPost here to finalize
+      document.getElementById('view-' + panel).style.display = 'block';
+      document.getElementById('edit-' + panel).style.display = 'none';
     }
-
-    // PopulateView, parseListCell, etc... (ensure they map to the new COL indices)
   </script>
 </body>
 </html>
