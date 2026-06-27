@@ -14,147 +14,81 @@
     html, body { height: 100%; margin: 0; background-color: #0f1117; }
     body { font-family: 'Inter', system-ui, sans-serif; color: #e8ecf4; -webkit-font-smoothing: antialiased; }
 
-    /* ── Shared nav (matches index.html exactly) ── */
-    .site-header {
-      background: #171b26; border-bottom: 1px solid #1e2335;
-      position: sticky; top: 0; z-index: 50;
-    }
-    .site-header-inner {
-      max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; height: 52px;
-      display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
-    }
-    .site-brand {
-      font-size: 0.9rem; font-weight: 700; color: #e8ecf4;
-      white-space: nowrap; flex-shrink: 0; text-decoration: none;
-    }
+    /* ── Shared nav ── */
+    .site-header { background: #171b26; border-bottom: 1px solid #1e2335; position: sticky; top: 0; z-index: 50; }
+    .site-header-inner { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+    .site-brand { font-size: 0.9rem; font-weight: 700; color: #e8ecf4; white-space: nowrap; flex-shrink: 0; text-decoration: none; }
     .site-nav { display: flex; align-items: center; gap: 0.25rem; }
-    .nav-link {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600;
-      color: #7d8fb3; text-decoration: none; padding: 0.35rem 0.75rem; border-radius: 6px;
-      transition: color 0.13s, background 0.13s;
-    }
+    .nav-link { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600; color: #7d8fb3; text-decoration: none; padding: 0.35rem 0.75rem; border-radius: 6px; transition: color 0.13s, background 0.13s; }
     .nav-link:hover  { color: #e8ecf4; background: rgba(255,255,255,0.05); }
     .nav-link.active { color: #6c8fff; background: rgba(108,143,255,0.1); }
-    .nav-link-primary {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
-      color: #34d399; text-decoration: none;
-      border: 1px solid rgba(52,211,153,0.3); border-radius: 6px;
-      padding: 0.32rem 0.75rem; background: rgba(52,211,153,0.07);
-      transition: background 0.13s, border-color 0.13s; white-space: nowrap;
-    }
-    .nav-link-primary:hover { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.55); }
+    .nav-link-primary { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600; color: #34d399; text-decoration: none; border: 1px solid rgba(52,211,153,0.3); border-radius: 6px; padding: 0.32rem 0.75rem; background: rgba(52,211,153,0.07); transition: background 0.13s, border-color 0.13s; white-space: nowrap; }
+    .nav-link-primary:hover  { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.55); }
     .nav-link-primary.active { background: rgba(52,211,153,0.18); border-color: rgba(52,211,153,0.6); }
     .nav-divider { width: 1px; height: 18px; background: #252c42; margin: 0 0.5rem; flex-shrink: 0; }
-    .btn-ghost {
-      display: inline-flex; align-items: center; gap: 0.4rem; background: transparent; color: #7d8fb3;
-      font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 500;
-      border: 1px solid #252c42; border-radius: 7px; padding: 0.4rem 0.85rem;
-      cursor: pointer; transition: color 0.14s, border-color 0.14s;
-    }
+    .btn-ghost { display: inline-flex; align-items: center; gap: 0.4rem; background: transparent; color: #7d8fb3; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 500; border: 1px solid #252c42; border-radius: 7px; padding: 0.4rem 0.85rem; cursor: pointer; transition: color 0.14s, border-color 0.14s; }
     .btn-ghost:hover { color: #f87171; border-color: rgba(248,113,113,0.45); }
 
-    /* ── Layout ── */
-    .panel {
-      background: #171b26; border: 1px solid #1e2335; border-radius: 14px;
-      padding: 1.5rem 1.75rem; margin-bottom: 1rem; transition: border-color 0.2s;
-    }
-    .panel.is-editing { border-color: rgba(108,143,255,0.45); }
+    /* ── Caseload nav arrows ── */
+    .nav-arrow { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: rgba(108,143,255,0.06); color: #7d8fb3; border: 1px solid #252c42; border-radius: 6px; cursor: pointer; font-size: 0.85rem; line-height: 1; transition: color 0.13s, background 0.13s, border-color 0.13s; flex-shrink: 0; text-decoration: none; user-select: none; }
+    .nav-arrow:hover { color: #6c8fff; background: rgba(108,143,255,0.12); border-color: rgba(108,143,255,0.35); }
+    .nav-arrow[aria-disabled="true"] { opacity: 0.3; pointer-events: none; }
 
+    /* ── Layout ── */
+    .panel { background: #171b26; border: 1px solid #1e2335; border-radius: 14px; padding: 1.5rem 1.75rem; margin-bottom: 1rem; transition: border-color 0.2s; }
+    .panel.is-editing { border-color: rgba(108,143,255,0.45); }
     .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
     .section-title  { font-size: 0.875rem; font-weight: 600; color: #e8ecf4; }
-
     .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
     @media (max-width: 560px) { .field-grid { grid-template-columns: 1fr; } }
-
     .field { display: flex; flex-direction: column; gap: 0.3rem; }
-    .field-label {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.63rem;
-      font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #4a5578;
-    }
+    .field-label { font-family: 'JetBrains Mono', monospace; font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #4a5578; }
     .field-value { font-size: 0.875rem; color: #c4cde4; min-height: 1.4rem; line-height: 1.4; }
     .field-value:empty::before { content: '—'; color: #4a5578; }
 
-    .field-input, .field-textarea {
-      background: #0f1117; border: 1px solid #252c42; border-radius: 7px;
-      color: #e8ecf4; font-family: 'Inter', system-ui, sans-serif;
-      font-size: 0.875rem; padding: 0.45rem 0.7rem; width: 100%;
-      outline: none; transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .field-input:focus, .field-textarea:focus {
-      border-color: rgba(108,143,255,0.6); box-shadow: 0 0 0 3px rgba(108,143,255,0.12);
-    }
+    /* ── Inputs, textareas, selects ── */
+    .field-input, .field-textarea, .field-select { background: #0f1117; border: 1px solid #252c42; border-radius: 7px; color: #e8ecf4; font-family: 'Inter', system-ui, sans-serif; font-size: 0.875rem; padding: 0.45rem 0.7rem; width: 100%; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+    .field-textarea { resize: vertical; line-height: 1.55; }
+    .field-input:focus, .field-textarea:focus, .field-select:focus { border-color: rgba(108,143,255,0.6); box-shadow: 0 0 0 3px rgba(108,143,255,0.12); }
 
-    /* ── Date picker — recolour calendar icon for dark background ── */
-    input[type="date"].field-input {
-      color-scheme: dark;          /* tells the browser to use dark-mode chrome for the picker */
-      cursor: pointer;
-    }
-    input[type="date"].field-input::-webkit-calendar-picker-indicator {
-      filter: invert(0.55) sepia(1) saturate(3) hue-rotate(190deg); /* matches accent #6c8fff */
-      cursor: pointer;
-      opacity: 0.75;
-    }
-    input[type="date"].field-input::-webkit-calendar-picker-indicator:hover {
-      opacity: 1;
-    }
+    /* ── Select dropdown ── */
+    .field-select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a5578' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.65rem center; padding-right: 2rem; cursor: pointer; }
+    .field-select option { background: #1e2335; color: #e8ecf4; }
 
-    /* ── Goal cards (view state) ── */
-    .goal-card {
-      background: rgba(255,255,255,0.03); border: 1px solid #1e2335;
-      border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 0.5rem;
-    }
-    .goal-card-label {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase; color: #4a5578; margin-bottom: 0.2rem;
-    }
+    /* ── Date picker ── */
+    input[type="date"].field-input { color-scheme: dark; cursor: pointer; }
+    input[type="date"].field-input::-webkit-calendar-picker-indicator { filter: invert(0.55) sepia(1) saturate(3) hue-rotate(190deg); cursor: pointer; opacity: 0.75; }
+    input[type="date"].field-input::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+
+    /* ── Goal cards (view mode) ── */
+    .goal-card { background: rgba(255,255,255,0.03); border: 1px solid #1e2335; border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 0.5rem; }
+    .goal-card-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #4a5578; margin-bottom: 0.2rem; }
     .goal-card-text  { font-size: 0.85rem; color: #c4cde4; line-height: 1.5; }
     .goal-card-sdi   { font-size: 0.78rem; color: #6c8fff; margin-top: 0.55rem; line-height: 1.4; }
     .goal-card-sdi-label { color: #4a5578; }
     .list-empty { font-size: 0.8rem; color: #4a5578; font-style: italic; }
 
-    /* ── Goal rows (edit state) ── */
-    .goal-edit-row {
-      display: grid; grid-template-columns: 1fr 1fr auto;
-      gap: 0.5rem; margin-bottom: 0.5rem; align-items: start;
-    }
-    @media (max-width: 560px) { .goal-edit-row { grid-template-columns: 1fr; } }
-    .goal-edit-row .field-input { width: 100%; }
-    .btn-remove {
-      align-self: center; flex-shrink: 0; background: transparent; border: 1px solid #252c42;
-      color: #4a5578; border-radius: 6px; padding: 0.32rem 0.55rem;
-      cursor: pointer; font-size: 0.85rem; line-height: 1;
-      transition: color 0.13s, border-color 0.13s;
-    }
+    /* ── Goal edit cards (vertical stack) ── */
+    .goal-edit-card { background: #0f1117; border: 1px solid #252c42; border-radius: 9px; padding: 0.9rem 1rem; margin-bottom: 0.65rem; display: flex; flex-direction: column; gap: 0.6rem; animation: goalFadeIn 0.18s ease forwards; }
+    @keyframes goalFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    .goal-edit-card-header { display: flex; align-items: center; justify-content: space-between; }
+    .goal-edit-card-num { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #4a5578; }
+    .btn-remove { background: transparent; border: 1px solid #252c42; color: #4a5578; border-radius: 6px; padding: 0.25rem 0.5rem; cursor: pointer; font-size: 0.72rem; line-height: 1; transition: color 0.13s, border-color 0.13s; font-family: 'JetBrains Mono', monospace; }
     .btn-remove:hover { color: #f87171; border-color: rgba(248,113,113,0.4); }
 
     /* ── Buttons ── */
-    .btn {
-      display: inline-flex; align-items: center; gap: 0.35rem;
-      font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
-      border-radius: 6px; padding: 0.35rem 0.8rem; cursor: pointer;
-      border: 1px solid transparent;
-      transition: background 0.13s, border-color 0.13s, opacity 0.13s;
-      white-space: nowrap; line-height: 1;
-    }
+    .btn { display: inline-flex; align-items: center; gap: 0.35rem; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600; border-radius: 6px; padding: 0.35rem 0.8rem; cursor: pointer; border: 1px solid transparent; transition: background 0.13s, border-color 0.13s, opacity 0.13s; white-space: nowrap; line-height: 1; }
     .btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .btn-edit   { background: rgba(108,143,255,0.07); color: #6c8fff; border-color: rgba(108,143,255,0.25); }
-    .btn-edit:hover:not(:disabled) { background: rgba(108,143,255,0.15); border-color: rgba(108,143,255,0.5); }
-    .btn-save   { background: rgba(52,211,153,0.1); color: #34d399; border-color: rgba(52,211,153,0.3); }
-    .btn-save:hover:not(:disabled) { background: rgba(52,211,153,0.2); border-color: rgba(52,211,153,0.55); }
+    .btn-edit:hover:not(:disabled)   { background: rgba(108,143,255,0.15); border-color: rgba(108,143,255,0.5); }
+    .btn-save   { background: rgba(52,211,153,0.1);  color: #34d399; border-color: rgba(52,211,153,0.3); }
+    .btn-save:hover:not(:disabled)   { background: rgba(52,211,153,0.2); border-color: rgba(52,211,153,0.55); }
     .btn-cancel { background: transparent; color: #4a5578; border-color: #252c42; }
     .btn-cancel:hover:not(:disabled) { color: #e8ecf4; border-color: #4a5578; }
     .btn-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 
     /* ── Toast ── */
-    #toast {
-      position: fixed; bottom: 1.5rem; left: 50%;
-      transform: translateX(-50%) translateY(6px);
-      background: #171b26; border: 1px solid #252c42; border-radius: 10px;
-      padding: 0.6rem 1.1rem; font-size: 0.78rem;
-      font-family: 'JetBrains Mono', monospace; color: #e8ecf4;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.2s, transform 0.2s; z-index: 100; white-space: nowrap;
-    }
+    #toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(6px); background: #171b26; border: 1px solid #252c42; border-radius: 10px; padding: 0.6rem 1.1rem; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; color: #e8ecf4; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 100; white-space: nowrap; }
     #toast.show    { opacity: 1; transform: translateX(-50%) translateY(0); }
     #toast.success { border-color: rgba(52,211,153,0.4); color: #34d399; }
     #toast.error   { border-color: rgba(248,113,113,0.4); color: #f87171; }
@@ -169,13 +103,25 @@
 
 <body class="bg-[#0f1117] text-slate-100 min-h-screen flex flex-col">
 
-  <!-- ═══ SHARED NAV (identical markup to index.html) ═══ -->
+  <!-- ═══ SHARED NAV ═══ -->
   <header class="site-header" role="banner">
     <div class="site-header-inner">
       <a href="/index.html" class="site-brand" aria-label="M-Powered Education home">M-Powered Education</a>
+
       <nav class="site-nav" aria-label="Site navigation">
-        <a href="/index.html"                 class="nav-link">Dashboard</a>
+        <!-- Workspace link (new) -->
+        <a href="/index.html"  class="nav-link" id="nav-workspace">Workspace</a>
+        <!-- Dashboard link -->
+        <a href="/caseload.html" class="nav-link" id="nav-dashboard">Dashboard</a>
         <a href="/modify-student.html?id=new" class="nav-link-primary" id="nav-new-student">+ New Student</a>
+
+        <div class="nav-divider" role="separator" aria-hidden="true"></div>
+
+        <!-- Caseload prev/next arrows -->
+        <button id="btn-prev-student" class="nav-arrow" aria-label="Previous student" title="Previous student" onclick="App.navigateStudent(-1)">&#8592;</button>
+        <span id="nav-position-label" style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#4a5578;min-width:3rem;text-align:center;">—</span>
+        <button id="btn-next-student" class="nav-arrow" aria-label="Next student" title="Next student" onclick="App.navigateStudent(1)">&#8594;</button>
+
         <div class="nav-divider" role="separator" aria-hidden="true"></div>
         <button onclick="App.logout()" class="btn-ghost" aria-label="Sign out">Sign Out</button>
       </nav>
@@ -201,7 +147,7 @@
     <div id="content-area">
 
       <!-- Name header -->
-      <div class="panel" style="margin-bottom:1.5rem;">
+      <div class="panel" style="margin-bottom:1.25rem;">
         <p style="font-family:'JetBrains Mono',monospace; font-size:0.63rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#4a5578; margin-bottom:0.35rem;">Student Record</p>
         <h1 id="display-name" style="font-size:1.35rem; font-weight:700; margin:0;"></h1>
         <p id="display-id"    style="font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:#4a5578; margin:0.2rem 0 0;"></p>
@@ -244,10 +190,44 @@
           <div class="field"><span class="field-label">Supplemental Aids</span><span class="field-value" id="rv-supplemental"></span></div>
         </div>
         <div class="field-grid" id="edit-academic" style="display:none;">
-          <div class="field"><label class="field-label" for="in-disability">Disability</label><input class="field-input" id="in-disability" type="text" /></div>
-          <div class="field"><label class="field-label" for="in-iepStart">IEP Start</label><input class="field-input" id="in-iepStart" type="date" /></div>
-          <div class="field"><label class="field-label" for="in-iepEnd">IEP End</label><input class="field-input" id="in-iepEnd" type="date" /></div>
-          <div class="field"><label class="field-label" for="in-supplemental">Supplemental Aids</label><input class="field-input" id="in-supplemental" type="text" /></div>
+
+          <!-- IDEA disability dropdown — 13 federal categories, national prevalence order -->
+          <div class="field">
+            <label class="field-label" for="in-disability">Disability (IDEA Category)</label>
+            <select class="field-select" id="in-disability">
+              <option value="">— Select category —</option>
+              <option value="Specific Learning Disability (SLD)">Specific Learning Disability (SLD)</option>
+              <option value="Speech or Language Impairment (SLI)">Speech or Language Impairment (SLI)</option>
+              <option value="Other Health Impairment (OHI)">Other Health Impairment (OHI)</option>
+              <option value="Autism Spectrum Disorder (ASD)">Autism Spectrum Disorder (ASD)</option>
+              <option value="Developmental Delay (DD)">Developmental Delay (DD)</option>
+              <option value="Intellectual Disability (ID)">Intellectual Disability (ID)</option>
+              <option value="Emotional Disturbance (ED)">Emotional Disturbance (ED)</option>
+              <option value="Multiple Disabilities">Multiple Disabilities</option>
+              <option value="Hearing Impairment / Deafness">Hearing Impairment / Deafness</option>
+              <option value="Orthopedic Impairment (OI)">Orthopedic Impairment (OI)</option>
+              <option value="Visual Impairment / Blindness">Visual Impairment / Blindness</option>
+              <option value="Traumatic Brain Injury (TBI)">Traumatic Brain Injury (TBI)</option>
+              <option value="Deaf-Blindness">Deaf-Blindness</option>
+            </select>
+          </div>
+
+          <!-- IEP Start — native date picker -->
+          <div class="field">
+            <label class="field-label" for="in-iepStart">IEP Start Date</label>
+            <input class="field-input" id="in-iepStart" type="date" />
+          </div>
+
+          <!-- IEP End — native date picker -->
+          <div class="field">
+            <label class="field-label" for="in-iepEnd">IEP End Date</label>
+            <input class="field-input" id="in-iepEnd" type="date" />
+          </div>
+
+          <div class="field">
+            <label class="field-label" for="in-supplemental">Supplemental Aids</label>
+            <input class="field-input" id="in-supplemental" type="text" />
+          </div>
         </div>
         <div id="footer-academic" class="btn-row" style="display:none; margin-top:1rem;">
           <button class="btn btn-save"   onclick="App.savePanel('academic')">Save changes</button>
@@ -256,11 +236,12 @@
         </div>
       </div>
 
-      <!-- PANEL: IEP Goals & SDI (unified) -->
-      <!--
-        Goals and SDI are co-located in COL.GOALS (index 9) as a JSON array
-        of {description, sdi} objects.  Each pair is displayed as a card and
-        edited as a side-by-side row.
+      <!-- PANEL: IEP Goals & SDI
+           COL.GOALS (index 9) stores a JSON array.
+           v1.1 shape: { goal_id, description, domain, standard_alignment:{},
+                         sdi:{strategy,…}, artifact_type, progress_monitoring:{} }
+           [SHIM] Legacy shape { id?, description, sdi:string } handled by
+           _normaliseGoalObj() before any render or save.
       -->
       <div class="panel" id="panel-goals">
         <div class="section-header">
@@ -273,17 +254,11 @@
           <div id="goals-list"></div>
         </div>
 
-        <!-- Edit state -->
+        <!-- Edit state — vertical stack, full-width textareas -->
         <div id="edit-goals" style="display:none;">
-          <!-- Column headers for the two input columns -->
-          <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:0.5rem; margin-bottom:0.35rem; padding:0 0.1rem;">
-            <span class="field-label">Goal</span>
-            <span class="field-label">SDI</span>
-            <span></span>
-          </div>
           <div id="goal-rows" style="margin-bottom:0.75rem;"></div>
           <button class="btn btn-edit" onclick="App.addGoalRow('', '')" style="font-size:0.65rem;">
-            + Add Goal &amp; SDI Pair
+            + Add Goal &amp; SDI
           </button>
         </div>
 
@@ -320,16 +295,12 @@
   <script>
   'use strict';
 
-  // ─────────────────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────────
   //  Column map — 0-indexed, must match Code.gs exactly.
-  //
-  //   0  Timestamp        | 1  DatabaseID (lookup key)
-  //   2  Tag              | 3  First Name  | 4  Last Name
-  //   5  IEP Start        | 6  IEP End
-  //   7  Disability       | 8  Supplemental Aids
-  //   9  Goals            ← JSON [{description, sdi}, …]
-  //  10  Accommodations   ← JSON [{selections:[…]}, …]  or plain strings
-  // ─────────────────────────────────────────────────────────────
+  //   0 Timestamp | 1 DatabaseID | 2 Tag | 3 First | 4 Last
+  //   5 IEP Start | 6 IEP End   | 7 Disability | 8 Supplemental
+  //   9 Goals (JSON v1.1 array) | 10 Accommodations (JSON array)
+  // ─────────────────────────────────────────────────────────────────
   var COL = {
     TIMESTAMP:      0,
     ID:             1,
@@ -340,25 +311,27 @@
     IEP_END:        6,
     DISABILITY:     7,
     SUPPLEMENTAL:   8,
-    GOALS:          9,   // ← confirmed index 9 (column J)
+    GOALS:          9,
     ACCOMMODATIONS: 10
   };
 
   var GAS_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
 
-  // ─────────────────────────────────────────────────────────────
-  //  App — all logic in an IIFE; public methods on window.App so
-  //  onclick="App.x()" always resolves regardless of strict mode.
-  // ─────────────────────────────────────────────────────────────
   var App = (function () {
 
-    // ── Private state ─────────────────────────────────────────
+    // ── Private state ──────────────────────────────────────────────
     var _record    = null;
     var _studentId = null;
     var _isNew     = false;
     var _editing   = { identity: false, academic: false, goals: false, accommodations: false };
 
-    // ── Network ───────────────────────────────────────────────
+    // ── Caseload nav state ─────────────────────────────────────────
+    // _roster: student rows (header stripped, blanks filtered).
+    // _rosterIndex: 0-based position of the currently displayed student.
+    var _roster      = [];
+    var _rosterIndex = -1;
+
+    // ── Network ────────────────────────────────────────────────────
     function _gasPost(payload) {
       var url = GAS_URL.split('#')[0].split('?')[0];
       return fetch(url, {
@@ -370,7 +343,7 @@
       .then(function (d) { if (d.result !== 'success') throw new Error(d.error || 'GAS error'); return d; });
     }
 
-    // ── Page state ────────────────────────────────────────────
+    // ── Page state ─────────────────────────────────────────────────
     function showState(state) {
       document.getElementById('loading-overlay').classList.toggle('active', state === 'loading');
       document.getElementById('fallback-state').classList.toggle('active',  state === 'error');
@@ -384,10 +357,26 @@
     function getInput(id)      { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
     function setInput(id, val) { var el = document.getElementById(id); if (el) el.value = (val != null) ? String(val) : ''; }
 
-    // Convert any date format the sheet might return into the YYYY-MM-DD string
-    // that <input type="date"> requires as its .value.
-    // Handles: ISO timestamps ("2026-02-25T05:00:00.000Z"), plain dates ("2026-02-25"),
-    // US-style dates ("2/25/2026"), and Google Sheets Date objects (already a JS Date).
+    // setSelect — sets a <select> by value with graceful fallback for
+    // legacy free-text entries that don't exactly match an option.
+    function setSelect(id, val) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var v = String(val || '');
+      for (var i = 0; i < el.options.length; i++) {
+        if (el.options[i].value === v) { el.value = v; return; }
+      }
+      // Case-insensitive partial match for legacy strings
+      var lower = v.toLowerCase();
+      for (var j = 0; j < el.options.length; j++) {
+        if (el.options[j].value.toLowerCase().indexOf(lower) !== -1) {
+          el.value = el.options[j].value; return;
+        }
+      }
+      el.value = '';  // no match — show blank placeholder
+    }
+
+    // ── Date normaliser ────────────────────────────────────────────
     function _toDateInputValue(raw) {
       if (!raw) return '';
       var d;
@@ -395,24 +384,14 @@
         d = raw;
       } else {
         var s = String(raw).trim();
-        // Already in YYYY-MM-DD — return as-is (avoids timezone shift from new Date())
         if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-        // ISO timestamp — slice the date portion directly, no parsing needed
         if (/^\d{4}-\d{2}-\d{2}T/.test(s)) return s.slice(0, 10);
-        // US-style M/D/YYYY
         var parts = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-        if (parts) {
-          return parts[3] + '-' +
-            String(parts[1]).padStart(2, '0') + '-' +
-            String(parts[2]).padStart(2, '0');
-        }
+        if (parts) return parts[3] + '-' + String(parts[1]).padStart(2,'0') + '-' + String(parts[2]).padStart(2,'0');
         d = new Date(s);
       }
       if (isNaN(d.getTime())) return '';
-      // Use UTC getters so timezone offsets don't shift the date by a day
-      return d.getUTCFullYear() + '-' +
-        String(d.getUTCMonth() + 1).padStart(2, '0') + '-' +
-        String(d.getUTCDate()).padStart(2, '0');
+      return d.getUTCFullYear() + '-' + String(d.getUTCMonth()+1).padStart(2,'0') + '-' + String(d.getUTCDate()).padStart(2,'0');
     }
 
     function setPanelStatus(panel, msg, colour) {
@@ -430,158 +409,147 @@
       _toastTimer = setTimeout(function () { el.className = ''; }, 2800);
     }
 
-    // ── Data helpers ──────────────────────────────────────────
+    // ── Caseload navigation ────────────────────────────────────────
+    function _initCaseloadNav(dataRows, currentId) {
+      _roster = dataRows.filter(function (r) {
+        return Array.isArray(r) && (String(r[COL.FIRST_NAME]||'').trim() || String(r[COL.LAST_NAME]||'').trim());
+      });
+      var norm = normalise(currentId);
+      _rosterIndex = -1;
+      for (var i = 0; i < _roster.length; i++) {
+        if (normalise(_roster[i][COL.ID]) === norm) { _rosterIndex = i; break; }
+      }
+      _updateNavArrows();
+    }
 
-    // Parse goals cell — handles JSON string, plain array, or single string.
-    // Always returns an array of {description, sdi} objects.
+    function _updateNavArrows() {
+      var label   = document.getElementById('nav-position-label');
+      var btnPrev = document.getElementById('btn-prev-student');
+      var btnNext = document.getElementById('btn-next-student');
+      if (!label || !btnPrev || !btnNext) return;
+      var total = _roster.length;
+      if (total <= 1 || _rosterIndex < 0) {
+        label.textContent = total > 0 ? '1 / ' + total : '—';
+        btnPrev.setAttribute('aria-disabled','true');
+        btnNext.setAttribute('aria-disabled','true');
+        return;
+      }
+      label.textContent = (_rosterIndex + 1) + ' / ' + total;
+      btnPrev.removeAttribute('aria-disabled');
+      btnNext.removeAttribute('aria-disabled');
+    }
+
+    // navigateStudent(dir) — dir: -1 prev, +1 next. Loops at boundaries.
+    function navigateStudent(dir) {
+      if (!_roster.length || _rosterIndex < 0) return;
+      var total   = _roster.length;
+      var nextIdx = ((_rosterIndex + dir) + total) % total;
+      var nextId  = String(_roster[nextIdx][COL.ID] || '').trim();
+      if (!nextId) return;
+      window.location.href = '/modify-student.html?id=' + encodeURIComponent(nextId);
+    }
+
+    // ── Data helpers ───────────────────────────────────────────────
+
     function parseGoals(raw) {
       if (!raw && raw !== 0) return [];
-      if (Array.isArray(raw)) {
-        // Already parsed (e.g. from server echo after save)
-        return raw.map(function (g) { return _normaliseGoalObj(g); }).filter(Boolean);
-      }
+      if (Array.isArray(raw)) return raw.map(_normaliseGoalObj).filter(Boolean);
       var s = String(raw).trim();
       if (!s || s === '[]') return [];
       if (s.charAt(0) === '[') {
         try {
           var parsed = JSON.parse(s);
-          return Array.isArray(parsed)
-            ? parsed.map(function (g) { return _normaliseGoalObj(g); }).filter(Boolean)
-            : [];
+          return Array.isArray(parsed) ? parsed.map(_normaliseGoalObj).filter(Boolean) : [];
         } catch (e) {}
       }
-      // Single plain string — treat as one goal with no SDI
-      return [{ description: s, sdi: '' }];
+      return [_buildGoalShell({ description: s })];
     }
 
-    // Normalise any stored object shape into a v1.1 goal object.
-    // [SHIM] Handles every legacy shape so existing Sheets rows keep working:
-    //   • null / undefined / empty string  → null (filtered by caller)
-    //   • plain non-empty string           → { description: str, sdi: { strategy: '' }, … }
-    //   • { id, description, sdi: string } → promote sdi string to sdi.strategy
-    //   • { description, sdi: object }     → canonical v1.1, pass through
-    //
-    // The normalised shape always has these top-level keys so renderGoals
-    // can read them safely without nested null checks:
-    //   goal_id, description, domain, standard_alignment, sdi, artifact_type,
-    //   progress_monitoring
+    // _normaliseGoalObj — routes any stored shape to _buildGoalShell.
+    // [SHIM] Legacy { id?, description, sdi:string } objects are promoted
+    // to v1.1 so existing Sheet rows render without a migration step.
     function _normaliseGoalObj(g) {
       if (g === null || g === undefined) return null;
-
-      // String input — try JSON parse first, otherwise treat as description
       if (typeof g === 'string') {
         var t = g.trim();
         if (!t) return null;
-        if (t.charAt(0) === '{') {
-          try { return _normaliseGoalObj(JSON.parse(t)); } catch (e) {}
-        }
+        if (t.charAt(0) === '{') { try { return _normaliseGoalObj(JSON.parse(t)); } catch(e) {} }
         return _buildGoalShell({ description: t });
       }
-
       if (Array.isArray(g)) return null;
-
       if (typeof g === 'object') {
-        // Already v1.1 — has nested sdi object
-        if (g.sdi && typeof g.sdi === 'object') {
-          return _buildGoalShell(g);
-        }
-        // [SHIM] Legacy flat shape: { id?, description, sdi: string, target?, area? }
-        var desc = String(
-          g.description !== undefined ? g.description :
-          g.text        !== undefined ? g.text        :
-          g.label       !== undefined ? g.label       : ''
-        ).trim();
+        if (g.sdi && typeof g.sdi === 'object') return _buildGoalShell(g);
+        // [SHIM] Legacy flat shape
+        var desc = String(g.description || g.text || g.label || '').trim();
         var legacySdi = String(g.sdi || '').trim();
         if (!desc && !legacySdi && Object.keys(g).length === 0) return null;
         return _buildGoalShell({
-          goal_id     : g.goal_id || g.id || null,
-          description : desc,
-          domain      : g.domain || g.area || 'literacy',
-          sdi         : { strategy: legacySdi, evidence_base: '', delivery_model: '', frequency: '' },
+          goal_id: g.goal_id || g.id || null,
+          description: desc,
+          domain: g.domain || g.area || 'literacy',
+          sdi: { strategy: legacySdi, evidence_base: '', delivery_model: '', frequency: '' },
           progress_monitoring: {
-            metric: 'accuracy', unit: 'percent',
-            baseline: null,
+            metric: 'accuracy', unit: 'percent', baseline: null,
             target: g.target != null ? parseFloat(g.target) || null : null,
-            mastery_criterion: g.criteria || g.mastery_criterion || '',
-          },
+            mastery_criterion: g.criteria || g.mastery_criterion || ''
+          }
         });
       }
-
       return null;
     }
 
-    // Build a complete v1.1 goal shell, filling every key so callers never
-    // need nested null-checks. Merges supplied values over safe defaults.
+    // _buildGoalShell — always returns a fully-keyed v1.1 object.
     function _buildGoalShell(src) {
       src = src || {};
       var sdiSrc = (src.sdi && typeof src.sdi === 'object') ? src.sdi : {};
-      var pmSrc  = (src.progress_monitoring && typeof src.progress_monitoring === 'object')
-                   ? src.progress_monitoring : {};
-      var stdSrc = (src.standard_alignment  && typeof src.standard_alignment  === 'object')
-                   ? src.standard_alignment  : {};
+      var pmSrc  = (src.progress_monitoring && typeof src.progress_monitoring === 'object') ? src.progress_monitoring : {};
+      var stdSrc = (src.standard_alignment  && typeof src.standard_alignment  === 'object') ? src.standard_alignment  : {};
       return {
         goal_id    : src.goal_id || null,
         description: String(src.description || '').trim(),
         domain     : String(src.domain || 'literacy'),
         standard_alignment: {
-          code       : String(stdSrc.code        || ''),
-          description: String(stdSrc.description || ''),
-          grade_band : String(stdSrc.grade_band  || ''),
+          code: String(stdSrc.code||''), description: String(stdSrc.description||''), grade_band: String(stdSrc.grade_band||'')
         },
         sdi: {
-          strategy      : String(sdiSrc.strategy       || ''),
-          evidence_base : String(sdiSrc.evidence_base  || ''),
-          delivery_model: String(sdiSrc.delivery_model || ''),
-          frequency     : String(sdiSrc.frequency      || ''),
+          strategy: String(sdiSrc.strategy||''), evidence_base: String(sdiSrc.evidence_base||''),
+          delivery_model: String(sdiSrc.delivery_model||''), frequency: String(sdiSrc.frequency||'')
         },
         artifact_type: String(src.artifact_type || 'graphic_organizer'),
         progress_monitoring: {
-          metric            : String(pmSrc.metric             || 'accuracy'),
-          unit              : String(pmSrc.unit               || 'percent'),
-          baseline          : (pmSrc.baseline != null) ? parseFloat(pmSrc.baseline) || null : null,
-          target            : (pmSrc.target   != null) ? parseFloat(pmSrc.target)   || null : null,
-          mastery_criterion : String(pmSrc.mastery_criterion  || ''),
-        },
+          metric: String(pmSrc.metric||'accuracy'), unit: String(pmSrc.unit||'percent'),
+          baseline: (pmSrc.baseline!=null) ? parseFloat(pmSrc.baseline)||null : null,
+          target:   (pmSrc.target  !=null) ? parseFloat(pmSrc.target)  ||null : null,
+          mastery_criterion: String(pmSrc.mastery_criterion||'')
+        }
       };
     }
 
-    // Parse accommodations cell — returns plain string array.
     function parseAccommodations(raw) {
       if (!raw && raw !== 0) return [];
-      if (Array.isArray(raw)) return raw.map(function (i) { return String(i || '').trim(); }).filter(Boolean);
+      if (Array.isArray(raw)) return raw.map(function(i){return String(i||'').trim();}).filter(Boolean);
       var s = String(raw).trim();
       if (!s || s === '[]') return [];
       if (s.charAt(0) === '[') {
         try {
           var parsed = JSON.parse(s);
           if (Array.isArray(parsed)) {
-            return parsed.map(function (i) {
+            return parsed.map(function(i) {
               if (typeof i === 'object' && i !== null) {
-                // {selections:[…]} shape
                 if (i.selections && Array.isArray(i.selections)) return i.selections.join(', ');
-                return Object.values(i).filter(function(v){ return typeof v === 'string'; }).join(' — ');
+                return Object.values(i).filter(function(v){return typeof v==='string';}).join(' — ');
               }
-              return String(i || '').trim();
+              return String(i||'').trim();
             }).filter(Boolean);
           }
-        } catch (e) {}
+        } catch(e) {}
       }
       return [s];
     }
 
-    // Escape a value for safe insertion into a textarea/input via .value
-    // (no innerHTML for user data — we use .value and .textContent only).
     function _esc(s) { return String(s || ''); }
 
-    // ── Render ────────────────────────────────────────────────
-
-    // ── renderGoals — v1.1 card renderer ─────────────────────────────────
-    // Reads the normalised v1.1 shape produced by parseGoals/_normaliseGoalObj.
-    // Each card shows: goal number · domain badge · KY standard pill · goal text
-    //                  SDI block · progress monitoring footer · Track button.
-    // All blocks are conditional — absent data renders nothing, not empty labels.
-    // [SHIM] Legacy records (sdi as string) are already promoted to v1.1 shape
-    //        by _normaliseGoalObj before reaching this function.
+    // ── renderGoals — v1.1 view-mode card renderer ─────────────────
     function renderGoals(goals) {
       var list = document.getElementById('goals-list');
       if (!list) return;
@@ -595,172 +563,131 @@
         return;
       }
 
-      goals.forEach(function (g, idx) {
+      goals.forEach(function(g, idx) {
         var card = document.createElement('div');
         card.className = 'goal-card';
         if (g.goal_id) card.setAttribute('data-goal-id', g.goal_id);
 
-        // ── Header: badges + Track button ──────────────────────────────
+        // Header: badges + Track button
         var header = document.createElement('div');
-        header.style.cssText = 'display:flex; align-items:flex-start; justify-content:space-between; gap:0.75rem; margin-bottom:0.55rem; flex-wrap:wrap;';
-
+        header.style.cssText = 'display:flex;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:0.55rem;flex-wrap:wrap;';
         var badges = document.createElement('div');
-        badges.style.cssText = 'display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap;';
+        badges.style.cssText = 'display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;';
 
-        // Goal number badge
         var numBadge = document.createElement('span');
         numBadge.className = 'goal-card-label';
-        numBadge.style.cssText = 'display:inline-block; background:rgba(108,143,255,0.1); border:1px solid rgba(108,143,255,0.2); border-radius:4px; padding:0.15rem 0.5rem; margin-bottom:0;';
-        numBadge.textContent = 'Goal ' + (idx + 1);
+        numBadge.style.cssText = 'display:inline-block;background:rgba(108,143,255,0.1);border:1px solid rgba(108,143,255,0.2);border-radius:4px;padding:0.15rem 0.5rem;margin-bottom:0;';
+        numBadge.textContent = 'Goal ' + (idx+1);
         badges.appendChild(numBadge);
 
-        // Domain badge (only if non-default)
         if (g.domain && g.domain !== 'literacy') {
-          var domBadge = document.createElement('span');
-          domBadge.className = 'goal-card-label';
-          domBadge.style.cssText = 'display:inline-block; background:rgba(255,255,255,0.04); border:1px solid #252c42; border-radius:4px; padding:0.15rem 0.5rem; margin-bottom:0; text-transform:capitalize;';
-          domBadge.textContent = g.domain;
-          badges.appendChild(domBadge);
+          var domB = document.createElement('span');
+          domB.className = 'goal-card-label';
+          domB.style.cssText = 'display:inline-block;background:rgba(255,255,255,0.04);border:1px solid #252c42;border-radius:4px;padding:0.15rem 0.5rem;margin-bottom:0;text-transform:capitalize;';
+          domB.textContent = g.domain;
+          badges.appendChild(domB);
         }
 
-        // KY Standard code pill (only if present)
         var std = g.standard_alignment || {};
         if (std.code) {
-          var stdPill = document.createElement('span');
-          stdPill.className = 'goal-card-label';
-          stdPill.style.cssText = 'display:inline-block; background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.2); border-radius:4px; padding:0.15rem 0.5rem; margin-bottom:0; color:#34d399; font-family:"JetBrains Mono",monospace;';
-          stdPill.textContent = std.code + (std.grade_band ? ' · Gr ' + std.grade_band : '');
-          badges.appendChild(stdPill);
+          var stdP = document.createElement('span');
+          stdP.className = 'goal-card-label';
+          stdP.style.cssText = 'display:inline-block;background:rgba(52,211,153,0.08);border:1px solid rgba(52,211,153,0.2);border-radius:4px;padding:0.15rem 0.5rem;margin-bottom:0;color:#34d399;font-family:"JetBrains Mono",monospace;';
+          stdP.textContent = std.code + (std.grade_band ? ' · Gr '+std.grade_band : '');
+          badges.appendChild(stdP);
         }
-
         header.appendChild(badges);
 
-        // Track Progress button — passes goal_id (stable contract key, not array index)
+        // Track button — goal_id is the Data Contract join key (FERPA-safe)
         var trackBtn = document.createElement('button');
         trackBtn.type = 'button';
-        trackBtn.style.cssText = 'flex-shrink:0; display:inline-flex; align-items:center; gap:0.3rem; background:rgba(108,143,255,0.08); color:#6c8fff; border:1px solid rgba(108,143,255,0.25); border-radius:6px; padding:0.28rem 0.65rem; font-family:"JetBrains Mono",monospace; font-size:0.65rem; font-weight:600; cursor:pointer; transition:background 0.13s, border-color 0.13s; white-space:nowrap;';
-        trackBtn.textContent = '↗ Track Progress';
-        trackBtn.setAttribute('aria-label', 'Track progress for goal ' + (idx + 1));
-        (function (goalId, studentTag) {
-          trackBtn.addEventListener('click', function () {
-            launchTracker(studentTag, goalId);
-          });
-        }(g.goal_id || ('LOCAL-legacy-' + idx), String(_record[COL.TAG] || '')));
+        trackBtn.style.cssText = 'flex-shrink:0;display:inline-flex;align-items:center;gap:0.3rem;background:rgba(108,143,255,0.08);color:#6c8fff;border:1px solid rgba(108,143,255,0.25);border-radius:6px;padding:0.28rem 0.65rem;font-family:"JetBrains Mono",monospace;font-size:0.65rem;font-weight:600;cursor:pointer;transition:background 0.13s;white-space:nowrap;';
+        trackBtn.textContent = '↗ Track';
+        trackBtn.setAttribute('aria-label', 'Track progress for goal '+(idx+1));
+        (function(goalId, tag) {
+          trackBtn.addEventListener('click', function() { launchTracker(tag, goalId); });
+        }(g.goal_id || ('LOCAL-legacy-'+idx), String(_record[COL.TAG]||'')));
         header.appendChild(trackBtn);
         card.appendChild(header);
 
-        // ── Goal description ────────────────────────────────────────────
+        // Description
         var gText = document.createElement('p');
         gText.className = 'goal-card-text';
-        gText.textContent = (g.description && g.description.trim())
-          ? g.description.trim() : '(no description)';
+        gText.textContent = (g.description && g.description.trim()) ? g.description.trim() : '(no description)';
         card.appendChild(gText);
 
-        // ── KY Standard description (if present) ───────────────────────
         if (std.description) {
           var stdDesc = document.createElement('p');
-          stdDesc.style.cssText = 'font-size:0.75rem; color:#4a5578; font-style:italic; margin-top:0.35rem; line-height:1.4;';
+          stdDesc.style.cssText = 'font-size:0.75rem;color:#4a5578;font-style:italic;margin-top:0.35rem;line-height:1.4;';
           stdDesc.textContent = std.description;
           card.appendChild(stdDesc);
         }
 
-        // ── SDI block ───────────────────────────────────────────────────
+        // SDI block — always rendered so missing SDI is visible
+        var hr = document.createElement('hr');
+        hr.style.cssText = 'border:none;border-top:1px solid #1e2335;margin:0.55rem 0 0.45rem;';
+        card.appendChild(hr);
+
         var sdi = g.sdi || {};
-        var sdiStrategy = sdi.strategy || '';
-        if (sdiStrategy || sdi.evidence_base || sdi.delivery_model || sdi.frequency) {
-          var divider = document.createElement('hr');
-          divider.style.cssText = 'border:none; border-top:1px solid #1e2335; margin:0.55rem 0 0.45rem;';
-          card.appendChild(divider);
+        var sdiStr = sdi.strategy || '';
+        var sdiLine = document.createElement('p');
+        sdiLine.className = 'goal-card-sdi';
+        sdiLine.style.cssText = 'display:block;width:100%;margin-top:0;';
+        var sdiLbl = document.createElement('span');
+        sdiLbl.className = 'goal-card-sdi-label';
+        sdiLbl.textContent = 'SDI: ';
+        sdiLine.appendChild(sdiLbl);
+        sdiLine.appendChild(document.createTextNode(sdiStr || '—'));
+        card.appendChild(sdiLine);
 
-          var sdiBlock = document.createElement('div');
-          sdiBlock.style.cssText = 'display:flex; flex-direction:column; gap:0.2rem;';
-
-          var sdiLine = document.createElement('p');
-          sdiLine.className = 'goal-card-sdi';
-          sdiLine.style.cssText = 'display:block; width:100%; margin-top:0;';
-          var sdiLabel = document.createElement('span');
-          sdiLabel.className = 'goal-card-sdi-label';
-          sdiLabel.textContent = 'SDI: ';
-          sdiLine.appendChild(sdiLabel);
-          sdiLine.appendChild(document.createTextNode(sdiStrategy || '—'));
-          sdiBlock.appendChild(sdiLine);
-
-          // Evidence base + delivery meta (small, muted)
-          var sdiMeta = [
-            sdi.evidence_base  || '',
-            sdi.delivery_model || '',
-            sdi.frequency      || '',
-          ].filter(Boolean).join(' · ');
-          if (sdiMeta) {
-            var sdiMetaEl = document.createElement('p');
-            sdiMetaEl.style.cssText = 'font-size:0.71rem; color:#4a5578; font-family:"JetBrains Mono",monospace; margin:0;';
-            sdiMetaEl.textContent = sdiMeta;
-            sdiBlock.appendChild(sdiMetaEl);
-          }
-
-          card.appendChild(sdiBlock);
-        } else {
-          // Always show SDI line so teachers notice when it's missing
-          var divider2 = document.createElement('hr');
-          divider2.style.cssText = 'border:none; border-top:1px solid #1e2335; margin:0.55rem 0 0.45rem;';
-          card.appendChild(divider2);
-          var sdiEmpty = document.createElement('p');
-          sdiEmpty.className = 'goal-card-sdi';
-          var sdiLabel2 = document.createElement('span');
-          sdiLabel2.className = 'goal-card-sdi-label';
-          sdiLabel2.textContent = 'SDI: ';
-          sdiEmpty.appendChild(sdiLabel2);
-          sdiEmpty.appendChild(document.createTextNode('—'));
-          card.appendChild(sdiEmpty);
+        var sdiMeta = [sdi.evidence_base||'', sdi.delivery_model||'', sdi.frequency||''].filter(Boolean).join(' · ');
+        if (sdiMeta) {
+          var sdiMetaEl = document.createElement('p');
+          sdiMetaEl.style.cssText = 'font-size:0.71rem;color:#4a5578;font-family:"JetBrains Mono",monospace;margin:0.15rem 0 0;';
+          sdiMetaEl.textContent = sdiMeta;
+          card.appendChild(sdiMetaEl);
         }
 
-        // ── Progress monitoring footer ──────────────────────────────────
+        // Progress monitoring footer
         var pm = g.progress_monitoring || {};
-        var hasBaseline = pm.baseline !== null && pm.baseline !== undefined;
-        var hasTarget   = pm.target   !== null && pm.target   !== undefined;
-        var unit        = pm.unit === 'percent' ? '%' : (' ' + (pm.unit || ''));
-        var haspm       = pm.metric || hasBaseline || hasTarget || pm.mastery_criterion;
-
-        if (haspm) {
+        var hasBL = pm.baseline !== null && pm.baseline !== undefined;
+        var hasTG = pm.target   !== null && pm.target   !== undefined;
+        var unit  = pm.unit === 'percent' ? '%' : (' '+(pm.unit||''));
+        if (pm.metric || hasBL || hasTG || pm.mastery_criterion) {
           var pmRow = document.createElement('div');
-          pmRow.style.cssText = 'display:flex; align-items:center; flex-wrap:wrap; gap:0.6rem; margin-top:0.55rem; padding-top:0.45rem; border-top:1px solid #1e2335;';
-
+          pmRow.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;gap:0.6rem;margin-top:0.55rem;padding-top:0.45rem;border-top:1px solid #1e2335;';
           if (pm.metric) {
-            var metricBadge = document.createElement('span');
-            metricBadge.style.cssText = 'font-family:"JetBrains Mono",monospace; font-size:0.6rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#4a5578;';
-            metricBadge.textContent = pm.metric;
-            pmRow.appendChild(metricBadge);
+            var mBadge = document.createElement('span');
+            mBadge.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#4a5578;';
+            mBadge.textContent = pm.metric;
+            pmRow.appendChild(mBadge);
           }
-
-          if (hasBaseline || hasTarget) {
-            var range = document.createElement('span');
-            range.style.cssText = 'font-family:"JetBrains Mono",monospace; font-size:0.75rem; color:#c4cde4;';
-            var parts = [];
-            if (hasBaseline) parts.push(pm.baseline + unit);
-            if (hasTarget)   parts.push(pm.target   + unit);
-            range.textContent = parts.join(' → ');
-            pmRow.appendChild(range);
+          if (hasBL || hasTG) {
+            var rng = [];
+            if (hasBL) rng.push(pm.baseline+unit);
+            if (hasTG) rng.push(pm.target+unit);
+            var rngEl = document.createElement('span');
+            rngEl.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:0.75rem;color:#c4cde4;';
+            rngEl.textContent = rng.join(' → ');
+            pmRow.appendChild(rngEl);
           }
-
           if (pm.mastery_criterion) {
-            var mastery = document.createElement('span');
-            mastery.style.cssText = 'font-size:0.72rem; color:#4a5578;';
-            mastery.textContent = pm.mastery_criterion;
-            pmRow.appendChild(mastery);
+            var mast = document.createElement('span');
+            mast.style.cssText = 'font-size:0.72rem;color:#4a5578;';
+            mast.textContent = pm.mastery_criterion;
+            pmRow.appendChild(mast);
           }
-
           card.appendChild(pmRow);
         }
 
-        // ── Artifact type chip (bottom-right, only when non-default) ───
         if (g.artifact_type && g.artifact_type !== 'graphic_organizer') {
-          var artChip = document.createElement('div');
-          artChip.style.cssText = 'margin-top:0.4rem; text-align:right;';
+          var artDiv = document.createElement('div');
+          artDiv.style.cssText = 'margin-top:0.4rem;text-align:right;';
           var artSpan = document.createElement('span');
-          artSpan.style.cssText = 'font-family:"JetBrains Mono",monospace; font-size:0.6rem; color:#4a5578; background:rgba(255,255,255,0.03); border:1px solid #1e2335; border-radius:4px; padding:0.1rem 0.45rem;';
-          artSpan.textContent = g.artifact_type.replace(/_/g, ' ');
-          artChip.appendChild(artSpan);
-          card.appendChild(artChip);
+          artSpan.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:0.6rem;color:#4a5578;background:rgba(255,255,255,0.03);border:1px solid #1e2335;border-radius:4px;padding:0.1rem 0.45rem;';
+          artSpan.textContent = g.artifact_type.replace(/_/g,' ');
+          artDiv.appendChild(artSpan);
+          card.appendChild(artDiv);
         }
 
         list.appendChild(card);
@@ -778,26 +705,21 @@
         ul.appendChild(empty);
         return;
       }
-      items.forEach(function (item) {
+      items.forEach(function(item) {
         var li = document.createElement('li');
-        li.style.cssText = 'font-size:0.82rem; color:#c4cde4; background:rgba(255,255,255,0.03); border:1px solid #1e2335; border-radius:8px; padding:0.6rem 0.85rem; line-height:1.4; margin-bottom:0.4rem;';
+        li.style.cssText = 'font-size:0.82rem;color:#c4cde4;background:rgba(255,255,255,0.03);border:1px solid #1e2335;border-radius:8px;padding:0.6rem 0.85rem;line-height:1.4;margin-bottom:0.4rem;';
         li.textContent = item;
         ul.appendChild(li);
       });
     }
 
-    // FIX: populateView correctly reads from COL.* indices and calls renderGoals.
-    // Previously there was no boot fetch, so _record was always [] and this was
-    // never reached. Now called from init() after a successful getRoster fetch.
     function populateView(row) {
-      // ── Diagnostic: log the raw Goals cell so you can confirm the shape ──
-      // Remove or comment out once the data structure is confirmed correct.
-      console.log('[populateView] raw row[COL.GOALS] (index ' + COL.GOALS + '):', row[COL.GOALS]);
-      console.log('[populateView] typeof:', typeof row[COL.GOALS]);
-      var fn = String(row[COL.FIRST_NAME] || '').trim();
-      var ln = String(row[COL.LAST_NAME]  || '').trim();
-      setText('display-name', [fn, ln].filter(Boolean).join(' ') || '(Name unavailable)');
-      setText('display-id',   'DatabaseID: ' + (row[COL.ID] || '—'));
+      var fn = String(row[COL.FIRST_NAME]||'').trim();
+      var ln = String(row[COL.LAST_NAME] ||'').trim();
+      var fullName = [fn, ln].filter(Boolean).join(' ') || '(Name unavailable)';
+      setText('display-name', fullName);
+      setText('display-id',   'DatabaseID: ' + (row[COL.ID]||'—'));
+      document.title = fullName + ' — M-Powered Education';
 
       setText('rv-studentId',    row[COL.ID]);
       setText('rv-tag',          row[COL.TAG]);
@@ -808,30 +730,27 @@
       setText('rv-iepEnd',       row[COL.IEP_END]);
       setText('rv-supplemental', row[COL.SUPPLEMENTAL]);
 
-      // FIX: COL.GOALS = 9. parseGoals handles JSON string → [{description,sdi}] array.
       renderGoals(parseGoals(row[COL.GOALS]));
-
       renderAccommodations(parseAccommodations(row[COL.ACCOMMODATIONS]));
     }
 
-    // ── Panel show / hide ─────────────────────────────────────
+    // ── Panel show / hide ──────────────────────────────────────────
     function _showView(panel) {
-      var el = document.getElementById('view-' + panel);
+      var el = document.getElementById('view-'+panel);
       if (!el) return;
-      // goals/accommodations view-div is a plain div/ul — display:'' restores correctly
       el.style.display = (panel === 'identity' || panel === 'academic') ? 'grid' : '';
     }
     function _hideView(panel) {
-      var el = document.getElementById('view-' + panel);
+      var el = document.getElementById('view-'+panel);
       if (el) el.style.display = 'none';
     }
 
     function editPanel(panel) {
       if (_editing[panel]) return;
       _editing[panel] = true;
-      var panelEl = document.getElementById('panel-' + panel);
-      var editEl  = document.getElementById('edit-'  + panel);
-      var footEl  = document.getElementById('footer-'+ panel);
+      var panelEl = document.getElementById('panel-'+panel);
+      var editEl  = document.getElementById('edit-' +panel);
+      var footEl  = document.getElementById('footer-'+panel);
       if (panelEl) panelEl.classList.add('is-editing');
       _hideView(panel);
       if (editEl) editEl.style.display = 'block';
@@ -844,7 +763,7 @@
         setInput('in-lastName',  _record[COL.LAST_NAME]);
       }
       if (panel === 'academic') {
-        setInput('in-disability',   _record[COL.DISABILITY]);
+        setSelect('in-disability',  _record[COL.DISABILITY]);
         setInput('in-iepStart',     _toDateInputValue(_record[COL.IEP_START]));
         setInput('in-iepEnd',       _toDateInputValue(_record[COL.IEP_END]));
         setInput('in-supplemental', _record[COL.SUPPLEMENTAL]);
@@ -854,33 +773,29 @@
         if (container) {
           container.innerHTML = '';
           var goals = parseGoals(_record[COL.GOALS]);
-          // Ensure at least one blank row if no goals exist yet.
-          // Pass g.sdi.strategy (v1.1) — the edit UI exposes only the primary
-          // strategy string; full sub-fields are preserved in the round-trip shim.
           (goals.length ? goals : [{ description: '', sdi: { strategy: '' } }])
-            .forEach(function (g) {
+            .forEach(function(g) {
               var sdiStr = (g.sdi && typeof g.sdi === 'object')
                 ? (g.sdi.strategy || '')
-                : String(g.sdi || '');   /* [SHIM] legacy flat string */
+                : String(g.sdi || '');  /* [SHIM] legacy flat string */
               addGoalRow(g.description, sdiStr);
             });
         }
       }
       if (panel === 'accommodations') {
-        setInput('in-accommodations',
-          parseAccommodations(_record[COL.ACCOMMODATIONS]).join('\n'));
+        setInput('in-accommodations', parseAccommodations(_record[COL.ACCOMMODATIONS]).join('\n'));
       }
 
-      if (editEl) { var first = editEl.querySelector('input, textarea'); if (first) first.focus(); }
+      if (editEl) { var first = editEl.querySelector('input,textarea,select'); if (first) first.focus(); }
     }
 
     function cancelPanel(panel) { _closePanel(panel); }
 
     function _closePanel(panel) {
       _editing[panel] = false;
-      var panelEl = document.getElementById('panel-' + panel);
-      var editEl  = document.getElementById('edit-'  + panel);
-      var footEl  = document.getElementById('footer-'+ panel);
+      var panelEl = document.getElementById('panel-'+panel);
+      var editEl  = document.getElementById('edit-' +panel);
+      var footEl  = document.getElementById('footer-'+panel);
       if (panelEl) panelEl.classList.remove('is-editing');
       _showView(panel);
       if (editEl) editEl.style.display = 'none';
@@ -888,49 +803,81 @@
       setPanelStatus(panel, '', '');
     }
 
-    // ── Goal rows (edit UI) ───────────────────────────────────
-    // addGoalRow(desc, sdi) — both are plain strings for the edit inputs.
-    // Callers pass g.description and g.sdi.strategy (the strategy field of the
-    // v1.1 sdi object). The edit UI is intentionally kept as a simple two-column
-    // layout; full v1.1 sub-fields are preserved in the JSON round-trip via
-    // the [SHIM] merge in savePanel('goals') below.
+    // ── addGoalRow — vertical stack with full-width textareas ──────
+    // Each goal gets its own card: description textarea (120px min),
+    // then SDI textarea (120px min), then remove button in header.
+    // [SHIM] Callers pass g.description and g.sdi.strategy; all other
+    // v1.1 sub-fields are preserved via the round-trip merge in savePanel.
     function addGoalRow(desc, sdi) {
       var container = document.getElementById('goal-rows');
       if (!container) return;
+      var rowNum = container.querySelectorAll('.goal-edit-card').length + 1;
 
-      var row = document.createElement('div');
-      row.className = 'goal-edit-row';
+      var card = document.createElement('div');
+      card.className = 'goal-edit-card';
 
-      var descInput = document.createElement('input');
-      descInput.type = 'text';
-      descInput.className = 'field-input goal-input';
-      descInput.placeholder = 'Goal description…';
-      descInput.value = _esc(desc);
+      // Card header: number label + remove button
+      var cardHdr = document.createElement('div');
+      cardHdr.className = 'goal-edit-card-header';
 
-      var sdiInput = document.createElement('input');
-      sdiInput.type = 'text';
-      sdiInput.className = 'field-input sdi-input';
-      sdiInput.placeholder = 'Specially Designed Instruction…';
-      sdiInput.value = _esc(sdi);
+      var numLbl = document.createElement('span');
+      numLbl.className = 'goal-edit-card-num';
+      numLbl.textContent = 'Goal ' + rowNum;
+      cardHdr.appendChild(numLbl);
 
-      var removeBtn = document.createElement('button');
-      removeBtn.type = 'button';
-      removeBtn.className = 'btn-remove';
-      removeBtn.title = 'Remove this goal';
-      removeBtn.textContent = '×';
-      removeBtn.onclick = function () { container.removeChild(row); };
+      var rmBtn = document.createElement('button');
+      rmBtn.type = 'button';
+      rmBtn.className = 'btn-remove';
+      rmBtn.textContent = '× Remove';
+      rmBtn.onclick = function() {
+        card.style.transition = 'opacity 0.15s, transform 0.15s';
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(-4px)';
+        setTimeout(function() {
+          if (card.parentNode) card.parentNode.removeChild(card);
+          // Re-number remaining cards after removal
+          var remaining = container.querySelectorAll('.goal-edit-card-num');
+          remaining.forEach(function(el, i) { el.textContent = 'Goal ' + (i+1); });
+        }, 160);
+      };
+      cardHdr.appendChild(rmBtn);
+      card.appendChild(cardHdr);
 
-      row.appendChild(descInput);
-      row.appendChild(sdiInput);
-      row.appendChild(removeBtn);
-      container.appendChild(row);
-      descInput.focus();
+      // Goal description — full-width textarea, ~5 lines
+      var descLbl = document.createElement('label');
+      descLbl.className = 'field-label';
+      descLbl.textContent = 'Goal Description';
+      card.appendChild(descLbl);
+
+      var descTA = document.createElement('textarea');
+      descTA.className = 'field-textarea goal-input';
+      descTA.placeholder = 'By [date], [student] will [observable behavior] with [criterion] as measured by [method]…';
+      descTA.style.minHeight = '120px';
+      descTA.value = _esc(desc);
+      card.appendChild(descTA);
+
+      // SDI — full-width textarea, ~5 lines
+      var sdiLbl = document.createElement('label');
+      sdiLbl.className = 'field-label';
+      sdiLbl.style.marginTop = '0.1rem';
+      sdiLbl.textContent = 'SDI — Specially Designed Instruction';
+      card.appendChild(sdiLbl);
+
+      var sdiTA = document.createElement('textarea');
+      sdiTA.className = 'field-textarea sdi-input';
+      sdiTA.placeholder = 'Describe the instructional methods, content modifications, or delivery adjustments…';
+      sdiTA.style.minHeight = '120px';
+      sdiTA.value = _esc(sdi);
+      card.appendChild(sdiTA);
+
+      container.appendChild(card);
+      descTA.focus();
     }
 
-    // ── Save ──────────────────────────────────────────────────
+    // ── savePanel ─────────────────────────────────────────────────
     function savePanel(panel) {
-      var saveBtn   = document.querySelector('#footer-' + panel + ' .btn-save');
-      var cancelBtn = document.querySelector('#footer-' + panel + ' .btn-cancel');
+      var saveBtn   = document.querySelector('#footer-'+panel+' .btn-save');
+      var cancelBtn = document.querySelector('#footer-'+panel+' .btn-cancel');
       if (saveBtn)   saveBtn.disabled   = true;
       if (cancelBtn) cancelBtn.disabled = true;
       setPanelStatus(panel, 'Saving…', '#6c8fff');
@@ -949,34 +896,26 @@
         updates[COL.SUPPLEMENTAL] = getInput('in-supplemental');
       }
       if (panel === 'goals') {
-        // Collect the edit-row inputs (description + sdi strategy string).
-        // [SHIM] Merge: for each row, find the previously-stored v1.1 goal object
-        // (matched by position) and preserve all sub-fields the edit UI doesn't
-        // expose (standard_alignment, artifact_type, progress_monitoring, etc.).
-        // Only description and sdi.strategy are overwritten from the edit inputs.
-        var goalEls  = document.querySelectorAll('#goal-rows .goal-edit-row');
-        var existing = parseGoals(_record[COL.GOALS]);
+        // [SHIM] Round-trip merge: read description + sdi.strategy from textareas.
+        // Find the existing v1.1 object at the same position and carry forward
+        // all sub-fields the edit UI doesn't expose (standard_alignment,
+        // artifact_type, progress_monitoring, etc.).
+        var goalCards = document.querySelectorAll('#goal-rows .goal-edit-card');
+        var existing  = parseGoals(_record[COL.GOALS]);
 
-        var merged = Array.prototype.slice.call(goalEls)
-          .map(function (rowEl, i) {
-            var newDesc     = rowEl.querySelector('.goal-input').value.trim();
-            var newStrategy = rowEl.querySelector('.sdi-input').value.trim();
-            if (!newDesc && !newStrategy) return null;   // skip entirely blank rows
+        var merged = Array.prototype.slice.call(goalCards)
+          .map(function(cardEl, i) {
+            var newDesc = ((cardEl.querySelector('.goal-input')||{}).value||'').trim();
+            var newStrat= ((cardEl.querySelector('.sdi-input') ||{}).value||'').trim();
+            if (!newDesc && !newStrat) return null;  // skip blank cards
 
-            // Base: existing v1.1 object at this position (or fresh shell)
             var base = existing[i] ? _buildGoalShell(existing[i]) : _buildGoalShell({});
+            base.description  = newDesc;
+            base.sdi.strategy = newStrat;
 
-            // Overwrite only the fields the edit UI controls
-            base.description   = newDesc;
-            base.sdi.strategy  = newStrategy;
-
-            // Assign a LOCAL- id if the object doesn't already have one
             if (!base.goal_id) {
-              var ts  = Date.now().toString(36);
-              var rnd = Math.random().toString(36).slice(2, 8);
-              base.goal_id = 'LOCAL-' + ts + '-' + rnd;
+              base.goal_id = 'LOCAL-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
             }
-
             return base;
           })
           .filter(Boolean);
@@ -984,8 +923,7 @@
         updates[COL.GOALS] = JSON.stringify(merged);
       }
       if (panel === 'accommodations') {
-        var lines = getInput('in-accommodations')
-          .split('\n').map(function (s) { return s.trim(); }).filter(Boolean);
+        var lines = getInput('in-accommodations').split('\n').map(function(s){return s.trim();}).filter(Boolean);
         updates[COL.ACCOMMODATIONS] = JSON.stringify(lines);
       }
 
@@ -993,88 +931,58 @@
     }
 
     function _saveRecord(studentId, updates, panel, saveBtn, cancelBtn) {
-      // Optimistic local merge so populateView reflects new data immediately
-      Object.keys(updates).forEach(function (col) {
-        _record[parseInt(col, 10)] = updates[col];
-      });
+      Object.keys(updates).forEach(function(col) { _record[parseInt(col,10)] = updates[col]; });
 
       var payload = _isNew
         ? { action: 'addStudent', student: _record }
         : { action: 'updateStudent', studentId: studentId, updates: updates };
 
       _gasPost(payload)
-      .then(function (data) {
+      .then(function(data) {
         if (_isNew) {
           _isNew = false;
           if (data.studentId) { _studentId = String(data.studentId); _record[COL.ID] = _studentId; }
-          document.querySelectorAll('.btn-save').forEach(function (b) { b.textContent = 'Save changes'; });
+          document.querySelectorAll('.btn-save').forEach(function(b){ b.textContent = 'Save changes'; });
         }
-        // Prefer the server's authoritative row when echoed back
         if (data.row && Array.isArray(data.row)) _record = data.row;
         populateView(_record);
         _closePanel(panel);
         showToast('Saved successfully', 'success');
       })
-      .catch(function (err) {
+      .catch(function(err) {
         console.error('[saveRecord]', err);
-        setPanelStatus(panel, 'Save failed — ' + (err.message || 'unknown error'), '#f87171');
+        setPanelStatus(panel, 'Save failed — '+(err.message||'unknown error'), '#f87171');
         showToast('Save failed', 'error');
       })
-      .finally(function () {
+      .finally(function() {
         if (saveBtn)   saveBtn.disabled   = false;
         if (cancelBtn) cancelBtn.disabled = false;
       });
     }
 
-    // ── Normalise ─────────────────────────────────────────────
-    function normalise(v) {
-      return String(v || '').replace(/^["'\s]+|["'\s]+$/g, '').toLowerCase();
-    }
+    function normalise(v) { return String(v||'').replace(/^["'\s]+|["'\s]+$/g,'').toLowerCase(); }
 
-    // ── Boot ──────────────────────────────────────────────────
-    // FIX: was missing entirely. Without this, _record stays [] and every
-    // panel shows blanks because populateView is never called.
+    // ── Boot ───────────────────────────────────────────────────────
     function init() {
       var params = new URLSearchParams(window.location.search);
       _studentId = params.get('id');
-
-      // Mark "New Student" nav item active when editing a student record
-      // (it stays as the active CTA rather than highlighting "Dashboard")
       var navNew = document.getElementById('nav-new-student');
 
       if (!_studentId || !_studentId.trim()) {
         showState('error');
-        document.getElementById('fallback-message').textContent =
-          'No student ID in URL. Use ?id=<DatabaseID>';
+        document.getElementById('fallback-message').textContent = 'No student ID in URL. Use ?id=<DatabaseID>';
         return;
       }
 
-      // ?id=new — blank record mode
       if (_studentId.toLowerCase() === 'new') {
         _isNew  = true;
-        // Build an explicit 11-element array.
-        // Indices 0 (Timestamp) and 1 (DatabaseID) are intentionally left as
-        // empty strings here — Code.gs MUST override them with new Date() and
-        // auto-incremented newId respectively and must NOT read student[0/1].
-        // Using explicit null-markers makes any accidental read visible in logs.
-        _record = [
-          '',       // 0  Timestamp     — GAS sets this
-          '',       // 1  DatabaseID    — GAS auto-increments this
-          '',       // 2  Tag
-          '',       // 3  First Name
-          '',       // 4  Last Name
-          '',       // 5  IEP Start
-          '',       // 6  IEP End
-          '',       // 7  Disability
-          '',       // 8  Supplemental Aids
-          '[]',     // 9  Goals JSON
-          '[]'      // 10 Accommodations JSON
-        ];
+        _record = ['','','','','','','','','','[]','[]'];
         document.title = 'New Student — M-Powered Education';
         if (navNew) navNew.classList.add('active');
         setText('display-name', 'New Student');
         setText('display-id',   'Unsaved record');
-        document.querySelectorAll('.btn-save').forEach(function (b) { b.textContent = 'Add student'; });
+        document.querySelectorAll('.btn-save').forEach(function(b){ b.textContent = 'Add student'; });
+        document.getElementById('nav-position-label').textContent = 'New';
         showState('data');
         return;
       }
@@ -1083,37 +991,42 @@
       var searchId = normalise(_studentId);
 
       _gasPost({ action: 'getRoster' })
-      .then(function (data) {
-        var rows = Array.isArray(data.rows) ? data.rows : [];
-        // Row 0 is the header — skip it
-        var match = rows.slice(1).find(function (row) {
+      .then(function(data) {
+        var allRows  = Array.isArray(data.rows) ? data.rows : [];
+        var dataRows = allRows.length > 1 ? allRows.slice(1) : [];
+
+        // Init caseload navigation with the full roster
+        _initCaseloadNav(dataRows, _studentId);
+
+        var match = dataRows.find(function(row) {
           return Array.isArray(row) && normalise(row[COL.ID]) === searchId;
         });
+
         if (!match) {
           showState('error');
-          document.getElementById('fallback-message').textContent =
-            'No record found for DatabaseID "' + _studentId + '".';
+          document.getElementById('fallback-message').textContent = 'No record found for DatabaseID "'+_studentId+'".';
           return;
         }
+
         _record = match;
-        populateView(_record);   // ← this is what renders the goals list
+        populateView(_record);
         showState('data');
       })
-      .catch(function (err) {
+      .catch(function(err) {
         showState('error');
-        document.getElementById('fallback-message').textContent =
-          'Could not load record: ' + (err.message || 'unknown error');
+        document.getElementById('fallback-message').textContent = 'Could not load record: '+(err.message||'unknown error');
       });
     }
 
-    // ── Public API ────────────────────────────────────────────
+    // ── Public API ─────────────────────────────────────────────────
     return {
-      editPanel:   editPanel,
-      cancelPanel: cancelPanel,
-      savePanel:   savePanel,
-      addGoalRow:  addGoalRow,
-      logout: function () {
-        try { localStorage.clear(); } catch (e) {}
+      editPanel:       editPanel,
+      cancelPanel:     cancelPanel,
+      savePanel:       savePanel,
+      addGoalRow:      addGoalRow,
+      navigateStudent: navigateStudent,
+      logout: function() {
+        try { localStorage.clear(); } catch(e) {}
         window.location.replace('https://www.mpowerededucation.com/index.html');
       },
       init: init
@@ -1123,20 +1036,18 @@
 
   document.addEventListener('DOMContentLoaded', App.init);
 
-  /* ══════════════════════════════════════════════════════════════════
+  /* ══════════════════════════════════════════════════════════════
      launchTracker(studentTag, goalId)
-     Data Contract v1.1 — called by the Track Progress button in each
-     goal card. Passes the opaque studentTag (FERPA-safe) and the
-     stable goal_id (contract join key) to the Data/Click Tracker.
+     Data Contract v1.1 — called by Track buttons in each goal card.
 
-     @param {string} studentTag — opaque token (e.g. "JS-9W"), never PII
-     @param {string} goalId     — "LOCAL-…" (pre-dock) or "CM-GOAL-XXXXX"
-                                   (after Caseload Manager reconciliation)
+     @param {string} studentTag — opaque FERPA-safe token (COL.TAG value)
+     @param {string} goalId     — "LOCAL-…" pre-dock, or "CM-GOAL-XXXXX"
+                                   after Caseload Manager reconciliation.
 
-     Replace the alert() stub with actual Tracker navigation or a modal
-     once the Data/Click Tracker tool is built. The goal_id is the key
-     the Tracker pushes in its timeseries_event packets.
-  ══════════════════════════════════════════════════════════════════ */
+     Replace the alert() stub with Tracker navigation / modal once the
+     Data/Click Tracker tool is built. goal_id is the join key the
+     Tracker uses when pushing timeseries_event packets back.
+  ══════════════════════════════════════════════════════════════ */
   function launchTracker(studentTag, goalId) {
     console.log('[launchTracker] student:', studentTag, '| goal_id:', goalId);
     alert(
@@ -1145,6 +1056,7 @@
       'Goal ID       : ' + goalId     + '\n\n' +
       '(Data/Click Tracker — coming soon)'
     );
-  }</script>
+  }
+  </script>
 </body>
 </html>
