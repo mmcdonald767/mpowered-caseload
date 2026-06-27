@@ -310,22 +310,42 @@
 
   // ── Render ────────────────────────────────────────────────────
   function renderListView(ulId, items) {
-    var ul = document.getElementById(ulId);
-    if (!ul) return;
-    ul.innerHTML = '';
-    if (!items || items.length === 0) {
-      var empty = document.createElement('li');
-      empty.className = 'list-view-empty';
-      empty.textContent = 'No entries recorded.';
-      ul.appendChild(empty);
-    } else {
-      items.forEach(function(item) {
-        var li = document.createElement('li');
-        li.className = 'list-view-item';
-        li.textContent = typeof item === 'object' ? JSON.stringify(item) : String(item);
-        ul.appendChild(li);
-      });
-    }
+  var ul = document.getElementById(ulId);
+  if (!ul) return;
+  ul.innerHTML = '';
+  
+  if (!items || items.length === 0) {
+    var empty = document.createElement('li');
+    empty.className = 'list-view-empty';
+    empty.textContent = 'No entries recorded.';
+    ul.appendChild(empty);
+  } else {
+    items.forEach(function(item) {
+      var li = document.createElement('li');
+      li.className = 'list-view-item';
+      
+      // Intelligent Unpacking:
+      if (typeof item === 'object') {
+        // If it's a goal object, show the description
+        if (item.description) {
+          li.textContent = item.description;
+        } 
+        // If it's an accommodation object, show the selections
+        else if (item.selections && Array.isArray(item.selections)) {
+          li.textContent = item.selections.length > 0 ? item.selections.join(', ') : 'No selections';
+        } 
+        // Fallback for other objects
+        else {
+          li.textContent = JSON.stringify(item);
+        }
+      } else {
+        // Fallback for simple strings
+        li.textContent = String(item);
+      }
+      ul.appendChild(li);
+    });
+  }
+}
   }
 
   function populateView(row) {
