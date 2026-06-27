@@ -198,13 +198,33 @@
         </div>
         <ul id="view-goals" class="field-grid single-col" style="list-style:none; padding:0; margin:0; gap:0.5rem;"></ul>
         <div id="edit-goals" style="display:none;">
-          <textarea class="field-textarea" id="in-goals" style="width:100%;"></textarea>
-          <p class="list-edit-hint">One goal per line. Each line becomes a separate list item.</p>
+          <div id="goal-rows" style="display:flex; flex-direction:column; gap:0.5rem;"></div>
+          <button class="btn btn-edit" onclick="addGoalRow('')" style="margin-top:0.6rem; font-size:0.65rem;">+ Add Another Goal</button>
         </div>
         <div id="footer-goals" class="btn-row" style="display:none; margin-top:1rem;">
           <button class="btn btn-save" onclick="savePanel('goals')">Save changes</button>
           <button class="btn btn-cancel" onclick="cancelPanel('goals')">Cancel</button>
           <span id="status-goals" style="font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#4a5578; margin-left:0.25rem;"></span>
+        </div>
+      </div>
+
+      <!-- PANEL: SDI -->
+      <div class="panel" id="panel-sdi">
+        <div class="section-header">
+          <span class="section-title">SDI <span style="color:#4a5578; font-weight:400;">(Specially Designed Instruction)</span></span>
+          <div class="btn-row">
+            <button class="btn btn-edit" onclick="editPanel('sdi')">Edit</button>
+          </div>
+        </div>
+        <ul id="view-sdi" class="field-grid single-col" style="list-style:none; padding:0; margin:0; gap:0.5rem;"></ul>
+        <div id="edit-sdi" style="display:none;">
+          <textarea class="field-textarea" id="in-sdi" style="width:100%;"></textarea>
+          <p class="list-edit-hint">One SDI entry per line. Each line becomes a separate list item.</p>
+        </div>
+        <div id="footer-sdi" class="btn-row" style="display:none; margin-top:1rem;">
+          <button class="btn btn-save" onclick="savePanel('sdi')">Save changes</button>
+          <button class="btn btn-cancel" onclick="cancelPanel('sdi')">Cancel</button>
+          <span id="status-sdi" style="font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#4a5578; margin-left:0.25rem;"></span>
         </div>
       </div>
 
@@ -241,13 +261,13 @@
   var COL = {
     TIMESTAMP: 0, ID: 1, FIRST_NAME: 2, LAST_NAME: 3,
     IEP_START: 4, IEP_END: 5, DISABILITY: 6,
-    SUPPLEMENTAL: 7, GOALS: 8, ACCOMMODATIONS: 9
+    SUPPLEMENTAL: 7, GOALS: 8, SDI: 9, ACCOMMODATIONS: 10
   };
 
   var _record    = null;
   var _studentId = null;
   var _isNew     = false;
-  var _editing   = { identity: false, academic: false, goals: false, accommodations: false };
+  var _editing   = { identity: false, academic: false, goals: false, sdi: false, accommodations: false };
 
   // ── Network ───────────────────────────────────────────────────
   function _gasPost(payload) {
@@ -307,6 +327,39 @@
 
   function textToList(text) {
     return String(text || '').split('\n').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+  }
+
+  // ── Dynamic Goal Rows ─────────────────────────────────────────
+  function addGoalRow(value) {
+    var container = document.getElementById('goal-rows');
+    if (!container) return;
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex; align-items:center; gap:0.5rem;';
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'field-input';
+    input.value = value || '';
+    input.placeholder = 'Describe goal…';
+    input.style.flex = '1';
+    var removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'btn btn-cancel';
+    removeBtn.style.cssText = 'padding:0.3rem 0.55rem; flex-shrink:0;';
+    removeBtn.title = 'Remove this goal';
+    removeBtn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+    removeBtn.onclick = function() { container.removeChild(row); };
+    row.appendChild(input);
+    row.appendChild(removeBtn);
+    container.appendChild(row);
+    input.focus();
+  }
+
+  function collectGoalRows() {
+    var container = document.getElementById('goal-rows');
+    if (!container) return [];
+    return Array.prototype.slice.call(container.querySelectorAll('input[type="text"]'))
+      .map(function(inp) { return inp.value.trim(); })
+      .filter(function(v) { return v.length > 0; });
   }
 
   // ── Render ────────────────────────────────────────────────────
@@ -373,12 +426,13 @@
     setText('rv-iepEnd',      row[COL.IEP_END]);
     setText('rv-supplemental',row[COL.SUPPLEMENTAL]);
     renderListView('view-goals',          parseListCell(row[COL.GOALS]));
+    renderListView('view-sdi',            parseListCell(row[COL.SDI]));
     renderListView('view-accommodations', parseListCell(row[COL.ACCOMMODATIONS]));
   }
 
   // ── Edit / cancel ─────────────────────────────────────────────
   // Panels whose view-div is a <ul> (list panels) vs a field-grid <div>
-  var _listPanels = { goals: true, accommodations: true };
+  var _listPanels = { goals: true, sdi: true, accommodations: true };
 
   function _showView(panel)  {
     var el = document.getElementById('view-' + panel);
@@ -412,7 +466,19 @@
       setInput('in-iepEnd',       _record[COL.IEP_END]);
       setInput('in-supplemental', _record[COL.SUPPLEMENTAL]);
     }
-    if (panel === 'goals')          setInput('in-goals',          listToText(parseListCell(_record[COL.GOALS])));
+    if (panel === 'goals') {
+      var container = document.getElementById('goal-rows');
+      if (container) {
+        container.innerHTML = '';
+        var goals = parseListCell(_record[COL.GOALS]);
+        if (goals.length === 0) {
+          addGoalRow('');
+        } else {
+          goals.forEach(function(g) { addGoalRow(unpackItem(g)); });
+        }
+      }
+    }
+    if (panel === 'sdi')            setInput('in-sdi',            listToText(parseListCell(_record[COL.SDI])));
     if (panel === 'accommodations') setInput('in-accommodations', listToText(parseListCell(_record[COL.ACCOMMODATIONS])));
 
     var first = editEl ? editEl.querySelector('input,textarea') : null;
@@ -452,7 +518,8 @@
       updates[COL.IEP_END]     = getInput('in-iepEnd');
       updates[COL.SUPPLEMENTAL]= getInput('in-supplemental');
     }
-    if (panel === 'goals')          updates[COL.GOALS]          = JSON.stringify(textToList(getInput('in-goals')));
+    if (panel === 'goals')          updates[COL.GOALS]          = JSON.stringify(collectGoalRows());
+    if (panel === 'sdi')            updates[COL.SDI]            = JSON.stringify(textToList(getInput('in-sdi')));
     if (panel === 'accommodations') updates[COL.ACCOMMODATIONS]  = JSON.stringify(textToList(getInput('in-accommodations')));
 
     saveRecord(_studentId, updates, panel, saveBtn, cancelBtn);
@@ -513,7 +580,7 @@
     // ── New Student Mode ─────────────────────────────────────────
     if (_studentId.toLowerCase() === 'new') {
       _isNew  = true;
-      _record = new Array(10).fill('');   // blank row matching COL indices
+      _record = new Array(11).fill('');   // blank row matching COL indices
       document.title = 'New Student — M-Powered Education';
       setText('display-name', 'New Student');
       setText('display-id',   'Unsaved record');
