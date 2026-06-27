@@ -84,19 +84,19 @@
       border-color: rgba(108,143,255,0.6); box-shadow: 0 0 0 3px rgba(108,143,255,0.12);
     }
 
-    /* ── Select — inherits field-input look; arrow recoloured for dark bg ── */
-    select.field-input {
-      appearance: none; -webkit-appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a5578' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.65rem center;
-      padding-right: 2rem;
+    /* ── Date picker — recolour calendar icon for dark background ── */
+    input[type="date"].field-input {
+      color-scheme: dark;          /* tells the browser to use dark-mode chrome for the picker */
       cursor: pointer;
     }
-    select.field-input:focus {
-      border-color: rgba(108,143,255,0.6); box-shadow: 0 0 0 3px rgba(108,143,255,0.12);
+    input[type="date"].field-input::-webkit-calendar-picker-indicator {
+      filter: invert(0.55) sepia(1) saturate(3) hue-rotate(190deg); /* matches accent #6c8fff */
+      cursor: pointer;
+      opacity: 0.75;
     }
-    select.field-input option { background: #171b26; color: #e8ecf4; }
+    input[type="date"].field-input::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+    }
 
     /* ── Goal cards (view state) ── */
     .goal-card {
@@ -244,27 +244,9 @@
           <div class="field"><span class="field-label">Supplemental Aids</span><span class="field-value" id="rv-supplemental"></span></div>
         </div>
         <div class="field-grid" id="edit-academic" style="display:none;">
-          <div class="field">
-            <label class="field-label" for="in-disability">Disability</label>
-            <select class="field-input" id="in-disability">
-              <option value="">— Select a category —</option>
-              <option value="Specific Learning Disability">Specific Learning Disability</option>
-              <option value="Speech or Language Impairment">Speech or Language Impairment</option>
-              <option value="Other Health Impairment">Other Health Impairment</option>
-              <option value="Autism">Autism</option>
-              <option value="Developmental Delay">Developmental Delay (ages 3–9)</option>
-              <option value="Intellectual Disability">Intellectual Disability</option>
-              <option value="Emotional Disturbance">Emotional Disturbance</option>
-              <option value="Multiple Disabilities">Multiple Disabilities</option>
-              <option value="Hearing Impairment">Hearing Impairment (including deafness)</option>
-              <option value="Orthopedic Impairment">Orthopedic Impairment</option>
-              <option value="Traumatic Brain Injury">Traumatic Brain Injury</option>
-              <option value="Visual Impairment">Visual Impairment (including blindness)</option>
-              <option value="Deaf-Blindness">Deaf-Blindness</option>
-            </select>
-          </div>
-          <div class="field"><label class="field-label" for="in-iepStart">IEP Start</label><input class="field-input" id="in-iepStart" type="text" placeholder="YYYY-MM-DD" /></div>
-          <div class="field"><label class="field-label" for="in-iepEnd">IEP End</label><input class="field-input" id="in-iepEnd" type="text" placeholder="YYYY-MM-DD" /></div>
+          <div class="field"><label class="field-label" for="in-disability">Disability</label><input class="field-input" id="in-disability" type="text" /></div>
+          <div class="field"><label class="field-label" for="in-iepStart">IEP Start</label><input class="field-input" id="in-iepStart" type="date" /></div>
+          <div class="field"><label class="field-label" for="in-iepEnd">IEP End</label><input class="field-input" id="in-iepEnd" type="date" /></div>
           <div class="field"><label class="field-label" for="in-supplemental">Supplemental Aids</label><input class="field-input" id="in-supplemental" type="text" /></div>
         </div>
         <div id="footer-academic" class="btn-row" style="display:none; margin-top:1rem;">
@@ -401,6 +383,37 @@
     }
     function getInput(id)      { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
     function setInput(id, val) { var el = document.getElementById(id); if (el) el.value = (val != null) ? String(val) : ''; }
+
+    // Convert any date format the sheet might return into the YYYY-MM-DD string
+    // that <input type="date"> requires as its .value.
+    // Handles: ISO timestamps ("2026-02-25T05:00:00.000Z"), plain dates ("2026-02-25"),
+    // US-style dates ("2/25/2026"), and Google Sheets Date objects (already a JS Date).
+    function _toDateInputValue(raw) {
+      if (!raw) return '';
+      var d;
+      if (raw instanceof Date) {
+        d = raw;
+      } else {
+        var s = String(raw).trim();
+        // Already in YYYY-MM-DD — return as-is (avoids timezone shift from new Date())
+        if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+        // ISO timestamp — slice the date portion directly, no parsing needed
+        if (/^\d{4}-\d{2}-\d{2}T/.test(s)) return s.slice(0, 10);
+        // US-style M/D/YYYY
+        var parts = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+        if (parts) {
+          return parts[3] + '-' +
+            String(parts[1]).padStart(2, '0') + '-' +
+            String(parts[2]).padStart(2, '0');
+        }
+        d = new Date(s);
+      }
+      if (isNaN(d.getTime())) return '';
+      // Use UTC getters so timezone offsets don't shift the date by a day
+      return d.getUTCFullYear() + '-' +
+        String(d.getUTCMonth() + 1).padStart(2, '0') + '-' +
+        String(d.getUTCDate()).padStart(2, '0');
+    }
 
     function setPanelStatus(panel, msg, colour) {
       var el = document.getElementById('status-' + panel);
@@ -665,8 +678,8 @@
       }
       if (panel === 'academic') {
         setInput('in-disability',   _record[COL.DISABILITY]);
-        setInput('in-iepStart',     _record[COL.IEP_START]);
-        setInput('in-iepEnd',       _record[COL.IEP_END]);
+        setInput('in-iepStart',     _toDateInputValue(_record[COL.IEP_START]));
+        setInput('in-iepEnd',       _toDateInputValue(_record[COL.IEP_END]));
         setInput('in-supplemental', _record[COL.SUPPLEMENTAL]);
       }
       if (panel === 'goals') {
