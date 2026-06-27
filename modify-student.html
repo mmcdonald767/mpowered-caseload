@@ -4,729 +4,86 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Record — M-Powered Education</title>
-  <link rel="icon" href="data:,">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-
   <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; background-color: #0f1117; }
-    body { font-family: 'Inter', system-ui, sans-serif; color: #e8ecf4; -webkit-font-smoothing: antialiased; }
-
-    /* ── Shared nav (identical to index.html) ── */
-    .site-header {
-      background: #171b26;
-      border-bottom: 1px solid #1e2335;
-      position: sticky; top: 0; z-index: 50;
-    }
-    .site-header-inner {
-      max-width: 1280px; margin: 0 auto;
-      padding: 0 1.5rem; height: 52px;
-      display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
-    }
-    .site-brand {
-      font-size: 0.9rem; font-weight: 700; color: #e8ecf4;
-      white-space: nowrap; flex-shrink: 0; text-decoration: none;
-    }
-    .site-nav { display: flex; align-items: center; gap: 0.25rem; }
-    .nav-link {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; font-weight: 600;
-      color: #7d8fb3; text-decoration: none;
-      padding: 0.35rem 0.75rem; border-radius: 6px;
-      transition: color 0.13s, background 0.13s;
-    }
-    .nav-link:hover  { color: #e8ecf4; background: rgba(255,255,255,0.05); }
-    .nav-link.active { color: #6c8fff; background: rgba(108,143,255,0.1); }
-    .nav-link-primary {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
-      color: #34d399; text-decoration: none;
-      border: 1px solid rgba(52,211,153,0.3); border-radius: 6px;
-      padding: 0.32rem 0.75rem; background: rgba(52,211,153,0.07);
-      transition: background 0.13s, border-color 0.13s; white-space: nowrap;
-    }
-    .nav-link-primary:hover { background: rgba(52,211,153,0.15); border-color: rgba(52,211,153,0.55); }
-    .nav-divider { width: 1px; height: 18px; background: #252c42; margin: 0 0.5rem; flex-shrink: 0; }
-
-    /* ── Panel system ── */
-    .panel {
-      background: #171b26; border: 1px solid #1e2335;
-      border-radius: 14px; padding: 1.5rem 1.75rem;
-      margin-bottom: 1rem; transition: border-color 0.2s;
-    }
-    .panel.is-editing { border-color: rgba(108,143,255,0.45); }
-
-    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-    .section-title  { font-size: 0.875rem; font-weight: 600; color: #e8ecf4; }
-
-    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
-    @media (max-width: 520px) { .field-grid { grid-template-columns: 1fr; } }
-
-    .field { display: flex; flex-direction: column; gap: 0.3rem; }
-    .field-label {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.63rem;
-      font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #4a5578;
-    }
-    .field-value { font-size: 0.875rem; color: #c4cde4; min-height: 1.4rem; line-height: 1.4; }
-    .field-value:empty::before { content: '—'; color: #4a5578; }
-
-    .field-input, .field-textarea {
-      background: #0f1117; border: 1px solid #252c42; border-radius: 7px;
-      color: #e8ecf4; font-family: 'Inter', system-ui, sans-serif;
-      font-size: 0.875rem; padding: 0.45rem 0.7rem; width: 100%;
-      outline: none; transition: border-color 0.15s, box-shadow 0.15s;
-    }
-    .field-input:focus, .field-textarea:focus {
-      border-color: rgba(108,143,255,0.6); box-shadow: 0 0 0 3px rgba(108,143,255,0.12);
-    }
-    .field-textarea { resize: vertical; min-height: 80px; font-size: 0.8rem; line-height: 1.5; }
-
-    /* Goal rows */
-    .goal-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
-    .goal-row .field-input { flex: 1; }
-    .btn-remove {
-      flex-shrink: 0; background: transparent; border: 1px solid #252c42;
-      color: #4a5578; border-radius: 6px; padding: 0.28rem 0.55rem;
-      cursor: pointer; font-size: 0.85rem; line-height: 1;
-      transition: color 0.13s, border-color 0.13s;
-    }
-    .btn-remove:hover { color: #f87171; border-color: rgba(248,113,113,0.4); }
-
-    .list-view-item {
-      font-size: 0.82rem; color: #c4cde4;
-      background: rgba(255,255,255,0.03); border: 1px solid #1e2335;
-      border-radius: 8px; padding: 0.6rem 0.85rem; line-height: 1.4;
-      margin-bottom: 0.4rem;
-    }
-    .list-view-empty { font-size: 0.8rem; color: #4a5578; font-style: italic; }
-    .list-edit-hint {
-      font-size: 0.7rem; color: #4a5578;
-      font-family: 'JetBrains Mono', monospace; margin-top: 0.35rem;
-    }
-
-    .btn {
-      display: inline-flex; align-items: center; gap: 0.35rem;
-      font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
-      border-radius: 6px; padding: 0.35rem 0.8rem; cursor: pointer;
-      border: 1px solid transparent;
-      transition: background 0.13s, border-color 0.13s, opacity 0.13s;
-      white-space: nowrap; line-height: 1;
-    }
-    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-    .btn-edit   { background: rgba(108,143,255,0.07); color: #6c8fff; border-color: rgba(108,143,255,0.25); }
-    .btn-edit:hover:not(:disabled) { background: rgba(108,143,255,0.15); border-color: rgba(108,143,255,0.5); }
-    .btn-save   { background: rgba(52,211,153,0.1); color: #34d399; border-color: rgba(52,211,153,0.3); }
-    .btn-save:hover:not(:disabled) { background: rgba(52,211,153,0.2); border-color: rgba(52,211,153,0.55); }
-    .btn-cancel { background: transparent; color: #4a5578; border-color: #252c42; }
-    .btn-cancel:hover:not(:disabled) { color: #e8ecf4; border-color: #4a5578; }
-    .btn-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
-
-    #toast {
-      position: fixed; bottom: 1.5rem; left: 50%;
-      transform: translateX(-50%) translateY(6px);
-      background: #171b26; border: 1px solid #252c42; border-radius: 10px;
-      padding: 0.6rem 1.1rem; font-size: 0.78rem;
-      font-family: 'JetBrains Mono', monospace; color: #e8ecf4;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.2s, transform 0.2s; z-index: 100; white-space: nowrap;
-    }
-    #toast.show    { opacity: 1; transform: translateX(-50%) translateY(0); }
-    #toast.success { border-color: rgba(52,211,153,0.4); color: #34d399; }
-    #toast.error   { border-color: rgba(248,113,113,0.4); color: #f87171; }
-
-    #loading-overlay, #fallback-state, #content-area { display: none; }
-    #loading-overlay.active { display: flex; }
-    #fallback-state.active  { display: flex; }
-    #content-area.active    { display: block; }
+    body { background-color: #0f1117; color: #e8ecf4; font-family: sans-serif; }
+    .panel { background: #171b26; border: 1px solid #1e2335; border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; }
+    .btn { cursor: pointer; padding: 0.35rem 0.8rem; border-radius: 6px; font-size: 0.7rem; font-weight: 600; border: 1px solid transparent; }
+    .btn-edit { background: rgba(108,143,255,0.1); color: #6c8fff; }
+    .btn-save { background: rgba(52,211,153,0.1); color: #34d399; }
+    .goal-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
+    .field-input { background: #0f1117; border: 1px solid #252c42; padding: 0.5rem; width: 100%; color: #fff; border-radius: 6px; }
+    #content-area { display: none; }
+    #content-area.active { display: block; }
   </style>
 </head>
+<body class="p-6">
+  <main id="content-area" class="active max-w-3xl mx-auto">
+    
+    <div class="panel" id="panel-goals">
+      <div class="flex justify-between mb-4">
+        <span class="font-bold">IEP Goals & SDI</span>
+        <button class="btn btn-edit" onclick="App.editPanel('goals')">Edit</button>
+      </div>
+      
+      <div id="view-goals">
+        <ul id="goals-list" class="space-y-3"></ul>
+      </div>
 
-<body class="bg-[#0f1117] text-slate-100 min-h-screen flex flex-col">
-
-  <!-- ═══ SHARED NAV ═══ -->
-  <header class="site-header" role="banner">
-    <div class="site-header-inner">
-
-      <a href="/index.html" class="site-brand" aria-label="M-Powered Education home">
-        M-Powered Education
-      </a>
-
-      <nav class="site-nav" aria-label="Site navigation">
-        <a href="/index.html"                 class="nav-link">Dashboard</a>
-        <a href="/modify-student.html?id=new" class="nav-link active" aria-current="page">+ New Student</a>
-        <div class="nav-divider" role="separator" aria-hidden="true"></div>
-        <button onclick="App.logout()" class="btn" style="background:transparent; color:#7d8fb3; border-color:#252c42; font-family:'JetBrains Mono',monospace; font-size:0.72rem;" aria-label="Sign out">Sign Out</button>
-      </nav>
-
+      <div id="edit-goals" style="display:none;">
+        <div id="goal-rows" class="mb-4"></div>
+        <button class="btn btn-edit" onclick="App.addGoalRow('', '')">+ Add Goal & SDI Pair</button>
+        <button class="btn btn-save block mt-4" onclick="App.savePanel('goals')">Save Changes</button>
+      </div>
     </div>
-  </header>
-  <!-- ═══ END NAV ═══ -->
-
-  <main class="flex-1" style="max-width:720px; margin:0 auto; width:100%; padding:2rem 1.5rem;" role="main">
-
-    <!-- Loading -->
-    <div id="loading-overlay" class="active flex-col items-center justify-center py-24" aria-live="polite">
-      <p style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#4a5578;">Retrieving student record…</p>
-    </div>
-
-    <!-- Error / not found -->
-    <div id="fallback-state" class="flex-col items-center justify-center py-24" role="alert">
-      <h2 style="font-size:0.95rem; font-weight:600; margin-bottom:0.4rem;">Record Not Found</h2>
-      <p id="fallback-message" style="font-size:0.8rem; color:#4a5578;"></p>
-      <a href="/index.html" style="margin-top:1.25rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:#6c8fff; text-decoration:none;">← Back to dashboard</a>
-    </div>
-
-    <!-- Student record -->
-    <div id="content-area">
-
-      <!-- Name header -->
-      <div class="panel" style="margin-bottom:1.5rem;">
-        <p style="font-family:'JetBrains Mono',monospace; font-size:0.63rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#4a5578; margin-bottom:0.35rem;">Student Record</p>
-        <h1 id="display-name" style="font-size:1.35rem; font-weight:700; margin:0;"></h1>
-        <p id="display-id"    style="font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:#4a5578; margin:0.2rem 0 0;"></p>
-      </div>
-
-      <!-- PANEL: Student Identifiers -->
-      <div class="panel" id="panel-identity">
-        <div class="section-header">
-          <span class="section-title">Student Identifiers</span>
-          <button class="btn btn-edit" onclick="App.editPanel('identity')">Edit</button>
-        </div>
-        <div class="field-grid" id="view-identity">
-          <div class="field"><span class="field-label">Database ID</span><span class="field-value" id="rv-studentId"></span></div>
-          <div class="field"><span class="field-label">Tag / Identifier</span><span class="field-value" id="rv-tag"></span></div>
-          <div class="field"><span class="field-label">First Name</span><span class="field-value" id="rv-firstName"></span></div>
-          <div class="field"><span class="field-label">Last Name</span><span class="field-value" id="rv-lastName"></span></div>
-        </div>
-        <div class="field-grid" id="edit-identity" style="display:none;">
-          <div class="field"><label class="field-label" for="in-tag">Tag / Identifier</label><input class="field-input" id="in-tag" type="text" /></div>
-          <div class="field"><label class="field-label" for="in-firstName">First Name</label><input class="field-input" id="in-firstName" type="text" /></div>
-          <div class="field"><label class="field-label" for="in-lastName">Last Name</label><input class="field-input" id="in-lastName" type="text" /></div>
-        </div>
-        <div id="footer-identity" class="btn-row" style="display:none; margin-top:1rem;">
-          <button class="btn btn-save" onclick="App.savePanel('identity')">Save changes</button>
-          <button class="btn btn-cancel" onclick="App.cancelPanel('identity')">Cancel</button>
-          <span id="status-identity" style="font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#4a5578; margin-left:0.25rem;"></span>
-        </div>
-      </div>
-
-      <!-- PANEL: Academic Status -->
-      <div class="panel" id="panel-academic">
-        <div class="section-header">
-          <span class="section-title">Academic Status</span>
-          <button class="btn btn-edit" onclick="App.editPanel('academic')">Edit</button>
-        </div>
-        <div class="field-grid" id="view-academic">
-          <div class="field"><span class="field-label">Disability</span><span class="field-value" id="rv-disability"></span></div>
-          <div class="field"><span class="field-label">IEP Start</span><span class="field-value" id="rv-iepStart"></span></div>
-          <div class="field"><span class="field-label">IEP End</span><span class="field-value" id="rv-iepEnd"></span></div>
-          <div class="field"><span class="field-label">Supplemental Aids</span><span class="field-value" id="rv-supplemental"></span></div>
-        </div>
-        <div class="field-grid" id="edit-academic" style="display:none;">
-          <div class="field"><label class="field-label" for="in-disability">Disability</label><input class="field-input" id="in-disability" type="text" /></div>
-          <div class="field"><label class="field-label" for="in-iepStart">IEP Start</label><input class="field-input" id="in-iepStart" type="text" placeholder="YYYY-MM-DD" /></div>
-          <div class="field"><label class="field-label" for="in-iepEnd">IEP End</label><input class="field-input" id="in-iepEnd" type="text" placeholder="YYYY-MM-DD" /></div>
-          <div class="field"><label class="field-label" for="in-supplemental">Supplemental Aids</label><input class="field-input" id="in-supplemental" type="text" /></div>
-        </div>
-        <div id="footer-academic" class="btn-row" style="display:none; margin-top:1rem;">
-          <button class="btn btn-save" onclick="App.savePanel('academic')">Save changes</button>
-          <button class="btn btn-cancel" onclick="App.cancelPanel('academic')">Cancel</button>
-          <span id="status-academic" style="font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#4a5578; margin-left:0.25rem;"></span>
-        </div>
-      </div>
-
-      <!-- PANEL: IEP Goals (dynamic rows) -->
-      <div class="panel" id="panel-goals">
-        <div class="section-header">
-          <span class="section-title">IEP Goals</span>
-          <button class="btn btn-edit" onclick="App.editPanel('goals')">Edit</button>
-        </div>
-        <ul id="view-goals" style="list-style:none; padding:0; margin:0;"></ul>
-        <div id="edit-goals" style="display:none;">
-          <div id="goal-rows" style="margin-bottom:0.5rem;"></div>
-          <button class="btn btn-edit" onclick="App.addGoalRow('')" style="font-size:0.65rem; margin-bottom:0.75rem;">
-            + Add Another Goal
-          </button>
-        </div>
-        <div id="footer-goals" class="btn-row" style="display:none; margin-top:1rem;">
-          <button class="btn btn-save" onclick="App.savePanel('goals')">Save changes</button>
-          <button class="btn btn-cancel" onclick="App.cancelPanel('goals')">Cancel</button>
-          <span id="status-goals" style="font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#4a5578; margin-left:0.25rem;"></span>
-        </div>
-      </div>
-
-      <!-- PANEL: SDI -->
-      <div class="panel" id="panel-sdi">
-        <div class="section-header">
-          <span class="section-title">SDI <span style="color:#4a5578; font-weight:400;">(Specially Designed Instruction)</span></span>
-          <button class="btn btn-edit" onclick="App.editPanel('sdi')">Edit</button>
-        </div>
-        <ul id="view-sdi" style="list-style:none; padding:0; margin:0;"></ul>
-        <div id="edit-sdi" style="display:none;">
-          <textarea class="field-textarea" id="in-sdi" style="width:100%;"></textarea>
-          <p class="list-edit-hint">One SDI entry per line.</p>
-        </div>
-        <div id="footer-sdi" class="btn-row" style="display:none; margin-top:1rem;">
-          <button class="btn btn-save" onclick="App.savePanel('sdi')">Save changes</button>
-          <button class="btn btn-cancel" onclick="App.cancelPanel('sdi')">Cancel</button>
-          <span id="status-sdi" style="font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#4a5578; margin-left:0.25rem;"></span>
-        </div>
-      </div>
-
-      <!-- PANEL: Accommodations -->
-      <div class="panel" id="panel-accommodations">
-        <div class="section-header">
-          <span class="section-title">Accommodations</span>
-          <button class="btn btn-edit" onclick="App.editPanel('accommodations')">Edit</button>
-        </div>
-        <ul id="view-accommodations" style="list-style:none; padding:0; margin:0;"></ul>
-        <div id="edit-accommodations" style="display:none;">
-          <textarea class="field-textarea" id="in-accommodations" style="width:100%;"></textarea>
-          <p class="list-edit-hint">One accommodation per line.</p>
-        </div>
-        <div id="footer-accommodations" class="btn-row" style="display:none; margin-top:1rem;">
-          <button class="btn btn-save" onclick="App.savePanel('accommodations')">Save changes</button>
-          <button class="btn btn-cancel" onclick="App.cancelPanel('accommodations')">Cancel</button>
-          <span id="status-accommodations" style="font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#4a5578; margin-left:0.25rem;"></span>
-        </div>
-      </div>
-
-    </div><!-- /content-area -->
   </main>
 
-  <div id="toast" role="status" aria-live="polite"></div>
-
   <script>
-  'use strict';
+    var COL = { GOALS: 9 }; // Ensure this matches your sheet
+    var _record = [];
 
-  // ─────────────────────────────────────────────────────────────
-  //  Column map — 0-indexed, mirrors Code.gs and index.html:
-  //
-  //   0  A  Timestamp
-  //   1  B  DatabaseID       ← lookup key; never written via UI
-  //   2  C  Identifier (Tag)
-  //   3  D  First Name
-  //   4  E  Last Name
-  //   5  F  IEP Start
-  //   6  G  IEP End
-  //   7  H  Disability
-  //   8  I  Supplemental Aids
-  //   9  J  Goals            ← JSON array of {id, description, sdi} objects
-  //  10  K  SDI              ← JSON array of plain strings (or {id, description, sdi})
-  // ─────────────────────────────────────────────────────────────
-  var COL = {
-    TIMESTAMP:      0,
-    ID:             1,
-    TAG:            2,
-    FIRST_NAME:     3,
-    LAST_NAME:      4,
-    IEP_START:      5,
-    IEP_END:        6,
-    DISABILITY:     7,
-    SUPPLEMENTAL:   8,
-    GOALS:          9,
-    SDI:            10   // ← dedicated SDI column (col K)
-  };
+    window.App = (function() {
+      return {
+        editPanel: function(panel) {
+          document.getElementById('view-' + panel).style.display = 'none';
+          document.getElementById('edit-' + panel).style.display = 'block';
+          
+          if(panel === 'goals') {
+            var container = document.getElementById('goal-rows');
+            container.innerHTML = '';
+            var goals = JSON.parse(_record[COL.GOALS] || '[]');
+            goals.forEach(function(g) { App.addGoalRow(g.description, g.sdi); });
+          }
+        },
+        
+        addGoalRow: function(desc, sdi) {
+          var div = document.createElement('div');
+          div.className = 'goal-row';
+          div.innerHTML = `
+            <input class="field-input goal-input" placeholder="Goal" value="${desc || ''}">
+            <input class="field-input sdi-input" placeholder="SDI" value="${sdi || ''}">
+            <button class="btn btn-edit" onclick="this.parentElement.remove()">×</button>
+          `;
+          document.getElementById('goal-rows').appendChild(div);
+        },
 
-  var GAS_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
-
-  // ─────────────────────────────────────────────────────────────
-  //  App — everything exposed on window.App so onclick="App.x()"
-  //  always resolves regardless of strict-mode scoping rules.
-  // ─────────────────────────────────────────────────────────────
-  var App = (function () {
-
-    // ── Private state ─────────────────────────────────────────
-    var _record    = null;
-    var _studentId = null;
-    var _isNew     = false;
-    var _editing   = {
-      identity: false, academic: false,
-      goals: false, sdi: false, accommodations: false
-    };
-    // Panels whose view-element is a <ul> — restored with display:'' not display:'grid'
-    var _listPanels = { goals: true, sdi: true, accommodations: true };
-
-    // ── Network ───────────────────────────────────────────────
-    function _gasPost(payload) {
-      var url = GAS_URL.split('#')[0].split('?')[0];
-      return fetch(url, {
-        method:  'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body:    JSON.stringify(payload)
-      })
-      .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(function (d) { if (d.result !== 'success') throw new Error(d.error || 'GAS error'); return d; });
-    }
-
-    // ── Page state ────────────────────────────────────────────
-    function showState(state) {
-      document.getElementById('loading-overlay').classList.toggle('active', state === 'loading');
-      document.getElementById('fallback-state').classList.toggle('active',  state === 'error');
-      document.getElementById('content-area').classList.toggle('active',    state === 'data');
-    }
-
-    function setText(id, val) {
-      var el = document.getElementById(id);
-      if (el) el.textContent = (val != null && String(val).trim() !== '') ? String(val) : '';
-    }
-    function getInput(id)      { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
-    function setInput(id, val) { var el = document.getElementById(id); if (el) el.value = (val != null) ? String(val) : ''; }
-
-    function setPanelStatus(panel, msg, colour) {
-      var el = document.getElementById('status-' + panel);
-      if (el) { el.textContent = msg; el.style.color = colour || '#4a5578'; }
-    }
-
-    var _toastTimer = null;
-    function showToast(msg, type) {
-      var el = document.getElementById('toast');
-      if (!el) return;
-      el.textContent = msg;
-      el.className = 'show ' + (type || '');
-      clearTimeout(_toastTimer);
-      _toastTimer = setTimeout(function () { el.className = ''; }, 2800);
-    }
-
-    // ── Data helpers ──────────────────────────────────────────
-
-    // Parse a cell that may be a JSON string, plain array, or plain string.
-    function parseListCell(raw) {
-      if (!raw && raw !== 0) return [];
-      if (Array.isArray(raw)) return raw.filter(function (i) { return i != null && String(i).trim() !== ''; });
-      var s = String(raw).trim();
-      if (!s || s === '[]') return [];
-      if (s.charAt(0) === '[') { try { return JSON.parse(s); } catch (e) {} }
-      return [s];
-    }
-
-    // Extract a human-readable string from any stored item shape:
-    //   {id, description, sdi}  → description
-    //   {selections:[...]}      → joined selections
-    //   plain string            → the string itself
-    function unpackItem(item) {
-      if (item == null) return '';
-      if (typeof item === 'string') {
-        var t = item.trim();
-        if (t.charAt(0) === '{' || t.charAt(0) === '[') {
-          try { item = JSON.parse(t); } catch (e) { return t; }
-        } else {
-          return t;
+        savePanel: function(panel) {
+          if(panel === 'goals') {
+            var rows = document.querySelectorAll('.goal-row');
+            var merged = Array.from(rows).map(function(row) {
+              return {
+                description: row.querySelector('.goal-input').value,
+                sdi: row.querySelector('.sdi-input').value
+              };
+            });
+            console.log("Saving unified goals:", merged);
+            // Here you would trigger _gasPost with updates[COL.GOALS] = JSON.stringify(merged);
+          }
+          document.getElementById('view-' + panel).style.display = 'block';
+          document.getElementById('edit-' + panel).style.display = 'none';
         }
-      }
-      if (Array.isArray(item)) return item.join(', ');
-      if (typeof item === 'object') {
-        if (item.description) return String(item.description);
-        if (item.selections && Array.isArray(item.selections))
-          return item.selections.length ? item.selections.join(', ') : 'No selections';
-        if (item.label) return String(item.label);
-        if (item.name)  return String(item.name);
-        if (item.text)  return String(item.text);
-        var vals = Object.values(item).filter(function (v) { return typeof v === 'string' || typeof v === 'number'; });
-        return vals.length ? vals.join(' — ') : '(empty entry)';
-      }
-      return String(item);
-    }
-
-    function listToText(items) {
-      return items.map(function (i) { return unpackItem(i); }).join('\n');
-    }
-    function textToList(text) {
-      return String(text || '').split('\n').map(function (s) { return s.trim(); }).filter(Boolean);
-    }
-
-    // ── Render ────────────────────────────────────────────────
-    function renderListView(ulId, items) {
-      var ul = document.getElementById(ulId);
-      if (!ul) return;
-      ul.innerHTML = '';
-      if (!items || !items.length) {
-        var empty = document.createElement('li');
-        empty.className = 'list-view-empty';
-        empty.textContent = 'No entries recorded.';
-        ul.appendChild(empty);
-      } else {
-        items.forEach(function (item) {
-          var li = document.createElement('li');
-          li.className = 'list-view-item';
-          li.textContent = unpackItem(item);
-          ul.appendChild(li);
-        });
-      }
-    }
-
-    // populateView — pulls from _record using the correct COL indices
-    // and re-renders every panel's view state.
-    function populateView(row) {
-      var fn = String(row[COL.FIRST_NAME] || '').trim();
-      var ln = String(row[COL.LAST_NAME]  || '').trim();
-      setText('display-name', [fn, ln].filter(Boolean).join(' ') || '(Name unavailable)');
-      setText('display-id',   'DatabaseID: ' + (row[COL.ID] || '—'));
-
-      // Simple text fields
-      setText('rv-studentId',   row[COL.ID]);
-      setText('rv-tag',         row[COL.TAG]);
-      setText('rv-firstName',   row[COL.FIRST_NAME]);
-      setText('rv-lastName',    row[COL.LAST_NAME]);
-      setText('rv-disability',  row[COL.DISABILITY]);
-      setText('rv-iepStart',    row[COL.IEP_START]);
-      setText('rv-iepEnd',      row[COL.IEP_END]);
-      setText('rv-supplemental',row[COL.SUPPLEMENTAL]);
-
-      // List panels — Goals uses COL.GOALS (index 9); SDI uses COL.SDI (index 10)
-      renderListView('view-goals',          parseListCell(row[COL.GOALS]));
-      renderListView('view-sdi',            parseListCell(row[COL.SDI]));
-      renderListView('view-accommodations', parseListCell(row[COL.ACCOMMODATIONS]));
-    }
-
-    // ── Panel show / hide ─────────────────────────────────────
-    function _showView(panel) {
-      var el = document.getElementById('view-' + panel);
-      if (el) el.style.display = _listPanels[panel] ? '' : 'grid';
-    }
-    function _hideView(panel) {
-      var el = document.getElementById('view-' + panel);
-      if (el) el.style.display = 'none';
-    }
-
-    function editPanel(panel) {
-      if (_editing[panel]) return;
-      _editing[panel] = true;
-      var panelEl = document.getElementById('panel-' + panel);
-      var editEl  = document.getElementById('edit-'  + panel);
-      var footEl  = document.getElementById('footer-'+ panel);
-      if (panelEl) panelEl.classList.add('is-editing');
-      _hideView(panel);
-      if (editEl) editEl.style.display = 'block';
-      if (footEl) footEl.style.display = 'flex';
-      setPanelStatus(panel, '', '');
-
-      // Populate edit inputs from _record
-      if (panel === 'identity') {
-        setInput('in-tag',       _record[COL.TAG]);
-        setInput('in-firstName', _record[COL.FIRST_NAME]);
-        setInput('in-lastName',  _record[COL.LAST_NAME]);
-      }
-      if (panel === 'academic') {
-        setInput('in-disability',   _record[COL.DISABILITY]);
-        setInput('in-iepStart',     _record[COL.IEP_START]);
-        setInput('in-iepEnd',       _record[COL.IEP_END]);
-        setInput('in-supplemental', _record[COL.SUPPLEMENTAL]);
-      }
-      if (panel === 'goals') {
-        var container = document.getElementById('goal-rows');
-        if (container) {
-          container.innerHTML = '';
-          var goals = parseListCell(_record[COL.GOALS]);
-          (goals.length ? goals : ['']).forEach(function (g) { addGoalRow(unpackItem(g)); });
-        }
-      }
-      if (panel === 'sdi') {
-        setInput('in-sdi', listToText(parseListCell(_record[COL.SDI])));
-      }
-      if (panel === 'accommodations') {
-        setInput('in-accommodations', listToText(parseListCell(_record[COL.ACCOMMODATIONS])));
-      }
-
-      if (editEl) { var first = editEl.querySelector('input, textarea'); if (first) first.focus(); }
-    }
-
-    function cancelPanel(panel) { _closePanel(panel); }
-
-    function _closePanel(panel) {
-      _editing[panel] = false;
-      var panelEl = document.getElementById('panel-' + panel);
-      var editEl  = document.getElementById('edit-'  + panel);
-      var footEl  = document.getElementById('footer-'+ panel);
-      if (panelEl) panelEl.classList.remove('is-editing');
-      _showView(panel);
-      if (editEl) editEl.style.display = 'none';
-      if (footEl) footEl.style.display = 'none';
-      setPanelStatus(panel, '', '');
-    }
-
-    // ── Dynamic goal rows ─────────────────────────────────────
-    function addGoalRow(value) {
-      var container = document.getElementById('goal-rows');
-      if (!container) return;
-      var row = document.createElement('div');
-      row.className = 'goal-row';
-      var input = document.createElement('input');
-      input.type = 'text';
-      input.className = 'field-input';
-      input.value = value || '';
-      input.placeholder = 'Describe goal…';
-      var removeBtn = document.createElement('button');
-      removeBtn.type = 'button';
-      removeBtn.className = 'btn-remove';
-      removeBtn.title = 'Remove goal';
-      removeBtn.innerHTML = '&times;';
-      removeBtn.onclick = function () { container.removeChild(row); };
-      row.appendChild(input);
-      row.appendChild(removeBtn);
-      container.appendChild(row);
-      input.focus();
-    }
-
-    function collectGoalRows() {
-      var container = document.getElementById('goal-rows');
-      if (!container) return [];
-      return Array.prototype.slice.call(container.querySelectorAll('input[type="text"]'))
-        .map(function (inp) { return inp.value.trim(); })
-        .filter(function (v) { return v.length > 0; });
-    }
-
-    // ── Save ──────────────────────────────────────────────────
-    function savePanel(panel) {
-      var saveBtn   = document.querySelector('#footer-' + panel + ' .btn-save');
-      var cancelBtn = document.querySelector('#footer-' + panel + ' .btn-cancel');
-      if (saveBtn)   saveBtn.disabled   = true;
-      if (cancelBtn) cancelBtn.disabled = true;
-      setPanelStatus(panel, 'Saving…', '#6c8fff');
-
-      var updates = {};
-
-      if (panel === 'identity') {
-        updates[COL.TAG]        = getInput('in-tag');
-        updates[COL.FIRST_NAME] = getInput('in-firstName');
-        updates[COL.LAST_NAME]  = getInput('in-lastName');
-      }
-      if (panel === 'academic') {
-        updates[COL.DISABILITY]   = getInput('in-disability');
-        updates[COL.IEP_START]    = getInput('in-iepStart');
-        updates[COL.IEP_END]      = getInput('in-iepEnd');
-        updates[COL.SUPPLEMENTAL] = getInput('in-supplemental');
-      }
-      if (panel === 'goals') {
-        // Build {id, description, sdi} objects, preserving existing sdi values.
-        var existingGoals   = parseListCell(_record[COL.GOALS]);
-        var newDescriptions = collectGoalRows();
-        var merged = newDescriptions.map(function (desc, i) {
-          var ex   = existingGoals[i];
-          var base = (ex && typeof ex === 'object') ? ex : {};
-          return { id: base.id || String(i + 1), description: desc, sdi: base.sdi || '' };
-        });
-        updates[COL.GOALS] = JSON.stringify(merged);
-      }
-      if (panel === 'sdi') {
-        // Store SDI as a plain JSON string array in COL.SDI (index 10)
-        updates[COL.SDI] = JSON.stringify(textToList(getInput('in-sdi')));
-      }
-      if (panel === 'accommodations') {
-        updates[COL.ACCOMMODATIONS] = JSON.stringify(textToList(getInput('in-accommodations')));
-      }
-
-      _saveRecord(_studentId, updates, panel, saveBtn, cancelBtn);
-    }
-
-    function _saveRecord(studentId, updates, panel, saveBtn, cancelBtn) {
-      // Optimistic local merge — populateView will reflect changes instantly
-      Object.keys(updates).forEach(function (col) {
-        _record[parseInt(col, 10)] = updates[col];
-      });
-
-      var payload = _isNew
-        ? { action: 'addStudent', student: _record }
-        : { action: 'updateStudent', studentId: studentId, updates: updates };
-
-      _gasPost(payload)
-      .then(function (data) {
-        if (_isNew) {
-          _isNew = false;
-          if (data.studentId) { _studentId = String(data.studentId); _record[COL.ID] = _studentId; }
-          document.querySelectorAll('.btn-save').forEach(function (b) { b.textContent = 'Save changes'; });
-        }
-        // Prefer the authoritative row the server echoes back
-        if (data.row && Array.isArray(data.row)) _record = data.row;
-        populateView(_record);
-        _closePanel(panel);
-        showToast('Saved successfully', 'success');
-      })
-      .catch(function (err) {
-        console.error('[saveRecord]', err);
-        setPanelStatus(panel, 'Save failed — ' + (err.message || 'unknown error'), '#f87171');
-        showToast('Save failed', 'error');
-      })
-      .finally(function () {
-        if (saveBtn)   saveBtn.disabled   = false;
-        if (cancelBtn) cancelBtn.disabled = false;
-      });
-    }
-
-    // ── Normalise ─────────────────────────────────────────────
-    function normalise(v) {
-      return String(v || '').replace(/^["'\s]+|["'\s]+$/g, '').toLowerCase();
-    }
-
-    // ── Boot ──────────────────────────────────────────────────
-    function init() {
-      var params = new URLSearchParams(window.location.search);
-      _studentId = params.get('id');
-
-      if (!_studentId || !_studentId.trim()) {
-        showState('error');
-        document.getElementById('fallback-message').textContent =
-          'No student ID in URL. Use ?id=<DatabaseID>';
-        return;
-      }
-
-      // New-student mode
-      if (_studentId.toLowerCase() === 'new') {
-        _isNew  = true;
-        _record = new Array(11).fill('');
-        document.title = 'New Student — M-Powered Education';
-        // Mark "New Student" link as active in nav
-        document.querySelectorAll('.nav-link-primary').forEach(function (a) { a.classList.add('active'); });
-        setText('display-name', 'New Student');
-        setText('display-id',   'Unsaved record');
-        document.querySelectorAll('.btn-save').forEach(function (b) { b.textContent = 'Add student'; });
-        showState('data');
-        return;
-      }
-
-      showState('loading');
-      var searchId = normalise(_studentId);
-
-      _gasPost({ action: 'getRoster' })
-      .then(function (data) {
-        var rows = Array.isArray(data.rows) ? data.rows : [];
-        // Skip header row (index 0)
-        var match = rows.slice(1).find(function (row) {
-          return Array.isArray(row) && normalise(row[COL.ID]) === searchId;
-        });
-        if (!match) {
-          showState('error');
-          document.getElementById('fallback-message').textContent =
-            'No record found for DatabaseID "' + _studentId + '".';
-          return;
-        }
-        _record = match;
-        populateView(_record);
-        showState('data');
-      })
-      .catch(function (err) {
-        showState('error');
-        document.getElementById('fallback-message').textContent =
-          'Could not load record: ' + (err.message || 'unknown error');
-      });
-    }
-
-    // ── Public API ────────────────────────────────────────────
-    return {
-      editPanel:   editPanel,
-      cancelPanel: cancelPanel,
-      savePanel:   savePanel,
-      addGoalRow:  addGoalRow,
-      logout: function () {
-        try { localStorage.clear(); } catch (e) {}
-        window.location.replace('https://www.mpowerededucation.com/index.html');
-      },
-      init: init
-    };
-
-  }());
-
-  document.addEventListener('DOMContentLoaded', App.init);
+      };
+    })();
   </script>
 </body>
 </html>
