@@ -19,28 +19,35 @@
 
   <main class="flex-1 max-w-3xl mx-auto w-full px-6 py-8" id="main-root">
 
-    <!-- Loading state -->
     <div id="loading-overlay" class="flex flex-col items-center justify-center py-24">
       <p class="font-mono text-xs text-slate-500">Retrieving student ledger record…</p>
     </div>
 
-    <!-- Error / not-found state -->
     <div id="fallback-state" class="flex-col items-center justify-center py-24" role="alert">
       <h2 id="fallback-title" class="text-base font-semibold">Record Not Found</h2>
       <p id="fallback-message" class="text-sm text-slate-500 mt-1"></p>
     </div>
 
-    <!-- Content (hidden until data loads) -->
     <div id="content-area">
       <div class="panel mb-5">
         <h1 id="display-name" class="text-xl font-bold"></h1>
       </div>
-      <section id="sec-identity" class="panel mb-5">
-        <h2 class="text-base font-semibold mb-2">Student Identifiers</h2>
-        <div id="sec-identity-body" class="space-y-1 text-sm text-slate-300">
-          <p><span class="text-slate-500 font-mono text-xs uppercase tracking-wide">Student ID</span><br><span id="rv-studentId">—</span></p>
-          <p><span class="text-slate-500 font-mono text-xs uppercase tracking-wide">First Name</span><br><span id="rv-firstName">—</span></p>
-          <p><span class="text-slate-500 font-mono text-xs uppercase tracking-wide">Last Name</span><br><span id="rv-lastName">—</span></p>
+
+      <section class="panel mb-5">
+        <h2 class="text-base font-semibold mb-3">Student Identifiers</h2>
+        <div class="grid grid-cols-2 gap-4 text-sm text-slate-300">
+          <p><span class="text-slate-500 font-mono text-xs uppercase block">Student ID</span><span id="rv-studentId"></span></p>
+          <p><span class="text-slate-500 font-mono text-xs uppercase block">First Name</span><span id="rv-firstName"></span></p>
+          <p><span class="text-slate-500 font-mono text-xs uppercase block">Last Name</span><span id="rv-lastName"></span></p>
+        </div>
+      </section>
+
+      <section class="panel mb-5">
+        <h2 class="text-base font-semibold mb-3">Academic Status</h2>
+        <div class="grid grid-cols-2 gap-4 text-sm text-slate-300">
+          <p><span class="text-slate-500 font-mono text-xs uppercase block">Disability</span><span id="rv-disability"></span></p>
+          <p><span class="text-slate-500 font-mono text-xs uppercase block">IEP Start</span><span id="rv-iepStart"></span></p>
+          <p><span class="text-slate-500 font-mono text-xs uppercase block">IEP End</span><span id="rv-iepEnd"></span></p>
         </div>
       </section>
     </div>
@@ -50,143 +57,84 @@
   <script>
     'use strict';
 
-    // ─── Helpers ────────────────────────────────────────────────────────────────
-
-    /**
-     * Safely sets textContent on an element found by ID.
-     * No-ops (and warns) if the element doesn't exist, preventing TypeErrors.
-     */
     function setText(id, value) {
       var el = document.getElementById(id);
-      if (!el) {
-        console.warn('[mpowered] Element not found: #' + id);
-        return;
-      }
-      el.textContent = (value !== null && value !== undefined) ? String(value) : '—';
+      if (el) el.textContent = (value !== null && value !== undefined) ? String(value) : '—';
     }
 
-    /** Show one UI state, hide the others. */
     function showState(state) {
       var states = ['loading-overlay', 'fallback-state', 'content-area'];
       states.forEach(function (id) {
         var el = document.getElementById(id);
         if (!el) return;
-        if (id === state) {
-          // content-area uses 'visible'; the rest use removing 'hidden'
-          if (id === 'content-area' || id === 'fallback-state') {
-            el.classList.add('visible');
-          } else {
-            el.classList.remove('hidden');
-          }
-        } else {
-          if (id === 'content-area' || id === 'fallback-state') {
-            el.classList.remove('visible');
-          } else {
-            el.classList.add('hidden');
-          }
-        }
+        el.classList.toggle('visible', id === state);
+        if (id !== 'content-area' && id !== 'fallback-state') el.classList.toggle('hidden', id !== state);
       });
     }
 
-    /**
-     * Normalise a raw cell value for comparison:
-     * strips surrounding quotes, collapses whitespace, lowercases.
-     */
     function normalise(value) {
-      if (value === null || value === undefined) return '';
-      return String(value).replace(/^["'\s]+|["'\s]+$/g, '').toLowerCase();
+      return String(value || '').replace(/^["'\s]+|["'\s]+$/g, '').toLowerCase();
     }
 
-    // ─── Column schema ───────────────────────────────────────────────────────────
-    // Adjust these indices to match the actual column order your GAS webhook returns.
-    // Example assumed layout:
-    //   col 0 → Student ID
-    //   col 1 → First Name
-    //   col 2 → Last Name
+    // ─── UPDATED Column schema to match index.html/Code.gs ───
     var COL = {
       ID:         1,
       FIRST_NAME: 2,
-      LAST_NAME:  3
+      LAST_NAME:  3,
+      IEP_START:  4,
+      IEP_END:    5,
+      DISABILITY: 6
     };
 
-    // ─── Main ────────────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+      var params    = new URLSearchParams(window.location.search);
+      var studentId = params.get('id');
 
-    if (!window.mpowered_initialized) {
-      window.mpowered_initialized = true;
+      if (!studentId) {
+        showState('fallback-state');
+        setText('fallback-message', 'No ID provided.');
+        return;
+      }
+
+      var searchId = normalise(studentId);
+      showState('loading-overlay');
 
       var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
 
-      document.addEventListener('DOMContentLoaded', function () {
+      fetch(GAS_WEBHOOK_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body:    JSON.stringify({ action: 'getRoster' })
+      })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        var rows = data.rows || [];
+        var match = rows.find(function (row) {
+          return Array.isArray(row) && normalise(row[COL.ID]) === searchId;
+        });
 
-        var params    = new URLSearchParams(window.location.search);
-        var studentId = params.get('id');
-
-        // No ID in the URL — show fallback immediately.
-        if (!studentId || studentId.trim() === '') {
+        if (!match) {
           showState('fallback-state');
-          setText('fallback-message', 'No student ID was provided in the URL. Add ?id=<studentId> and try again.');
+          setText('fallback-message', 'No record found for ID: ' + studentId);
           return;
         }
 
-        var searchId = normalise(studentId);
+        // Populate Fields
+        setText('display-name',  match[COL.FIRST_NAME] + ' ' + match[COL.LAST_NAME]);
+        setText('rv-studentId',  match[COL.ID]);
+        setText('rv-firstName',  match[COL.FIRST_NAME]);
+        setText('rv-lastName',   match[COL.LAST_NAME]);
+        setText('rv-disability', match[COL.DISABILITY]);
+        setText('rv-iepStart',   match[COL.IEP_START]);
+        setText('rv-iepEnd',     match[COL.IEP_END]);
 
-        // Start with the loading state (it's visible by default in CSS, but be explicit).
-        showState('loading-overlay');
-
-        fetch(GAS_WEBHOOK_URL, {
-          method:  'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body:    JSON.stringify({ action: 'getRoster' })
-        })
-        .then(function (res) {
-          if (!res.ok) {
-            throw new Error('Webhook returned HTTP ' + res.status + ' — check the GAS deployment.');
-          }
-          return res.json();
-        })
-        .then(function (data) {
-          // Guard: make sure the webhook gave us a rows array.
-          if (!data || !Array.isArray(data.rows)) {
-            throw new Error('Unexpected response shape — "rows" array missing from webhook payload.');
-          }
-
-          var rows = data.rows;
-
-          // ── FIX 1: find() now inspects col COL.ID of each row, not the whole row.
-          // ── FIX 2: we confirm each row is an array before indexing into it.
-          var match = rows.find(function (row) {
-            if (!Array.isArray(row)) return false;
-            return normalise(row[COL.ID]) === searchId;
-          });
-
-          if (!match) {
-            showState('fallback-state');
-            // Safe: setText guards against null elements internally.
-            setText('fallback-message', 'No record found for student ID "' + studentId + '".');
-            return;
-          }
-
-          // ── FIX 3: use explicit column indices and setText() for every DOM write.
-          var fullName = [match[COL.FIRST_NAME], match[COL.LAST_NAME]]
-            .map(function (v) { return (v || '').toString().trim(); })
-            .filter(Boolean)
-            .join(' ') || '(Name unavailable)';
-
-          setText('display-name',  fullName);
-          setText('rv-studentId',  match[COL.ID]         || '—');
-          setText('rv-firstName',  match[COL.FIRST_NAME]  || '—');
-          setText('rv-lastName',   match[COL.LAST_NAME]   || '—');
-
-          showState('content-area');
-        })
-        .catch(function (err) {
-          console.error('[mpowered] Fetch error:', err);
-          showState('fallback-state');
-          setText('fallback-message', 'Could not load record: ' + (err.message || 'Unknown error'));
-        });
-
+        showState('content-area');
+      })
+      .catch(function (err) {
+        showState('fallback-state');
+        setText('fallback-message', 'Fetch error: ' + err.message);
       });
-    }
+    });
   </script>
 </body>
 </html>
