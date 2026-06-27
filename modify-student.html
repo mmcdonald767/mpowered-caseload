@@ -54,7 +54,19 @@
   </main>
 
   <script>
-    var COL = { ID: 1, FIRST_NAME: 3, LAST_NAME: 4, GOALS: 9, SDI: 10 };
+   var COL = {
+  TIMESTAMP: 0,
+  ID: 1,           // DatabaseID is at Index 1
+  TAG: 2,          // Tag is at Index 2
+  FIRST_NAME: 3,   // First Name is at Index 3
+  LAST_NAME: 4,    // Last Name is at Index 4
+  IEP_START: 5,
+  IEP_END: 6,
+  DISABILITY: 7,
+  SUPPLEMENTAL: 8,
+  GOALS: 9,        // Goals is at Index 9
+  SDI: 10          // SDI is at Index 10
+};
     var _record = []; 
 
     window.App = (function() {
