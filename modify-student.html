@@ -410,21 +410,51 @@
     }
 
     // Normalise any stored object shape into {description, sdi}.
-    // Handles legacy shapes: plain string, {description, sdi}, {id, description, sdi}.
+    // Handles every legacy shape robustly:
+    //   • null / undefined / empty string       → null (filtered out by caller)
+    //   • plain non-empty string                → {description: str, sdi: ''}
+    //   • JSON string of an object              → recurse after parse
+    //   • {description, sdi}                    → canonical shape, pass through
+    //   • {id, description, sdi}                → strip id, keep description+sdi
+    //   • object with no description key        → '' for description, '' for sdi
+    //     (never returns null for a valid object — avoids silently dropping goals)
     function _normaliseGoalObj(g) {
-      if (!g) return null;
+      if (g === null || g === undefined) return null;
+
+      // String input — try to parse as JSON first, otherwise treat as description
       if (typeof g === 'string') {
         var t = g.trim();
         if (!t) return null;
-        if (t.charAt(0) === '{') { try { g = JSON.parse(t); } catch(e) { return { description: t, sdi: '' }; } }
-        else return { description: t, sdi: '' };
+        if (t.charAt(0) === '{') {
+          try {
+            var parsed = JSON.parse(t);
+            // Recurse once on the parsed object (won't recurse again — typeof parsed is 'object')
+            return _normaliseGoalObj(parsed);
+          } catch (e) {
+            // Malformed JSON string — treat the raw string as the description
+            return { description: t, sdi: '' };
+          }
+        }
+        return { description: t, sdi: '' };
       }
-      if (typeof g === 'object' && !Array.isArray(g)) {
-        return {
-          description: String(g.description || g.text || g.label || '').trim(),
-          sdi:         String(g.sdi         || '').trim()
-        };
+
+      // Array — should not happen for a single goal, but handle gracefully
+      if (Array.isArray(g)) return null;
+
+      // Plain object — extract description and sdi with safe fallbacks
+      if (typeof g === 'object') {
+        var desc = String(
+          g.description !== undefined ? g.description :
+          g.text        !== undefined ? g.text        :
+          g.label       !== undefined ? g.label       : ''
+        ).trim();
+        var sdi = String(g.sdi !== undefined ? g.sdi : '').trim();
+        // Only return null if the object is completely empty (both fields blank)
+        // — an object with only an sdi and no description is still valid.
+        if (!desc && !sdi && Object.keys(g).length === 0) return null;
+        return { description: desc, sdi: sdi };
       }
+
       return null;
     }
 
@@ -459,8 +489,15 @@
     // ── Render ────────────────────────────────────────────────
 
     // FIX: renderGoals is now called from populateView on every load and after save.
-    // It reads parsed [{description, sdi}] objects and builds cards using
-    // .textContent (never innerHTML with user data) to prevent XSS.
+    // Each goal renders as a card with:
+    //   ┌────────────────────────────────┐
+    //   │ GOAL N (label)                 │
+    //   │ description text               │  ← full width
+    //   │ ─────────────────────────────  │  ← divider (always present)
+    //   │ SDI: sdi text (or em-dash)     │  ← full width, always shown
+    //   └────────────────────────────────┘
+    // The SDI line is always rendered (even when empty) so the layout is
+    // consistent and teachers can see at a glance when SDI is missing.
     function renderGoals(goals) {
       var list = document.getElementById('goals-list');
       if (!list) return;
@@ -478,28 +515,41 @@
         var card = document.createElement('div');
         card.className = 'goal-card';
 
-        // Goal description
+        // ── Goal label ─────────────────────────────────────
         var gLabel = document.createElement('p');
         gLabel.className = 'goal-card-label';
         gLabel.textContent = 'Goal ' + (idx + 1);
         card.appendChild(gLabel);
 
+        // ── Goal description (full width) ──────────────────
         var gText = document.createElement('p');
         gText.className = 'goal-card-text';
-        gText.textContent = g.description || '(no description)';
+        gText.textContent = (g.description && g.description.trim())
+          ? g.description.trim()
+          : '(no description)';
         card.appendChild(gText);
 
-        // SDI — only show if present
-        if (g.sdi) {
-          var sdiLine = document.createElement('p');
-          sdiLine.className = 'goal-card-sdi';
-          var sdiSpan = document.createElement('span');
-          sdiSpan.className = 'goal-card-sdi-label';
-          sdiSpan.textContent = 'SDI: ';
-          sdiLine.appendChild(sdiSpan);
-          sdiLine.appendChild(document.createTextNode(g.sdi));
-          card.appendChild(sdiLine);
-        }
+        // ── Divider ────────────────────────────────────────
+        var divider = document.createElement('hr');
+        divider.style.cssText = 'border:none; border-top:1px solid #1e2335; margin:0.55rem 0 0.45rem;';
+        card.appendChild(divider);
+
+        // ── SDI (full width, always shown) ─────────────────
+        var sdiBlock = document.createElement('p');
+        sdiBlock.className = 'goal-card-sdi';
+        // display:block + width:100% ensures it never wraps beside the description
+        sdiBlock.style.cssText = 'display:block; width:100%; margin-top:0;';
+
+        var sdiLabel = document.createElement('span');
+        sdiLabel.className = 'goal-card-sdi-label';
+        sdiLabel.textContent = 'SDI: ';
+        sdiBlock.appendChild(sdiLabel);
+
+        var sdiText = document.createTextNode(
+          (g.sdi && g.sdi.trim()) ? g.sdi.trim() : '—'
+        );
+        sdiBlock.appendChild(sdiText);
+        card.appendChild(sdiBlock);
 
         list.appendChild(card);
       });
@@ -528,6 +578,10 @@
     // Previously there was no boot fetch, so _record was always [] and this was
     // never reached. Now called from init() after a successful getRoster fetch.
     function populateView(row) {
+      // ── Diagnostic: log the raw Goals cell so you can confirm the shape ──
+      // Remove or comment out once the data structure is confirmed correct.
+      console.log('[populateView] raw row[COL.GOALS] (index ' + COL.GOALS + '):', row[COL.GOALS]);
+      console.log('[populateView] typeof:', typeof row[COL.GOALS]);
       var fn = String(row[COL.FIRST_NAME] || '').trim();
       var ln = String(row[COL.LAST_NAME]  || '').trim();
       setText('display-name', [fn, ln].filter(Boolean).join(' ') || '(Name unavailable)');
@@ -755,7 +809,24 @@
       // ?id=new — blank record mode
       if (_studentId.toLowerCase() === 'new') {
         _isNew  = true;
-        _record = new Array(11).fill('');
+        // Build an explicit 11-element array.
+        // Indices 0 (Timestamp) and 1 (DatabaseID) are intentionally left as
+        // empty strings here — Code.gs MUST override them with new Date() and
+        // auto-incremented newId respectively and must NOT read student[0/1].
+        // Using explicit null-markers makes any accidental read visible in logs.
+        _record = [
+          '',       // 0  Timestamp     — GAS sets this
+          '',       // 1  DatabaseID    — GAS auto-increments this
+          '',       // 2  Tag
+          '',       // 3  First Name
+          '',       // 4  Last Name
+          '',       // 5  IEP Start
+          '',       // 6  IEP End
+          '',       // 7  Disability
+          '',       // 8  Supplemental Aids
+          '[]',     // 9  Goals JSON
+          '[]'      // 10 Accommodations JSON
+        ];
         document.title = 'New Student — M-Powered Education';
         if (navNew) navNew.classList.add('active');
         setText('display-name', 'New Student');
