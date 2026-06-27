@@ -65,8 +65,8 @@
     var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
 
     function _gasPost(payload) {
-      // FIXED: Correctly isolated base URL using array index
-      var cleanUrl = GAS_WEBHOOK_URL.split('#').split('?');
+      // FIXED: Correctly isolate the base URL by accessing array index [0]
+      var cleanUrl = GAS_WEBHOOK_URL.split('#')[0].split('?')[0];
       return fetch(cleanUrl, {
         method:  'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -91,29 +91,28 @@
     }
 
     function loadRoster() {
-  console.log('1. loadRoster started'); // Insert this at the very top
-  
-  _showRosterState('loading');
-  
-  _gasPost({ action: 'authCheck' })
-    .then(function(authData) {
-      console.log('2. Handshake received:', authData); // Insert this inside the .then
+      _showRosterState('loading');
       
-      if(authData && authData.token) {
-        localStorage.setItem('auth_token', authData.token);
-        return _gasPost({ action: 'getRoster' });
-      } else {
-        throw new Error('Not authenticated');
-      }
-    })
-    .catch(function(err) {
-      console.log('3. Error caught:', err); // Insert this inside the .catch
-      
-      console.error('[loadRoster] Auth failed:', err);
-      _showRosterState('error');
-      window.location.replace('https://www.mpowerededucation.com/index.html?next=' + encodeURIComponent(window.location.href));
-    });
-}
+      // Perform handshake
+      _gasPost({ action: 'authCheck' })
+        .then(function(authData) {
+          if(authData && authData.token) {
+            localStorage.setItem('auth_token', authData.token);
+            return _gasPost({ action: 'getRoster' });
+          } else {
+            throw new Error('Not authenticated');
+          }
+        })
+        .then(function (data) {
+          _showRosterState('data');
+          console.log('Roster loaded successfully');
+        })
+        .catch(function (err) {
+          console.error('[loadRoster] Auth failed:', err);
+          _showRosterState('error');
+          window.location.replace('https://www.mpowerededucation.com/index.html?next=' + encodeURIComponent(window.location.href));
+        });
+    }
 
     function logout() {
       try { localStorage.clear(); } catch (e) {}
