@@ -1127,8 +1127,7 @@ function parseAccommodations(raw) {
       // Section 3 — goals
       renderGoals(parseGoals(row[COL.GOALS]));
 
-      // Section 6 — state assessment read-only view
-      renderAccommodations(parseAccommodations(row[COL.ACCOMMODATIONS]));
+      // Section 6 — state assessment read-only view (renderAccommodations removed: #view-accommodations no longer in DOM)
       App.renderStateAccommodations(row[COL.ACCOMMODATIONS]);
 
       // Reveal the Delete button only for saved (non-new) records
