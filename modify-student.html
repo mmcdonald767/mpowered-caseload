@@ -260,105 +260,180 @@
       ============================================================ -->
       <form id="modifyStudentForm" onsubmit="handleUpdate(event)" novalidate>
 
-        <!-- SECTION 1 — STUDENT BASICS -->
-        <section class="panel mb-5" aria-labelledby="edit-s1" style="margin-bottom:1.25rem;">
+        <!-- ═══════════════════════════════════════════════════════
+             SECTION 1 — STUDENT BASICS
+        ═══════════════════════════════════════════════════════ -->
+        <section class="panel" id="panel-identity" aria-labelledby="hd-s1" style="margin-bottom:1.25rem;">
           <div class="section-heading">
             <div>
-              <p class="eyebrow" id="edit-s1">Section 01 &middot; Student Basics</p>
+              <p class="eyebrow" id="hd-s1">Section 01 &middot; Student Basics</p>
               <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">Identifying Information</h2>
             </div>
-            <span class="ferpa-notice">
-              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-              FERPA
-            </span>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+              <span class="ferpa-notice">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                FERPA
+              </span>
+              <button type="button" class="btn btn-edit" onclick="App.editPanel('identity')">Edit</button>
+            </div>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="field-label" for="firstName">First Name</label>
-              <input id="firstName" name="firstName" type="text" class="field-input" placeholder="e.g. Jordan" autocomplete="given-name" required aria-required="true" />
+
+          <!-- VIEW -->
+          <div id="view-identity" class="field-grid">
+            <div class="field">
+              <span class="field-label">First Name</span>
+              <span class="field-value" id="rv-firstName"></span>
             </div>
-            <div>
-              <label class="field-label" for="lastName">Last Name</label>
-              <input id="lastName" name="lastName" type="text" class="field-input" placeholder="e.g. Smith" autocomplete="family-name" required aria-required="true" />
+            <div class="field">
+              <span class="field-label">Last Name</span>
+              <span class="field-value" id="rv-lastName"></span>
             </div>
-            <div class="sm:col-span-2">
-              <label class="field-label" for="studentTag">Tag / Designation (Non-Personal Identifier)
-                <span class="ml-1 font-normal normal-case text-slate-500" style="font-size:0.68rem;">(e.g. initials, student ID, or pseudo-anonymous tracking code)</span>
-              </label>
-              <input id="studentTag" name="studentTag" type="text" class="field-input" placeholder="e.g. JS-9W or ID-4482" autocomplete="off" required aria-required="true" />
+            <div class="field">
+              <span class="field-label">Tag / Identifier</span>
+              <span class="field-value" id="rv-tag"></span>
             </div>
+            <div class="field">
+              <span class="field-label">Database ID</span>
+              <span class="field-value" id="rv-studentId"></span>
+            </div>
+          </div>
+
+          <!-- EDIT -->
+          <div id="edit-identity" style="display:none;">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="field-label" for="firstName">First Name</label>
+                <input id="firstName" name="firstName" type="text" class="field-input" placeholder="e.g. Jordan" autocomplete="given-name" />
+              </div>
+              <div>
+                <label class="field-label" for="lastName">Last Name</label>
+                <input id="lastName" name="lastName" type="text" class="field-input" placeholder="e.g. Smith" autocomplete="family-name" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="field-label" for="studentTag">Tag / Designation
+                  <span class="ml-1 font-normal normal-case text-slate-500" style="font-size:0.68rem;">(initials, student ID, or pseudo-anonymous code)</span>
+                </label>
+                <input id="studentTag" name="studentTag" type="text" class="field-input" placeholder="e.g. JS-9W or ID-4482" autocomplete="off" />
+              </div>
+            </div>
+          </div>
+
+          <!-- FOOTER -->
+          <div id="footer-identity" class="btn-row" style="display:none;margin-top:1rem;">
+            <button type="button" class="btn btn-save"   onclick="App.savePanel('identity')">Save changes</button>
+            <button type="button" class="btn btn-cancel" onclick="App.cancelPanel('identity')">Cancel</button>
+            <span id="status-identity" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#4a5578;margin-left:0.25rem;"></span>
           </div>
         </section>
 
-        <!-- SECTION 2 — IEP TIMELINE -->
-        <section class="panel mb-5" aria-labelledby="edit-s2" style="margin-bottom:1.25rem;">
+        <!-- ═══════════════════════════════════════════════════════
+             SECTION 2 — IEP TIMELINE
+        ═══════════════════════════════════════════════════════ -->
+        <section class="panel" id="panel-academic" aria-labelledby="hd-s2" style="margin-bottom:1.25rem;">
           <div class="section-heading">
             <div>
-              <p class="eyebrow" id="edit-s2">Section 02 &middot; IEP Timeline</p>
+              <p class="eyebrow" id="hd-s2">Section 02 &middot; IEP Timeline</p>
               <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">Annual Review Dates</h2>
             </div>
+            <button type="button" class="btn btn-edit" onclick="App.editPanel('academic')">Edit</button>
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="field-label" for="iepStart">IEP Start Date</label>
-              <input id="iepStart" name="iepStart" type="date" class="field-input" required aria-required="true" />
-              <p class="mt-1.5 text-[0.72rem] text-slate-500">Date the current IEP became effective</p>
+
+          <!-- VIEW -->
+          <div id="view-academic" class="field-grid">
+            <div class="field">
+              <span class="field-label">IEP Start Date</span>
+              <span class="field-value" id="rv-iepStart"></span>
             </div>
-            <div>
-              <label class="field-label" for="iepEnd">IEP End Date</label>
-              <input id="iepEnd" name="iepEnd" type="date" class="field-input" required aria-required="true" />
-              <p class="mt-1.5 text-[0.72rem] text-slate-500">Annual review / re-evaluation due date</p>
+            <div class="field">
+              <span class="field-label">IEP End Date</span>
+              <span class="field-value" id="rv-iepEnd"></span>
+            </div>
+            <div class="field sm:col-span-2" id="rv-iep-countdown-wrap" style="display:none;">
+              <div id="iepCountdownView" class="px-3.5 py-2.5 rounded-[8px] text-[0.8rem] font-mono" style="background:#1e2335;border:1px solid #252c42;" aria-live="polite"></div>
+            </div>
+            <div class="field">
+              <span class="field-label">Disability Classification</span>
+              <span class="field-value" id="rv-disability"></span>
+            </div>
+            <div class="field">
+              <span class="field-label">Supplemental Aids &amp; Services</span>
+              <span class="field-value" id="rv-supplemental"></span>
             </div>
           </div>
-          <div id="iepCountdown" class="hidden mt-4 px-3.5 py-2.5 rounded-[8px] text-[0.8rem] font-mono" style="background:#1e2335;border:1px solid #252c42;" aria-live="polite"></div>
+
+          <!-- EDIT -->
+          <div id="edit-academic" style="display:none;">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="field-label" for="iepStart">IEP Start Date</label>
+                <input id="iepStart" name="iepStart" type="date" class="field-input" />
+                <p class="mt-1.5 text-[0.72rem] text-slate-500">Date the current IEP became effective</p>
+              </div>
+              <div>
+                <label class="field-label" for="iepEnd">IEP End Date</label>
+                <input id="iepEnd" name="iepEnd" type="date" class="field-input" />
+                <p class="mt-1.5 text-[0.72rem] text-slate-500">Annual review / re-evaluation due date</p>
+              </div>
+              <div class="sm:col-span-2">
+                <div id="iepCountdown" class="hidden px-3.5 py-2.5 rounded-[8px] text-[0.8rem] font-mono" style="background:#1e2335;border:1px solid #252c42;" aria-live="polite"></div>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="field-label" for="primaryDisability">Disability Classification</label>
+                <input id="primaryDisability" name="primaryDisability" type="text" class="field-input" placeholder="e.g. Specific Learning Disability (SLD)" autocomplete="off" />
+                <p class="mt-1.5 text-[0.72rem] text-slate-500">Enter the IDEA primary disability category as listed in the IEP.</p>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="field-label" for="supplementalAids">Supplemental Aids &amp; Services</label>
+                <textarea id="supplementalAids" name="supplementalAids" class="field-textarea" placeholder="List accommodations, modifications, and supplemental aids…" aria-label="Supplemental aids and services description"></textarea>
+                <p class="mt-1.5 text-[0.72rem] text-slate-500">Include all IDEA-required accommodations and modifications listed in the IEP.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- FOOTER -->
+          <div id="footer-academic" class="btn-row" style="display:none;margin-top:1rem;">
+            <button type="button" class="btn btn-save"   onclick="App.savePanel('academic')">Save changes</button>
+            <button type="button" class="btn btn-cancel" onclick="App.cancelPanel('academic')">Cancel</button>
+            <span id="status-academic" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#4a5578;margin-left:0.25rem;"></span>
+          </div>
         </section>
 
-        <!-- SECTION 3 — PRIMARY DISABILITY -->
-        <section class="panel mb-5" aria-labelledby="edit-s3" style="margin-bottom:1.25rem;">
+        <!-- ═══════════════════════════════════════════════════════
+             SECTION 3 — IEP GOALS
+             (Primary disability merged into Section 2 above;
+              Section 3 is now Goals only — matching clinical flow)
+        ═══════════════════════════════════════════════════════ -->
+        <section class="panel" id="panel-goals" aria-labelledby="hd-s3" style="margin-bottom:1.25rem;">
           <div class="section-heading">
             <div>
-              <p class="eyebrow" id="edit-s3">Section 03 &middot; Primary Disability</p>
-              <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">IDEA Disability Category</h2>
-            </div>
-          </div>
-          <div>
-            <label class="field-label" for="primaryDisability">Disability Classification</label>
-            <input id="primaryDisability" name="primaryDisability" type="text" class="field-input" placeholder="e.g. Specific Learning Disability (SLD)" autocomplete="off" required aria-required="true" />
-            <p class="mt-1.5 text-[0.72rem] text-slate-500">Enter the IDEA primary disability category as listed in the IEP document.</p>
-          </div>
-        </section>
-
-        <!-- SECTION 4 — IEP GOALS -->
-        <section class="panel mb-5" aria-labelledby="edit-s4" style="margin-bottom:1.25rem;">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow" id="edit-s4">Section 04 &middot; IEP Goals</p>
+              <p class="eyebrow" id="hd-s3">Section 03 &middot; IEP Goals</p>
               <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">Measurable Annual Goals</h2>
             </div>
-            <button type="button" onclick="addGoalRow()" class="btn-ghost flex-shrink-0" aria-label="Add a new IEP goal entry">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              + Goal
-            </button>
+            <button type="button" class="btn btn-edit" onclick="App.editPanel('goals')">Edit</button>
           </div>
-          <div id="goalsContainer" class="flex flex-col gap-3" role="list" aria-label="IEP goal entries" aria-live="polite"></div>
-          <div id="goalsEmptyState" class="hidden text-center py-6 text-[0.82rem] text-slate-500">
-            No goals added yet. Click <strong class="text-slate-300">+ Goal</strong> to begin.
-          </div>
-          <p class="mt-3 text-[0.72rem] text-slate-500">Add one row per measurable annual goal. The SDI field captures Specially Designed Instruction aligned to each goal.</p>
-        </section>
 
-        <!-- SECTION 5 — SUPPLEMENTAL AIDS -->
-        <section class="panel mb-5" aria-labelledby="edit-s5" style="margin-bottom:1.25rem;">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow" id="edit-s5">Section 05 &middot; Supplemental Aids &amp; Services</p>
-              <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">Accommodations &amp; Modifications</h2>
-            </div>
+          <!-- VIEW -->
+          <div id="view-goals">
+            <div id="goals-list" aria-label="IEP goals read-only view"></div>
           </div>
-          <div>
-            <label class="field-label" for="supplementalAids">Supplemental Aids &amp; Services</label>
-            <textarea id="supplementalAids" name="supplementalAids" class="field-textarea" placeholder="List accommodations, modifications, and supplemental aids — e.g. extended time (1.5×), preferential seating, graphic organizers, chunked assignments, text-to-speech support…" aria-label="Supplemental aids and services description"></textarea>
-            <p class="mt-1.5 text-[0.72rem] text-slate-500">Include all IDEA-required accommodations and modifications listed in the IEP.</p>
+
+          <!-- EDIT -->
+          <div id="edit-goals" style="display:none;">
+            <div style="display:flex;align-items:center;justify-content:flex-end;margin-bottom:0.75rem;">
+              <button type="button" onclick="App.addGoalRow('','')" class="btn-ghost" style="font-size:0.72rem;" aria-label="Add a new IEP goal">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                + Goal
+              </button>
+            </div>
+            <div id="goal-rows" style="margin-bottom:0.5rem;"></div>
+            <p class="text-[0.72rem] text-slate-500 mt-2">One row per measurable annual goal. SDI describes the Specially Designed Instruction aligned to each goal.</p>
+          </div>
+
+          <!-- FOOTER -->
+          <div id="footer-goals" class="btn-row" style="display:none;margin-top:1rem;">
+            <button type="button" class="btn btn-save"   onclick="App.savePanel('goals')">Save changes</button>
+            <button type="button" class="btn btn-cancel" onclick="App.cancelPanel('goals')">Cancel</button>
+            <span id="status-goals" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#4a5578;margin-left:0.25rem;"></span>
           </div>
         </section>
 
@@ -433,20 +508,6 @@
             <span id="status-assessments" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#4a5578;margin-left:0.25rem;"></span>
           </div>
         </section>
-
-        <!-- SUBMIT BAR -->
-        <div class="submit-bar">
-          <div class="flex items-center justify-between gap-4 flex-wrap">
-            <p id="formValidationMsg" class="text-[0.8rem] text-red-400 hidden" role="alert" aria-live="assertive"></p>
-            <div class="flex items-center gap-3 ml-auto">
-              <a href="https://caseload.mpowerededucation.com/" class="btn-ghost">&#8592; Back to Roster</a>
-              <button type="submit" class="btn-primary" aria-label="Save changes to this student record">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </div>
 
       </form>
 
@@ -1048,18 +1109,26 @@ function parseAccommodations(raw) {
       setText('display-id',   'DatabaseID: ' + (row[COL.ID]||'—'));
       document.title = fullName + ' — M-Powered Education';
 
-      setText('rv-studentId',    row[COL.ID]);
-      setText('rv-tag',          row[COL.TAG]);
-      setText('rv-firstName',    row[COL.FIRST_NAME]);
-      setText('rv-lastName',     row[COL.LAST_NAME]);
-      setText('rv-disability',   row[COL.DISABILITY]);
+      // Section 1 — identity read-only fields
+      setText('rv-firstName', row[COL.FIRST_NAME]);
+      setText('rv-lastName',  row[COL.LAST_NAME]);
+      setText('rv-tag',       row[COL.TAG]);
+      setText('rv-studentId', row[COL.ID]);
+
+      // Section 2 — academic / IEP / supplemental read-only fields
       setText('rv-iepStart',     row[COL.IEP_START]);
       setText('rv-iepEnd',       row[COL.IEP_END]);
+      setText('rv-disability',   row[COL.DISABILITY]);
       setText('rv-supplemental', row[COL.SUPPLEMENTAL]);
 
+      // IEP countdown in read-only view
+      _renderIepCountdownView(row[COL.IEP_END]);
+
+      // Section 3 — goals
       renderGoals(parseGoals(row[COL.GOALS]));
-      renderAccommodations(parseAccommodations(row[COL.ACCOMMODATIONS]));
+
       // Section 6 — state assessment read-only view
+      renderAccommodations(parseAccommodations(row[COL.ACCOMMODATIONS]));
       App.renderStateAccommodations(row[COL.ACCOMMODATIONS]);
 
       // Reveal the Delete button only for saved (non-new) records
@@ -1067,11 +1136,46 @@ function parseAccommodations(raw) {
       if (delBtn) delBtn.style.display = _isNew ? 'none' : 'inline-flex';
     }
 
+    // Render the IEP countdown in the view-mode banner (#iepCountdownView)
+    function _renderIepCountdownView(endRaw) {
+      var banner = document.getElementById('iepCountdownView');
+      var wrap   = document.getElementById('rv-iep-countdown-wrap');
+      if (!banner || !wrap) return;
+      if (!endRaw) { wrap.style.display = 'none'; return; }
+      var endVal = _toDateInputValue(endRaw);
+      if (!endVal) { wrap.style.display = 'none'; return; }
+      var today    = new Date(); today.setHours(0,0,0,0);
+      var endDate  = new Date(endVal + 'T00:00:00');
+      var diffDays = Math.ceil((endDate - today) / 86400000);
+      var msg, color, bg, border;
+      if (diffDays < 0) {
+        msg='⚠ IEP expired '+Math.abs(diffDays)+' day'+(Math.abs(diffDays)!==1?'s':'')+' ago — annual review overdue.';
+        color='#f87171'; bg='rgba(248,113,113,0.06)'; border='rgba(248,113,113,0.3)';
+      } else if (diffDays===0) {
+        msg='⚠ IEP annual review is due today.';
+        color='#f59e0b'; bg='rgba(245,158,11,0.06)'; border='rgba(245,158,11,0.3)';
+      } else if (diffDays<=30) {
+        msg='⚡ '+diffDays+' day'+(diffDays!==1?'s':'')+' until annual review — action required soon.';
+        color='#f59e0b'; bg='rgba(245,158,11,0.06)'; border='rgba(245,158,11,0.28)';
+      } else if (diffDays<=60) {
+        msg='· '+diffDays+' days until IEP annual review.';
+        color='#6c8fff'; bg='rgba(108,143,255,0.06)'; border='rgba(108,143,255,0.2)';
+      } else {
+        msg='✓ '+diffDays+' days remaining in this IEP period.';
+        color='#34d399'; bg='rgba(52,211,153,0.06)'; border='rgba(52,211,153,0.22)';
+      }
+      banner.textContent   = msg;
+      banner.style.color   = color;
+      banner.style.background = bg;
+      banner.style.borderColor = border;
+      wrap.style.display   = '';
+    }
+
     // ── Panel show / hide ──────────────────────────────────────────
     function _showView(panel) {
       var el = document.getElementById('view-'+panel);
       if (!el) return;
-      // identity and academic use grid layout; all others use block/default
+      // identity and academic use grid layout; goals, assessments, and s6 use block/default
       el.style.display = (panel === 'identity' || panel === 'academic') ? 'grid' : '';
     }
     function _hideView(panel) {
@@ -1092,15 +1196,15 @@ function parseAccommodations(raw) {
       setPanelStatus(panel, '', '');
 
       if (panel === 'identity') {
-        setInput('in-tag',       _record[COL.TAG]);
-        setInput('in-firstName', _record[COL.FIRST_NAME]);
-        setInput('in-lastName',  _record[COL.LAST_NAME]);
+        setInput('firstName',  _record[COL.FIRST_NAME]);
+        setInput('lastName',   _record[COL.LAST_NAME]);
+        setInput('studentTag', _record[COL.TAG]);
       }
       if (panel === 'academic') {
-        setSelect('in-disability',  _record[COL.DISABILITY]);
-        setInput('in-iepStart',     _toDateInputValue(_record[COL.IEP_START]));
-        setInput('in-iepEnd',       _toDateInputValue(_record[COL.IEP_END]));
-        setInput('in-supplemental', _record[COL.SUPPLEMENTAL]);
+        setInput('iepStart',          _toDateInputValue(_record[COL.IEP_START]));
+        setInput('iepEnd',            _toDateInputValue(_record[COL.IEP_END]));
+        setInput('primaryDisability', _record[COL.DISABILITY]);
+        setInput('supplementalAids',  _record[COL.SUPPLEMENTAL]);
       }
       if (panel === 'goals') {
         var container = document.getElementById('goal-rows');
@@ -1111,7 +1215,7 @@ function parseAccommodations(raw) {
             .forEach(function(g) {
               var sdiStr = (g.sdi && typeof g.sdi === 'object')
                 ? (g.sdi.strategy || '')
-                : String(g.sdi || '');  /* [SHIM] legacy flat string */
+                : String(g.sdi || '');
               addGoalRow(g.description, sdiStr);
             });
         }
@@ -1224,15 +1328,16 @@ function parseAccommodations(raw) {
       var updates = {};
 
       if (panel === 'identity') {
-        updates[COL.TAG]        = getInput('in-tag');
-        updates[COL.FIRST_NAME] = getInput('in-firstName');
-        updates[COL.LAST_NAME]  = getInput('in-lastName');
+        updates[COL.TAG]        = getInput('studentTag');
+        updates[COL.FIRST_NAME] = getInput('firstName');
+        updates[COL.LAST_NAME]  = getInput('lastName');
       }
       if (panel === 'academic') {
-        updates[COL.DISABILITY]   = getInput('in-disability');
-        updates[COL.IEP_START]    = getInput('in-iepStart');
-        updates[COL.IEP_END]      = getInput('in-iepEnd');
-        updates[COL.SUPPLEMENTAL] = getInput('in-supplemental');
+        updates[COL.DISABILITY]   = getInput('in-disability') || getInput('primaryDisability');
+        updates[COL.IEP_START]    = getInput('in-iepStart')   || getInput('iepStart');
+        updates[COL.IEP_END]      = getInput('in-iepEnd')     || getInput('iepEnd');
+        updates[COL.SUPPLEMENTAL] = getInput('in-supplemental')
+          || (document.getElementById('supplementalAids') ? document.getElementById('supplementalAids').value.trim() : '');
       }
       if (panel === 'goals') {
         // [SHIM] Round-trip merge: read description + sdi.strategy from textareas.
@@ -1632,48 +1737,40 @@ function parseAccommodations(raw) {
   function hydrateForm(student) {
     if (!student) return;
 
-    /* ── Section 1 ── */
+    /* ── Section 1 — identity ── */
     var s = student.student || {};
     _setVal('firstName',  s.firstName  || student.firstName  || '');
     _setVal('lastName',   s.lastName   || student.lastName   || '');
     _setVal('studentTag', s.tag        || student.tag        || student.studentTag || '');
 
-    /* ── Section 2 ── */
+    /* ── Section 2 — academic / IEP / supplemental ── */
     var t = student.iepTimeline || {};
-    _setVal('iepStart', t.startDate || student.iepStart || '');
-    _setVal('iepEnd',   t.endDate   || student.iepEnd   || '');
-    updateIepCountdown();
-
-    /* ── Section 3 ── */
+    _setVal('iepStart',          t.startDate || student.iepStart || '');
+    _setVal('iepEnd',            t.endDate   || student.iepEnd   || '');
     _setVal('primaryDisability', student.primaryDisability || student.disability || '');
+    _setVal('supplementalAids',  student.supplementalAids  || student.supplemental || '');
 
-    /* ── Section 4 — goals ── */
-    var container = document.getElementById('goalsContainer');
-    if (container) {
-      container.innerHTML = '';
+    /* ── Section 3 — goals ── */
+    var goalRows = document.getElementById('goal-rows');
+    if (goalRows) {
+      goalRows.innerHTML = '';
       goalCounter = 0;
       var goals = student.goals || [];
       if (goals.length) {
         goals.forEach(function(g) { addGoalRow(g); });
       } else {
-        addGoalRow(); // seed one blank row
+        addGoalRow();
       }
     }
 
-    /* ── Section 5 ── */
-    _setVal('supplementalAids', student.supplementalAids || student.supplemental || '');
-
     /* ── Section 6 — state accommodations ── */
     var acc = student.stateAccommodations || {};
-    var sels = acc.selections || [];
-    // Restore checkboxes/radios in the edit form via the App helper
     if (typeof App._hydrateAssessmentsForm === 'function') {
       App._hydrateAssessmentsForm(acc);
     }
-    // Render the read-only view for S6
     App.renderStateAccommodations(JSON.stringify(acc));
 
-    /* ── Update page title ── */
+    /* ── Update page title / heading ── */
     var fn = s.firstName || student.firstName || '';
     var ln = s.lastName  || student.lastName  || '';
     var nameEl = document.getElementById('display-name');
@@ -1764,7 +1861,7 @@ function parseAccommodations(raw) {
     });
   }
 
-  /* Wire IEP date inputs to the countdown indicator */
+  /* Wire IEP date inputs to the countdown indicator (edit mode) */
   document.addEventListener('DOMContentLoaded', function() {
     var s = document.getElementById('iepStart');
     var e = document.getElementById('iepEnd');
