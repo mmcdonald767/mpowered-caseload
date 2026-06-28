@@ -379,7 +379,22 @@
               </div>
               <div class="sm:col-span-2">
                 <label class="field-label" for="primaryDisability">Disability Classification</label>
-                <input id="primaryDisability" name="primaryDisability" type="text" class="field-input" placeholder="e.g. Specific Learning Disability (SLD)" autocomplete="off" />
+                <input id="primaryDisability" name="primaryDisability" type="text" class="field-input" placeholder="e.g. Specific Learning Disability (SLD)" autocomplete="off" list="disability-options" />
+                <datalist id="disability-options">
+                  <option value="Specific Learning Disability (SLD)">
+                  <option value="Speech or Language Impairment">
+                  <option value="Other Health Impairment (OHI)">
+                  <option value="Autism Spectrum Disorder (ASD)">
+                  <option value="Developmental Delay">
+                  <option value="Intellectual Disability">
+                  <option value="Emotional Disturbance">
+                  <option value="Multiple Disabilities">
+                  <option value="Hearing Impairment">
+                  <option value="Orthopedic Impairment">
+                  <option value="Visual Impairment">
+                  <option value="Traumatic Brain Injury">
+                  <option value="Deaf-Blindness">
+                </datalist>
                 <p class="mt-1.5 text-[0.72rem] text-slate-500">Enter the IDEA primary disability category as listed in the IEP.</p>
               </div>
               <div class="sm:col-span-2">
