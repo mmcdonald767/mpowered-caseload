@@ -170,6 +170,21 @@
     .check-row-sub { padding-left: 1.75rem; }
     .sub-group { padding-left: 1.25rem; border-left: 2px solid #252c42; margin-left: 0.6rem; margin-bottom: 0.25rem; display: flex; flex-direction: column; gap: 0; }
     .sub-group.hidden { display: none !important; }
+
+    /* ── State assessment read-only chips ── */
+    .acc-tag {
+      display: inline-flex; align-items: center;
+      font-size: 0.78rem; color: #c4cde4;
+      background: rgba(255,255,255,0.03); border: 1px solid #1e2335;
+      border-radius: 8px; padding: 0.45rem 0.75rem;
+      line-height: 1.4;
+    }
+    .acc-tag-sub {
+      font-size: 0.7rem; color: #6c8fff;
+      font-family: 'JetBrains Mono', monospace;
+      margin-left: 0.4rem;
+    }
+    #view-s6-list { display: flex; flex-direction: column; gap: 0.35rem; }
   </style>
 </head>
 
@@ -347,59 +362,76 @@
           </div>
         </section>
 
-        <!-- SECTION 6 — STATE ASSESSMENTS -->
-        <section class="panel mb-5" aria-labelledby="edit-s6" style="margin-bottom:1.25rem;">
+        <!-- SECTION 6 — STATE ASSESSMENTS — view/edit pattern -->
+        <section class="panel mb-5" id="panel-assessments" aria-labelledby="edit-s6" style="margin-bottom:1.25rem;">
           <div class="section-heading">
             <div>
               <p class="eyebrow" id="edit-s6">Section 06 &middot; State Assessments</p>
               <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">Testing Accommodations</h2>
             </div>
+            <button type="button" class="btn btn-edit" onclick="App.editPanel('assessments')">Edit</button>
           </div>
-          <p class="text-[0.82rem] text-slate-400 leading-relaxed mb-4">Check all accommodations that apply. For grouped items, select one sub-option.</p>
-          <fieldset aria-labelledby="edit-s6">
-            <legend class="sr-only">State assessment accommodation options</legend>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
-              <div class="flex flex-col gap-0.5">
-                <div class="check-row"><input type="checkbox" id="acc-paraphrasing" name="stateAccommodations" value="paraphrasing" /><label for="acc-paraphrasing">Paraphrasing</label></div>
-                <div class="check-row"><input type="checkbox" id="acc-manipulatives" name="stateAccommodations" value="manipulatives" /><label for="acc-manipulatives">Manipulatives</label></div>
-                <div class="check-row"><input type="checkbox" id="acc-braille" name="stateAccommodations" value="braille" /><label for="acc-braille">Braille</label></div>
-                <div class="check-row"><input type="checkbox" id="acc-behavior-mod" name="stateAccommodations" value="reinforcement-behavior-mod" /><label for="acc-behavior-mod">Reinforcement and behavior modification strategies</label></div>
-                <div class="check-row"><input type="checkbox" id="acc-readers" name="stateAccommodations" value="readers" onchange="toggleSubGroup('readers-sub', this.checked)" /><label for="acc-readers">Readers <span class="text-slate-500">(Select one)</span></label></div>
-                <div id="readers-sub" class="sub-group hidden" role="group" aria-label="Reader type">
-                  <div class="check-row check-row-sub"><input type="radio" id="acc-reader-online" name="readersType" value="online-text-reader" /><label for="acc-reader-online">Online/Text Reader</label></div>
-                  <div class="check-row check-row-sub"><input type="radio" id="acc-reader-human" name="readersType" value="human-reader" /><label for="acc-reader-human">Human Reader</label></div>
+
+          <!-- VIEW STATE — read-only chip list, populated by renderStateAccommodations() -->
+          <div id="view-s6">
+            <div id="view-s6-list" aria-label="Selected testing accommodations"></div>
+          </div>
+
+          <!-- EDIT STATE — full checkbox/radio form, hidden until Edit is clicked -->
+          <div id="edit-assessments" style="display:none;">
+            <p class="text-[0.82rem] text-slate-400 leading-relaxed mb-4">Check all accommodations that apply. For grouped items, select one sub-option.</p>
+            <fieldset>
+              <legend class="sr-only">State assessment accommodation options</legend>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
+                <div class="flex flex-col gap-0.5">
+                  <div class="check-row"><input type="checkbox" id="acc-paraphrasing" name="stateAccommodations" value="paraphrasing" /><label for="acc-paraphrasing">Paraphrasing</label></div>
+                  <div class="check-row"><input type="checkbox" id="acc-manipulatives" name="stateAccommodations" value="manipulatives" /><label for="acc-manipulatives">Manipulatives</label></div>
+                  <div class="check-row"><input type="checkbox" id="acc-braille" name="stateAccommodations" value="braille" /><label for="acc-braille">Braille</label></div>
+                  <div class="check-row"><input type="checkbox" id="acc-behavior-mod" name="stateAccommodations" value="reinforcement-behavior-mod" /><label for="acc-behavior-mod">Reinforcement and behavior modification strategies</label></div>
+                  <div class="check-row"><input type="checkbox" id="acc-readers" name="stateAccommodations" value="readers" onchange="toggleSubGroup('readers-sub', this.checked)" /><label for="acc-readers">Readers <span class="text-slate-500">(Select one)</span></label></div>
+                  <div id="readers-sub" class="sub-group hidden" role="group" aria-label="Reader type">
+                    <div class="check-row check-row-sub"><input type="radio" id="acc-reader-online" name="readersType" value="online-text-reader" /><label for="acc-reader-online">Online/Text Reader</label></div>
+                    <div class="check-row check-row-sub"><input type="radio" id="acc-reader-human" name="readersType" value="human-reader" /><label for="acc-reader-human">Human Reader</label></div>
+                  </div>
+                  <div class="check-row"><input type="checkbox" id="acc-interpreters" name="stateAccommodations" value="interpreters" onchange="toggleSubGroup('interpreters-sub', this.checked)" /><label for="acc-interpreters">Interpreters <span class="text-slate-500">(Select one)</span></label></div>
+                  <div id="interpreters-sub" class="sub-group hidden" role="group" aria-label="Interpreter type">
+                    <div class="check-row check-row-sub"><input type="radio" id="acc-interp-asl" name="interpretersType" value="asl" /><label for="acc-interp-asl">American Sign Language</label></div>
+                    <div class="check-row check-row-sub"><input type="radio" id="acc-interp-other-lang" name="interpretersType" value="other-language" /><label for="acc-interp-other-lang">Other Language, specify:</label></div>
+                    <div class="check-row check-row-sub pl-6"><input type="text" id="acc-interp-lang-specify" name="interpretersLangSpecify" class="field-input field-input-inline" placeholder="Language…" aria-label="Interpreter language specification" /></div>
+                  </div>
                 </div>
-                <div class="check-row"><input type="checkbox" id="acc-interpreters" name="stateAccommodations" value="interpreters" onchange="toggleSubGroup('interpreters-sub', this.checked)" /><label for="acc-interpreters">Interpreters <span class="text-slate-500">(Select one)</span></label></div>
-                <div id="interpreters-sub" class="sub-group hidden" role="group" aria-label="Interpreter type">
-                  <div class="check-row check-row-sub"><input type="radio" id="acc-interp-asl" name="interpretersType" value="asl" /><label for="acc-interp-asl">American Sign Language</label></div>
-                  <div class="check-row check-row-sub"><input type="radio" id="acc-interp-other-lang" name="interpretersType" value="other-language" /><label for="acc-interp-other-lang">Other Language, specify:</label></div>
-                  <div class="check-row check-row-sub pl-6"><input type="text" id="acc-interp-lang-specify" name="interpretersLangSpecify" class="field-input field-input-inline" placeholder="Language…" aria-label="Interpreter language specification" /></div>
+                <div class="flex flex-col gap-0.5">
+                  <div class="check-row"><input type="checkbox" id="acc-scribes" name="stateAccommodations" value="scribes" /><label for="acc-scribes">Scribes</label></div>
+                  <div class="check-row"><input type="checkbox" id="acc-extended-time" name="stateAccommodations" value="extended-time" onchange="toggleSubGroup('extended-time-sub', this.checked)" /><label for="acc-extended-time">Extended Time <span class="text-slate-500">(Select one)</span></label></div>
+                  <div id="extended-time-sub" class="sub-group hidden" role="group" aria-label="Extended time type">
+                    <div class="check-row check-row-sub"><input type="radio" id="acc-time-half" name="extendedTimeType" value="time-and-a-half" /><label for="acc-time-half">Time and a Half</label></div>
+                    <div class="check-row check-row-sub"><input type="radio" id="acc-time-double" name="extendedTimeType" value="double-time" /><label for="acc-time-double">Double Time</label></div>
+                  </div>
+                  <div class="check-row"><input type="checkbox" id="acc-calculator" name="stateAccommodations" value="calculator" onchange="toggleSubGroup('calculator-sub', this.checked)" /><label for="acc-calculator">Calculator <span class="text-slate-500">(Select one)</span></label></div>
+                  <div id="calculator-sub" class="sub-group hidden" role="group" aria-label="Calculator type">
+                    <div class="check-row check-row-sub"><input type="radio" id="acc-calc-online" name="calculatorType" value="online-calculator" /><label for="acc-calc-online">Online Calculator</label></div>
+                    <div class="check-row check-row-sub"><input type="radio" id="acc-calc-handheld" name="calculatorType" value="handheld-calculator" /><label for="acc-calc-handheld">Handheld Calculator</label></div>
+                    <div class="check-row check-row-sub"><input type="radio" id="acc-calc-special" name="calculatorType" value="special-calculator" /><label for="acc-calc-special">Special Calculator, specify:</label></div>
+                    <div class="check-row check-row-sub pl-6"><input type="text" id="acc-calc-specify" name="calculatorSpecify" class="field-input field-input-inline" placeholder="Calculator type…" aria-label="Special calculator specification" /></div>
+                  </div>
                 </div>
               </div>
-              <div class="flex flex-col gap-0.5">
-                <div class="check-row"><input type="checkbox" id="acc-scribes" name="stateAccommodations" value="scribes" /><label for="acc-scribes">Scribes</label></div>
-                <div class="check-row"><input type="checkbox" id="acc-extended-time" name="stateAccommodations" value="extended-time" onchange="toggleSubGroup('extended-time-sub', this.checked)" /><label for="acc-extended-time">Extended Time <span class="text-slate-500">(Select one)</span></label></div>
-                <div id="extended-time-sub" class="sub-group hidden" role="group" aria-label="Extended time type">
-                  <div class="check-row check-row-sub"><input type="radio" id="acc-time-half" name="extendedTimeType" value="time-and-a-half" /><label for="acc-time-half">Time and a Half</label></div>
-                  <div class="check-row check-row-sub"><input type="radio" id="acc-time-double" name="extendedTimeType" value="double-time" /><label for="acc-time-double">Double Time</label></div>
-                </div>
-                <div class="check-row"><input type="checkbox" id="acc-calculator" name="stateAccommodations" value="calculator" onchange="toggleSubGroup('calculator-sub', this.checked)" /><label for="acc-calculator">Calculator <span class="text-slate-500">(Select one)</span></label></div>
-                <div id="calculator-sub" class="sub-group hidden" role="group" aria-label="Calculator type">
-                  <div class="check-row check-row-sub"><input type="radio" id="acc-calc-online" name="calculatorType" value="online-calculator" /><label for="acc-calc-online">Online Calculator</label></div>
-                  <div class="check-row check-row-sub"><input type="radio" id="acc-calc-handheld" name="calculatorType" value="handheld-calculator" /><label for="acc-calc-handheld">Handheld Calculator</label></div>
-                  <div class="check-row check-row-sub"><input type="radio" id="acc-calc-special" name="calculatorType" value="special-calculator" /><label for="acc-calc-special">Special Calculator, specify:</label></div>
-                  <div class="check-row check-row-sub pl-6"><input type="text" id="acc-calc-specify" name="calculatorSpecify" class="field-input field-input-inline" placeholder="Calculator type…" aria-label="Special calculator specification" /></div>
+              <div class="mt-2 flex flex-col gap-0.5">
+                <div class="check-row"><input type="checkbox" id="acc-small-group" name="stateAccommodations" value="small-group-testing" /><label for="acc-small-group">Small group testing</label></div>
+                <div class="check-row"><input type="checkbox" id="acc-other" name="stateAccommodations" value="other" onchange="toggleSubGroup('other-sub', this.checked)" /><label for="acc-other">Other, specify:</label></div>
+                <div id="other-sub" class="sub-group hidden pl-1">
+                  <input type="text" id="acc-other-specify" name="otherAccommodationSpecify" class="field-input" placeholder="Describe the accommodation…" aria-label="Other accommodation specification" />
                 </div>
               </div>
-            </div>
-            <div class="mt-2 flex flex-col gap-0.5">
-              <div class="check-row"><input type="checkbox" id="acc-small-group" name="stateAccommodations" value="small-group-testing" /><label for="acc-small-group">Small group testing</label></div>
-              <div class="check-row"><input type="checkbox" id="acc-other" name="stateAccommodations" value="other" onchange="toggleSubGroup('other-sub', this.checked)" /><label for="acc-other">Other, specify:</label></div>
-              <div id="other-sub" class="sub-group hidden pl-1">
-                <input type="text" id="acc-other-specify" name="otherAccommodationSpecify" class="field-input" placeholder="Describe the accommodation…" aria-label="Other accommodation specification" />
-              </div>
-            </div>
-          </fieldset>
+            </fieldset>
+          </div>
+
+          <!-- Save / Cancel footer -->
+          <div id="footer-assessments" class="btn-row" style="display:none; margin-top:1rem;">
+            <button type="button" class="btn btn-save"   onclick="App.savePanel('assessments')">Save changes</button>
+            <button type="button" class="btn btn-cancel" onclick="App.cancelPanel('assessments')">Cancel</button>
+            <span id="status-assessments" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#4a5578;margin-left:0.25rem;"></span>
+          </div>
         </section>
 
         <!-- SUBMIT BAR -->
@@ -467,7 +499,7 @@
     var _record    = null;
     var _studentId = null;
     var _isNew     = false;
-    var _editing   = { identity: false, academic: false, goals: false, accommodations: false };
+    var _editing   = { identity: false, academic: false, goals: false, accommodations: false, assessments: false };
 
     // ── Caseload nav state ─────────────────────────────────────────
     // _roster: student rows (header stripped, blanks filtered).
@@ -669,7 +701,155 @@
       };
     }
 
-    function parseAccommodations(raw) {
+    // ── _parseStateAccommodations ─────────────────────────────────
+    // Reads the raw COL.ACCOMMODATIONS cell value (which may be a
+    // stateAccommodations JSON object, a plain string array, or a
+    // legacy free-text string) and always returns a normalised
+    // stateAccommodations object: { selections:[], readersType, … }
+    function _parseStateAccommodations(raw) {
+      var empty = { selections:[], readersType:null, interpreterType:null,
+                    interpreterLang:null, extendedTimeType:null,
+                    calculatorType:null, calculatorSpecify:null, otherSpecify:null };
+      if (!raw && raw !== 0) return empty;
+      var s = String(raw).trim();
+      if (!s || s === '[]' || s === '{}') return empty;
+      // JSON object — canonical stateAccommodations shape
+      if (s.charAt(0) === '{') {
+        try {
+          var obj = JSON.parse(s);
+          return Object.assign({}, empty, obj);
+        } catch(e) {}
+      }
+      // JSON array — legacy plain string array; map values to selections
+      if (s.charAt(0) === '[') {
+        try {
+          var arr = JSON.parse(s);
+          if (Array.isArray(arr)) {
+            // If the first element is an object with a 'selections' key, use it
+            if (arr.length && typeof arr[0] === 'object' && arr[0] !== null && arr[0].selections) {
+              return Object.assign({}, empty, arr[0]);
+            }
+            return Object.assign({}, empty, { selections: arr.map(String).filter(Boolean) });
+          }
+        } catch(e) {}
+      }
+      return empty;
+    }
+
+    // ── renderStateAccommodations(raw) ────────────────────────────
+    // Builds the human-readable read-only chip list for #view-s6-list.
+    // Each selected accommodation gets one chip; sub-selections are
+    // shown as a blue secondary label inside the chip.
+    function renderStateAccommodations(raw) {
+      var list = document.getElementById('view-s6-list');
+      if (!list) return;
+      list.innerHTML = '';
+
+      var acc = _parseStateAccommodations(raw);
+      var sels = acc.selections || [];
+
+      // Label map — value → display name
+      var LABELS = {
+        'paraphrasing':              'Paraphrasing',
+        'manipulatives':             'Manipulatives',
+        'braille':                   'Braille',
+        'reinforcement-behavior-mod':'Reinforcement & behavior modification',
+        'readers':                   'Readers',
+        'interpreters':              'Interpreters',
+        'scribes':                   'Scribes',
+        'extended-time':             'Extended Time',
+        'calculator':                'Calculator',
+        'small-group-testing':       'Small group testing',
+        'other':                     'Other',
+      };
+
+      // Sub-label maps
+      var READER_LABELS    = { 'online-text-reader':'Online/Text Reader', 'human-reader':'Human Reader' };
+      var INTERP_LABELS    = { 'asl':'ASL', 'other-language':'Other Language' };
+      var TIME_LABELS      = { 'time-and-a-half':'Time and a Half', 'double-time':'Double Time' };
+      var CALC_LABELS      = { 'online-calculator':'Online Calculator', 'handheld-calculator':'Handheld Calculator', 'special-calculator':'Special Calculator' };
+
+      if (!sels.length) {
+        var none = document.createElement('p');
+        none.className = 'list-empty';
+        none.textContent = 'None recorded.';
+        list.appendChild(none);
+        return;
+      }
+
+      sels.forEach(function(val) {
+        var chip = document.createElement('div');
+        chip.className = 'acc-tag';
+
+        var label = LABELS[val] || val;
+        var sub   = '';
+
+        if (val === 'readers'       && acc.readersType)      sub = READER_LABELS[acc.readersType]   || acc.readersType;
+        if (val === 'interpreters'  && acc.interpreterType)  sub = INTERP_LABELS[acc.interpreterType]|| acc.interpreterType;
+        if (val === 'interpreters'  && acc.interpreterLang)  sub += (sub ? ' — ' : '') + acc.interpreterLang;
+        if (val === 'extended-time' && acc.extendedTimeType) sub = TIME_LABELS[acc.extendedTimeType] || acc.extendedTimeType;
+        if (val === 'calculator'    && acc.calculatorType)   sub = CALC_LABELS[acc.calculatorType]   || acc.calculatorType;
+        if (val === 'calculator'    && acc.calculatorSpecify)sub += (sub ? ' — ' : '') + acc.calculatorSpecify;
+        if (val === 'other'         && acc.otherSpecify)     sub = acc.otherSpecify;
+
+        chip.textContent = label;
+        if (sub) {
+          var subSpan = document.createElement('span');
+          subSpan.className = 'acc-tag-sub';
+          subSpan.textContent = ': ' + sub;
+          chip.appendChild(subSpan);
+        }
+        list.appendChild(chip);
+      });
+    }
+
+    // ── _hydrateAssessmentsForm(acc) ──────────────────────────────
+    // Restores checkboxes and radios in the Section 6 edit form from
+    // a normalised stateAccommodations object. Resets everything first
+    // so stale state from a previous edit session is never left behind.
+    function _hydrateAssessmentsForm(acc) {
+      // Reset all checkboxes and sub-groups first
+      document.querySelectorAll('input[name="stateAccommodations"]').forEach(function(cb) {
+        cb.checked = false;
+      });
+      ['readersType','interpretersType','extendedTimeType','calculatorType'].forEach(function(name) {
+        document.querySelectorAll('input[name="'+name+'"]').forEach(function(r){ r.checked = false; });
+      });
+      ['readers-sub','interpreters-sub','extended-time-sub','calculator-sub','other-sub'].forEach(function(id) {
+        var g = document.getElementById(id);
+        if (g) g.classList.add('hidden');
+      });
+      var textIds = ['acc-interp-lang-specify','acc-calc-specify','acc-other-specify'];
+      textIds.forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+
+      // Check each selected value and open its sub-group
+      var sels = acc.selections || [];
+      sels.forEach(function(val) {
+        var cb = document.querySelector('input[name="stateAccommodations"][value="'+val+'"]');
+        if (!cb) return;
+        cb.checked = true;
+        // Open sub-groups for items that have them
+        var subId = val === 'readers'       ? 'readers-sub'
+                  : val === 'interpreters'  ? 'interpreters-sub'
+                  : val === 'extended-time' ? 'extended-time-sub'
+                  : val === 'calculator'    ? 'calculator-sub'
+                  : val === 'other'         ? 'other-sub'
+                  : null;
+        if (subId) {
+          var g = document.getElementById(subId);
+          if (g) g.classList.remove('hidden');
+        }
+      });
+
+      // Restore radio selections and text inputs
+      if (acc.readersType)      { var r=document.querySelector('input[name="readersType"][value="'+acc.readersType+'"]');         if(r) r.checked=true; }
+      if (acc.interpreterType)  { var r=document.querySelector('input[name="interpretersType"][value="'+acc.interpreterType+'"]'); if(r) r.checked=true; }
+      if (acc.interpreterLang)  { var el=document.getElementById('acc-interp-lang-specify'); if(el) el.value=acc.interpreterLang; }
+      if (acc.extendedTimeType) { var r=document.querySelector('input[name="extendedTimeType"][value="'+acc.extendedTimeType+'"]'); if(r) r.checked=true; }
+      if (acc.calculatorType)   { var r=document.querySelector('input[name="calculatorType"][value="'+acc.calculatorType+'"]');    if(r) r.checked=true; }
+      if (acc.calculatorSpecify){ var el=document.getElementById('acc-calc-specify');         if(el) el.value=acc.calculatorSpecify; }
+      if (acc.otherSpecify)     { var el=document.getElementById('acc-other-specify');         if(el) el.value=acc.otherSpecify; }
+    }
       if (!raw && raw !== 0) return [];
       if (Array.isArray(raw)) return raw.map(function(i){return String(i||'').trim();}).filter(Boolean);
       var s = String(raw).trim();
@@ -876,6 +1056,8 @@
 
       renderGoals(parseGoals(row[COL.GOALS]));
       renderAccommodations(parseAccommodations(row[COL.ACCOMMODATIONS]));
+      // Section 6 — state assessment read-only view
+      renderStateAccommodations(row[COL.ACCOMMODATIONS]);
 
       // Reveal the Delete button only for saved (non-new) records
       var delBtn = document.getElementById('btn-delete-student');
@@ -886,6 +1068,7 @@
     function _showView(panel) {
       var el = document.getElementById('view-'+panel);
       if (!el) return;
+      // identity and academic use grid layout; all others use block/default
       el.style.display = (panel === 'identity' || panel === 'academic') ? 'grid' : '';
     }
     function _hideView(panel) {
@@ -932,6 +1115,11 @@
       }
       if (panel === 'accommodations') {
         setInput('in-accommodations', parseAccommodations(_record[COL.ACCOMMODATIONS]).join('\n'));
+      }
+      if (panel === 'assessments') {
+        // Parse the stored stateAccommodations JSON and restore all checkboxes/radios
+        var acc = _parseStateAccommodations(_record[COL.ACCOMMODATIONS]);
+        _hydrateAssessmentsForm(acc);
       }
 
       if (editEl) { var first = editEl.querySelector('input,textarea,select'); if (first) first.focus(); }
@@ -1073,6 +1261,10 @@
       if (panel === 'accommodations') {
         var lines = getInput('in-accommodations').split('\n').map(function(s){return s.trim();}).filter(Boolean);
         updates[COL.ACCOMMODATIONS] = JSON.stringify(lines);
+      }
+      if (panel === 'assessments') {
+        // collectStateAccommodations() reads all checked boxes/radios from the edit form
+        updates[COL.ACCOMMODATIONS] = JSON.stringify(collectStateAccommodations());
       }
 
       _saveRecord(_studentId, updates, panel, saveBtn, cancelBtn);
@@ -1248,14 +1440,15 @@
 
     // ── Public API ─────────────────────────────────────────────────
     return {
-      editPanel:       editPanel,
-      cancelPanel:     cancelPanel,
-      savePanel:       savePanel,
-      addGoalRow:      addGoalRow,
-      navigateStudent: navigateStudent,
-      showDeleteModal: showDeleteModal,
-      hideDeleteModal: hideDeleteModal,
-      confirmDelete:   confirmDelete,
+      editPanel:                editPanel,
+      cancelPanel:              cancelPanel,
+      savePanel:                savePanel,
+      addGoalRow:               addGoalRow,
+      navigateStudent:          navigateStudent,
+      showDeleteModal:          showDeleteModal,
+      hideDeleteModal:          hideDeleteModal,
+      confirmDelete:            confirmDelete,
+      _hydrateAssessmentsForm:  _hydrateAssessmentsForm,
       logout: function() {
         try { localStorage.clear(); } catch(e) {}
         window.location.replace('https://caseload.mpowerededucation.com/');
@@ -1468,17 +1661,15 @@
     /* ── Section 6 — state accommodations ── */
     var acc = student.stateAccommodations || {};
     var sels = acc.selections || [];
-    document.querySelectorAll('input[name="stateAccommodations"]').forEach(function(cb) {
-      cb.checked = sels.indexOf(cb.value) !== -1;
-      if (cb.checked) toggleSubGroup(cb.id.replace('acc-','') + '-sub', true);
-    });
-    if (acc.readersType)      _setRadio('readersType',       acc.readersType);
-    if (acc.interpreterType)  _setRadio('interpretersType',  acc.interpreterType);
-    if (acc.interpreterLang)  _setVal('acc-interp-lang-specify', acc.interpreterLang);
-    if (acc.extendedTimeType) _setRadio('extendedTimeType',  acc.extendedTimeType);
-    if (acc.calculatorType)   _setRadio('calculatorType',    acc.calculatorType);
-    if (acc.calculatorSpecify)_setVal('acc-calc-specify',    acc.calculatorSpecify);
-    if (acc.otherSpecify)     _setVal('acc-other-specify',   acc.otherSpecify);
+    // Restore checkboxes/radios in the edit form via the App helper
+    if (typeof App._hydrateAssessmentsForm === 'function') {
+      App._hydrateAssessmentsForm(acc);
+    } else {
+      // Fallback: call the internal helper via the exposed parse function
+      _hydrateAssessmentsForm(acc);
+    }
+    // Render the read-only view for S6
+    renderStateAccommodations(JSON.stringify(acc));
 
     /* ── Update page title ── */
     var fn = s.firstName || student.firstName || '';
