@@ -1621,59 +1621,18 @@ function parseAccommodations(raw) {
       .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
 
-  function addGoalRow(prefill) {
-    goalCounter++;
-    var id   = goalCounter;
-    var desc = (prefill && prefill.description) ? prefill.description : '';
-    var sdi  = '';
-    if (prefill && prefill.sdi) {
-      sdi = (typeof prefill.sdi === 'object') ? (prefill.sdi.strategy || '') : String(prefill.sdi);
-    }
-    var row = document.createElement('div');
-    row.className = 'goal-row';
-    row.setAttribute('role','listitem');
-    row.setAttribute('data-goal-id', id);
-    row.setAttribute('aria-label','Goal entry '+id);
-    row.innerHTML =
-      '<div class="flex items-center justify-between gap-2 mb-0.5">' +
-        '<span class="eyebrow mb-0" style="color:#4a5578;">Goal '+id+'</span>' +
-        '<button type="button" class="btn-danger-ghost" onclick="removeGoalRow('+id+')" aria-label="Remove goal '+id+'">' +
-          '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
-          ' Remove' +
-        '</button>' +
-      '</div>' +
-      '<div><label class="field-label" for="goalDesc-'+id+'">Goal Description</label>' +
-        '<textarea id="goalDesc-'+id+'" name="goalDesc-'+id+'" class="field-textarea" style="min-height:72px;" ' +
-          'placeholder="By [date], [student] will [observable behavior] with [criterion] as measured by [method]…" ' +
-          'aria-label="Goal description for goal '+id+'">'+escapeHtml(desc)+'</textarea></div>' +
-      '<div><label class="field-label" for="goalSdi-'+id+'">SDI ' +
-          '<span class="ml-1 font-normal normal-case text-slate-500" style="font-size:0.68rem;">(Specially Designed Instruction)</span></label>' +
-        '<textarea id="goalSdi-'+id+'" name="goalSdi-'+id+'" class="field-textarea" style="min-height:60px;" ' +
-          'placeholder="Describe the instructional methods, content modifications, or delivery adjustments…" ' +
-          'aria-label="SDI for goal '+id+'">'+escapeHtml(sdi)+'</textarea></div>';
-    var container = document.getElementById('goalsContainer');
-    container.appendChild(row);
-    updateGoalsEmptyState();
-    var ta = document.getElementById('goalDesc-'+id);
-    if (ta) ta.focus();
-  }
 
   function removeGoalRow(id) {
-    var container = document.getElementById('goalsContainer');
+    var container = document.getElementById('goal-rows');
+    if (!container) return;
     var row = container.querySelector('[data-goal-id="'+id+'"]');
     if (row) {
       row.style.transition='opacity 0.18s, transform 0.18s';
       row.style.opacity='0'; row.style.transform='translateY(-4px)';
-      setTimeout(function(){ if (row.parentNode) row.parentNode.removeChild(row); updateGoalsEmptyState(); }, 180);
+      setTimeout(function(){ if (row.parentNode) row.parentNode.removeChild(row); }, 180);
     }
   }
 
-  function updateGoalsEmptyState() {
-    var container  = document.getElementById('goalsContainer');
-    var emptyState = document.getElementById('goalsEmptyState');
-    if (!container || !emptyState) return;
-    emptyState.classList.toggle('hidden', container.querySelectorAll('[data-goal-id]').length > 0);
-  }
 
   /* ── Collect goals — Data Contract v1.1 ── */
   function _generateLocalId() {
@@ -1681,13 +1640,14 @@ function parseAccommodations(raw) {
   }
 
   function collectGoals() {
-    var container = document.getElementById('goalsContainer');
+    // Delegates to App.savePanel — this stub is kept for handleUpdate compatibility.
+    // Actual goal collection uses #goal-rows .goal-edit-card via savePanel('goals').
+    var container = document.getElementById('goal-rows');
     if (!container) return [];
     var goals = [];
-    container.querySelectorAll('[data-goal-id]').forEach(function(row) {
-      var id = row.getAttribute('data-goal-id');
-      var descEl = document.getElementById('goalDesc-'+id);
-      var sdiEl  = document.getElementById('goalSdi-'+id);
+    container.querySelectorAll('.goal-edit-card').forEach(function(card) {
+      var descEl = card.querySelector('.goal-input');
+      var sdiEl  = card.querySelector('.sdi-input');
       var desc   = descEl ? descEl.value.trim() : '';
       var sdi    = sdiEl  ? sdiEl.value.trim()  : '';
       if (!desc && !sdi) return;
@@ -1753,12 +1713,15 @@ function parseAccommodations(raw) {
     var goalRows = document.getElementById('goal-rows');
     if (goalRows) {
       goalRows.innerHTML = '';
-      goalCounter = 0;
       var goals = student.goals || [];
       if (goals.length) {
-        goals.forEach(function(g) { addGoalRow(g); });
+        goals.forEach(function(g) {
+          var desc = g.description || '';
+          var sdi  = (g.sdi && typeof g.sdi === 'object') ? (g.sdi.strategy || '') : String(g.sdi || '');
+          App.addGoalRow(desc, sdi);
+        });
       } else {
-        addGoalRow();
+        App.addGoalRow('', '');
       }
     }
 
