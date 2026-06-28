@@ -128,9 +128,48 @@
 
     /* ── Page states ── */
     #loading-overlay, #fallback-state, #content-area { display: none; }
-    #loading-overlay.active { display: flex; }
-    #fallback-state.active  { display: flex; }
-    #content-area.active    { display: block; }
+    #loading-overlay.active { display: flex !important; align-items:center; justify-content:center; }
+    #fallback-state.active  { display: flex !important; flex-direction:column; align-items:center; justify-content:center; }
+    #content-area.active    { display: block !important; }
+
+    /* ── Design-language from student-form.html ── */
+    .eyebrow { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #6c8fff; margin-bottom: 0.4rem; }
+    .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.1rem; }
+    .ferpa-notice { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.67rem; font-weight: 600; letter-spacing: 0.06em; color: #34d399; border: 1px solid rgba(52,211,153,0.28); border-radius: 20px; padding: 0.2rem 0.6rem; background: rgba(52,211,153,0.06); flex-shrink: 0; }
+    .panel { background: #171b26; border: 1px solid #1e2335; border-radius: 14px; padding: 1.75rem; transition: border-color 0.2s; }
+    .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; background: linear-gradient(135deg, #3b5bdb 0%, #6c8fff 100%); color: #fff; font-weight: 600; font-size: 0.875rem; border: none; border-radius: 9px; padding: 0.65rem 1.5rem; cursor: pointer; white-space: nowrap; text-decoration: none; box-shadow: 0 2px 12px rgba(60,91,219,0.35); transition: filter 0.12s, box-shadow 0.12s, transform 0.1s; }
+    .btn-primary:hover { filter: brightness(1.1); box-shadow: 0 4px 20px rgba(60,91,219,0.55); }
+    .btn-primary:active { transform: scale(0.97); }
+    .submit-bar { position: sticky; bottom: 0; background: linear-gradient(to top, #0f1117 75%, transparent); padding: 1.5rem 0 1.1rem; margin-top: 2rem; }
+    .hidden { display: none !important; }
+
+    /* ── Form inputs — from student-form.html ── */
+    .field-input { width: 100%; background: #1e2335; border: 1px solid #252c42; border-radius: 8px; padding: 0.55rem 0.85rem; font-size: 0.875rem; font-family: 'Inter', sans-serif; color: #e8ecf4; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
+    .field-input::placeholder { color: #3a4466; }
+    .field-input:focus { border-color: #6c8fff; box-shadow: 0 0 0 3px rgba(108,143,255,0.18); }
+    input[type="date"].field-input { color-scheme: dark; cursor: pointer; }
+    input[type="date"].field-input::-webkit-calendar-picker-indicator { filter: invert(0.6) sepia(1) saturate(2) hue-rotate(190deg); cursor: pointer; opacity: 0.6; }
+    input[type="date"].field-input::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+    .field-input-inline { padding: 0.35rem 0.65rem; font-size: 0.8rem; margin: 0.15rem 0 0.3rem; max-width: 260px; }
+    .field-textarea { width: 100%; background: #1e2335; border: 1px solid #252c42; border-radius: 8px; padding: 0.65rem 0.85rem; font-size: 0.875rem; font-family: 'Inter', sans-serif; color: #e8ecf4; outline: none; resize: vertical; min-height: 110px; line-height: 1.6; transition: border-color 0.15s, box-shadow 0.15s; }
+    .field-textarea::placeholder { color: #3a4466; }
+    .field-textarea:focus { border-color: #6c8fff; box-shadow: 0 0 0 3px rgba(108,143,255,0.18); }
+    .field-label { display: block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #6c8fff; margin-bottom: 0.4rem; }
+    .btn-danger-ghost { display: inline-flex; align-items: center; gap: 0.35rem; background: transparent; color: #4a5578; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 500; border: 1px solid #252c42; border-radius: 6px; padding: 0.3rem 0.6rem; cursor: pointer; flex-shrink: 0; transition: color 0.14s, border-color 0.14s, background 0.14s; }
+    .btn-danger-ghost:hover { color: #f87171; border-color: rgba(248,113,113,0.4); background: rgba(248,113,113,0.05); }
+    .goal-row { background: #1e2335; border: 1px solid #252c42; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; gap: 0.85rem; animation: goalSlideIn 0.22s ease forwards; }
+    @keyframes goalSlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .check-row { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.38rem 0.5rem; border-radius: 7px; cursor: pointer; transition: background 0.12s; }
+    .check-row:hover { background: rgba(108,143,255,0.05); }
+    .check-row input[type="checkbox"], .check-row input[type="radio"] { appearance: none; -webkit-appearance: none; width: 15px; height: 15px; border: 1.5px solid #2e3650; border-radius: 4px; background: #1e2335; flex-shrink: 0; margin-top: 2px; cursor: pointer; transition: border-color 0.14s, background 0.14s; position: relative; }
+    .check-row input[type="radio"] { border-radius: 50%; }
+    .check-row input[type="checkbox"]:checked, .check-row input[type="radio"]:checked { border-color: #6c8fff; background: #6c8fff; }
+    .check-row input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 3px; top: 0px; width: 5px; height: 9px; border: 2px solid #fff; border-top: none; border-left: none; transform: rotate(45deg); }
+    .check-row input[type="radio"]:checked { box-shadow: inset 0 0 0 3px #1e2335; }
+    .check-row label { font-size: 0.85rem; color: #c4cce0; cursor: pointer; line-height: 1.4; user-select: none; }
+    .check-row-sub { padding-left: 1.75rem; }
+    .sub-group { padding-left: 1.25rem; border-left: 2px solid #252c42; margin-left: 0.6rem; margin-bottom: 0.25rem; display: flex; flex-direction: column; gap: 0; }
+    .sub-group.hidden { display: none !important; }
   </style>
 </head>
 
@@ -172,194 +211,225 @@
   <main class="flex-1" style="max-width:760px; margin:0 auto; width:100%; padding:2rem 1.5rem;" role="main">
 
     <!-- Loading -->
-    <div id="loading-overlay" class="active flex-col items-center justify-center py-24" aria-live="polite">
-      <p style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:#4a5578;">Retrieving student record…</p>
+    <div id="loading-overlay" style="display:none;align-items:center;justify-content:center;padding:6rem 0;" aria-live="polite">
+      <p style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#4a5578;">Retrieving student record…</p>
     </div>
 
     <!-- Error / not found -->
-    <div id="fallback-state" class="flex-col items-center justify-center py-24" role="alert">
-      <h2 style="font-size:0.95rem; font-weight:600; margin-bottom:0.4rem;">Record Not Found</h2>
-      <p id="fallback-message" style="font-size:0.8rem; color:#4a5578;"></p>
-      <a href="/index.html" style="margin-top:1.25rem; font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:#6c8fff; text-decoration:none;">← Back to dashboard</a>
+    <div id="fallback-state" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:6rem 0;" role="alert">
+      <h2 style="font-size:0.95rem;font-weight:600;margin-bottom:0.4rem;">Record Not Found</h2>
+      <p id="fallback-message" style="font-size:0.8rem;color:#4a5578;"></p>
+      <a href="https://caseload.mpowerededucation.com/" style="margin-top:1.25rem;font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:#6c8fff;text-decoration:none;">← Back to dashboard</a>
     </div>
 
-    <!-- Student record -->
-    <div id="content-area">
+    <!-- Student record form -->
+    <div id="content-area" style="display:none;">
 
-      <!-- Name header -->
-      <div class="panel" style="margin-bottom:1.25rem;">
-        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
+      <!-- Page heading -->
+      <div style="margin-bottom:2rem;">
+        <p class="eyebrow">Student Records</p>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
           <div>
-            <p style="font-family:'JetBrains Mono',monospace; font-size:0.63rem; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; color:#4a5578; margin-bottom:0.35rem;">Student Record</p>
-            <h1 id="display-name" style="font-size:1.35rem; font-weight:700; margin:0;"></h1>
-            <p id="display-id"    style="font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:#4a5578; margin:0.2rem 0 0;"></p>
+            <h1 id="display-name" class="text-2xl font-bold text-slate-100 tracking-tight leading-tight" style="margin:0 0 0.25rem;"></h1>
+            <p id="display-id" style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#4a5578;margin:0;"></p>
           </div>
-          <!-- Delete Student — only shown for existing (non-new) records; JS reveals it -->
-          <button id="btn-delete-student"
-                  class="btn-delete"
-                  style="display:none; align-self:flex-start; margin-top:0.2rem;"
-                  onclick="App.showDeleteModal()"
-                  aria-label="Delete this student record">
+          <button id="btn-delete-student" class="btn-delete" style="display:none;align-self:flex-start;margin-top:0.2rem;" onclick="App.showDeleteModal()" aria-label="Delete this student record">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
             Delete Student
           </button>
         </div>
       </div>
 
-      <!-- PANEL: Student Identifiers -->
-      <div class="panel" id="panel-identity">
-        <div class="section-header">
-          <span class="section-title">Student Identifiers</span>
-          <button class="btn btn-edit" onclick="App.editPanel('identity')">Edit</button>
-        </div>
-        <div class="field-grid" id="view-identity">
-          <div class="field"><span class="field-label">Database ID</span><span class="field-value" id="rv-studentId"></span></div>
-          <div class="field"><span class="field-label">Tag / Identifier</span><span class="field-value" id="rv-tag"></span></div>
-          <div class="field"><span class="field-label">First Name</span><span class="field-value" id="rv-firstName"></span></div>
-          <div class="field"><span class="field-label">Last Name</span><span class="field-value" id="rv-lastName"></span></div>
-        </div>
-        <div class="field-grid" id="edit-identity" style="display:none;">
-          <div class="field"><label class="field-label" for="in-tag">Tag / Identifier</label><input class="field-input" id="in-tag" type="text" /></div>
-          <div class="field"><label class="field-label" for="in-firstName">First Name</label><input class="field-input" id="in-firstName" type="text" /></div>
-          <div class="field"><label class="field-label" for="in-lastName">Last Name</label><input class="field-input" id="in-lastName" type="text" /></div>
-        </div>
-        <div id="footer-identity" class="btn-row" style="display:none; margin-top:1rem;">
-          <button class="btn btn-save"   onclick="App.savePanel('identity')">Save changes</button>
-          <button class="btn btn-cancel" onclick="App.cancelPanel('identity')">Cancel</button>
-          <span id="status-identity" style="font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#4a5578; margin-left:0.25rem;"></span>
-        </div>
-      </div>
+      <!-- ============================================================
+           FORM — 6 sections mirroring student-form.html
+      ============================================================ -->
+      <form id="modifyStudentForm" onsubmit="handleUpdate(event)" novalidate>
 
-      <!-- PANEL: Academic Status -->
-      <div class="panel" id="panel-academic">
-        <div class="section-header">
-          <span class="section-title">Academic Status</span>
-          <button class="btn btn-edit" onclick="App.editPanel('academic')">Edit</button>
-        </div>
-        <div class="field-grid" id="view-academic">
-          <div class="field"><span class="field-label">Disability</span><span class="field-value" id="rv-disability"></span></div>
-          <div class="field"><span class="field-label">IEP Start</span><span class="field-value" id="rv-iepStart"></span></div>
-          <div class="field"><span class="field-label">IEP End</span><span class="field-value" id="rv-iepEnd"></span></div>
-          <div class="field"><span class="field-label">Supplemental Aids</span><span class="field-value" id="rv-supplemental"></span></div>
-        </div>
-        <div class="field-grid" id="edit-academic" style="display:none;">
-
-          <!-- IDEA disability dropdown — 13 federal categories, national prevalence order -->
-          <div class="field">
-            <label class="field-label" for="in-disability">Disability (IDEA Category)</label>
-            <select class="field-select" id="in-disability">
-              <option value="">— Select category —</option>
-              <option value="Specific Learning Disability (SLD)">Specific Learning Disability (SLD)</option>
-              <option value="Speech or Language Impairment (SLI)">Speech or Language Impairment (SLI)</option>
-              <option value="Other Health Impairment (OHI)">Other Health Impairment (OHI)</option>
-              <option value="Autism Spectrum Disorder (ASD)">Autism Spectrum Disorder (ASD)</option>
-              <option value="Developmental Delay (DD)">Developmental Delay (DD)</option>
-              <option value="Intellectual Disability (ID)">Intellectual Disability (ID)</option>
-              <option value="Emotional Disturbance (ED)">Emotional Disturbance (ED)</option>
-              <option value="Multiple Disabilities">Multiple Disabilities</option>
-              <option value="Hearing Impairment / Deafness">Hearing Impairment / Deafness</option>
-              <option value="Orthopedic Impairment (OI)">Orthopedic Impairment (OI)</option>
-              <option value="Visual Impairment / Blindness">Visual Impairment / Blindness</option>
-              <option value="Traumatic Brain Injury (TBI)">Traumatic Brain Injury (TBI)</option>
-              <option value="Deaf-Blindness">Deaf-Blindness</option>
-            </select>
+        <!-- SECTION 1 — STUDENT BASICS -->
+        <section class="panel mb-5" aria-labelledby="edit-s1" style="margin-bottom:1.25rem;">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow" id="edit-s1">Section 01 &middot; Student Basics</p>
+              <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">Identifying Information</h2>
+            </div>
+            <span class="ferpa-notice">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+              FERPA
+            </span>
           </div>
-
-          <!-- IEP Start — native date picker -->
-          <div class="field">
-            <label class="field-label" for="in-iepStart">IEP Start Date</label>
-            <input class="field-input" id="in-iepStart" type="date" />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="field-label" for="firstName">First Name</label>
+              <input id="firstName" name="firstName" type="text" class="field-input" placeholder="e.g. Jordan" autocomplete="given-name" required aria-required="true" />
+            </div>
+            <div>
+              <label class="field-label" for="lastName">Last Name</label>
+              <input id="lastName" name="lastName" type="text" class="field-input" placeholder="e.g. Smith" autocomplete="family-name" required aria-required="true" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="field-label" for="studentTag">Tag / Designation (Non-Personal Identifier)
+                <span class="ml-1 font-normal normal-case text-slate-500" style="font-size:0.68rem;">(e.g. initials, student ID, or pseudo-anonymous tracking code)</span>
+              </label>
+              <input id="studentTag" name="studentTag" type="text" class="field-input" placeholder="e.g. JS-9W or ID-4482" autocomplete="off" required aria-required="true" />
+            </div>
           </div>
+        </section>
 
-          <!-- IEP End — native date picker -->
-          <div class="field">
-            <label class="field-label" for="in-iepEnd">IEP End Date</label>
-            <input class="field-input" id="in-iepEnd" type="date" />
+        <!-- SECTION 2 — IEP TIMELINE -->
+        <section class="panel mb-5" aria-labelledby="edit-s2" style="margin-bottom:1.25rem;">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow" id="edit-s2">Section 02 &middot; IEP Timeline</p>
+              <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">Annual Review Dates</h2>
+            </div>
           </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="field-label" for="iepStart">IEP Start Date</label>
+              <input id="iepStart" name="iepStart" type="date" class="field-input" required aria-required="true" />
+              <p class="mt-1.5 text-[0.72rem] text-slate-500">Date the current IEP became effective</p>
+            </div>
+            <div>
+              <label class="field-label" for="iepEnd">IEP End Date</label>
+              <input id="iepEnd" name="iepEnd" type="date" class="field-input" required aria-required="true" />
+              <p class="mt-1.5 text-[0.72rem] text-slate-500">Annual review / re-evaluation due date</p>
+            </div>
+          </div>
+          <div id="iepCountdown" class="hidden mt-4 px-3.5 py-2.5 rounded-[8px] text-[0.8rem] font-mono" style="background:#1e2335;border:1px solid #252c42;" aria-live="polite"></div>
+        </section>
 
-          <div class="field">
-            <label class="field-label" for="in-supplemental">Supplemental Aids</label>
-            <input class="field-input" id="in-supplemental" type="text" />
+        <!-- SECTION 3 — PRIMARY DISABILITY -->
+        <section class="panel mb-5" aria-labelledby="edit-s3" style="margin-bottom:1.25rem;">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow" id="edit-s3">Section 03 &middot; Primary Disability</p>
+              <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">IDEA Disability Category</h2>
+            </div>
+          </div>
+          <div>
+            <label class="field-label" for="primaryDisability">Disability Classification</label>
+            <input id="primaryDisability" name="primaryDisability" type="text" class="field-input" placeholder="e.g. Specific Learning Disability (SLD)" autocomplete="off" required aria-required="true" />
+            <p class="mt-1.5 text-[0.72rem] text-slate-500">Enter the IDEA primary disability category as listed in the IEP document.</p>
+          </div>
+        </section>
+
+        <!-- SECTION 4 — IEP GOALS -->
+        <section class="panel mb-5" aria-labelledby="edit-s4" style="margin-bottom:1.25rem;">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow" id="edit-s4">Section 04 &middot; IEP Goals</p>
+              <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">Measurable Annual Goals</h2>
+            </div>
+            <button type="button" onclick="addGoalRow()" class="btn-ghost flex-shrink-0" aria-label="Add a new IEP goal entry">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              + Goal
+            </button>
+          </div>
+          <div id="goalsContainer" class="flex flex-col gap-3" role="list" aria-label="IEP goal entries" aria-live="polite"></div>
+          <div id="goalsEmptyState" class="hidden text-center py-6 text-[0.82rem] text-slate-500">
+            No goals added yet. Click <strong class="text-slate-300">+ Goal</strong> to begin.
+          </div>
+          <p class="mt-3 text-[0.72rem] text-slate-500">Add one row per measurable annual goal. The SDI field captures Specially Designed Instruction aligned to each goal.</p>
+        </section>
+
+        <!-- SECTION 5 — SUPPLEMENTAL AIDS -->
+        <section class="panel mb-5" aria-labelledby="edit-s5" style="margin-bottom:1.25rem;">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow" id="edit-s5">Section 05 &middot; Supplemental Aids &amp; Services</p>
+              <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">Accommodations &amp; Modifications</h2>
+            </div>
+          </div>
+          <div>
+            <label class="field-label" for="supplementalAids">Supplemental Aids &amp; Services</label>
+            <textarea id="supplementalAids" name="supplementalAids" class="field-textarea" placeholder="List accommodations, modifications, and supplemental aids — e.g. extended time (1.5×), preferential seating, graphic organizers, chunked assignments, text-to-speech support…" aria-label="Supplemental aids and services description"></textarea>
+            <p class="mt-1.5 text-[0.72rem] text-slate-500">Include all IDEA-required accommodations and modifications listed in the IEP.</p>
+          </div>
+        </section>
+
+        <!-- SECTION 6 — STATE ASSESSMENTS -->
+        <section class="panel mb-5" aria-labelledby="edit-s6" style="margin-bottom:1.25rem;">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow" id="edit-s6">Section 06 &middot; State Assessments</p>
+              <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">Testing Accommodations</h2>
+            </div>
+          </div>
+          <p class="text-[0.82rem] text-slate-400 leading-relaxed mb-4">Check all accommodations that apply. For grouped items, select one sub-option.</p>
+          <fieldset aria-labelledby="edit-s6">
+            <legend class="sr-only">State assessment accommodation options</legend>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
+              <div class="flex flex-col gap-0.5">
+                <div class="check-row"><input type="checkbox" id="acc-paraphrasing" name="stateAccommodations" value="paraphrasing" /><label for="acc-paraphrasing">Paraphrasing</label></div>
+                <div class="check-row"><input type="checkbox" id="acc-manipulatives" name="stateAccommodations" value="manipulatives" /><label for="acc-manipulatives">Manipulatives</label></div>
+                <div class="check-row"><input type="checkbox" id="acc-braille" name="stateAccommodations" value="braille" /><label for="acc-braille">Braille</label></div>
+                <div class="check-row"><input type="checkbox" id="acc-behavior-mod" name="stateAccommodations" value="reinforcement-behavior-mod" /><label for="acc-behavior-mod">Reinforcement and behavior modification strategies</label></div>
+                <div class="check-row"><input type="checkbox" id="acc-readers" name="stateAccommodations" value="readers" onchange="toggleSubGroup('readers-sub', this.checked)" /><label for="acc-readers">Readers <span class="text-slate-500">(Select one)</span></label></div>
+                <div id="readers-sub" class="sub-group hidden" role="group" aria-label="Reader type">
+                  <div class="check-row check-row-sub"><input type="radio" id="acc-reader-online" name="readersType" value="online-text-reader" /><label for="acc-reader-online">Online/Text Reader</label></div>
+                  <div class="check-row check-row-sub"><input type="radio" id="acc-reader-human" name="readersType" value="human-reader" /><label for="acc-reader-human">Human Reader</label></div>
+                </div>
+                <div class="check-row"><input type="checkbox" id="acc-interpreters" name="stateAccommodations" value="interpreters" onchange="toggleSubGroup('interpreters-sub', this.checked)" /><label for="acc-interpreters">Interpreters <span class="text-slate-500">(Select one)</span></label></div>
+                <div id="interpreters-sub" class="sub-group hidden" role="group" aria-label="Interpreter type">
+                  <div class="check-row check-row-sub"><input type="radio" id="acc-interp-asl" name="interpretersType" value="asl" /><label for="acc-interp-asl">American Sign Language</label></div>
+                  <div class="check-row check-row-sub"><input type="radio" id="acc-interp-other-lang" name="interpretersType" value="other-language" /><label for="acc-interp-other-lang">Other Language, specify:</label></div>
+                  <div class="check-row check-row-sub pl-6"><input type="text" id="acc-interp-lang-specify" name="interpretersLangSpecify" class="field-input field-input-inline" placeholder="Language…" aria-label="Interpreter language specification" /></div>
+                </div>
+              </div>
+              <div class="flex flex-col gap-0.5">
+                <div class="check-row"><input type="checkbox" id="acc-scribes" name="stateAccommodations" value="scribes" /><label for="acc-scribes">Scribes</label></div>
+                <div class="check-row"><input type="checkbox" id="acc-extended-time" name="stateAccommodations" value="extended-time" onchange="toggleSubGroup('extended-time-sub', this.checked)" /><label for="acc-extended-time">Extended Time <span class="text-slate-500">(Select one)</span></label></div>
+                <div id="extended-time-sub" class="sub-group hidden" role="group" aria-label="Extended time type">
+                  <div class="check-row check-row-sub"><input type="radio" id="acc-time-half" name="extendedTimeType" value="time-and-a-half" /><label for="acc-time-half">Time and a Half</label></div>
+                  <div class="check-row check-row-sub"><input type="radio" id="acc-time-double" name="extendedTimeType" value="double-time" /><label for="acc-time-double">Double Time</label></div>
+                </div>
+                <div class="check-row"><input type="checkbox" id="acc-calculator" name="stateAccommodations" value="calculator" onchange="toggleSubGroup('calculator-sub', this.checked)" /><label for="acc-calculator">Calculator <span class="text-slate-500">(Select one)</span></label></div>
+                <div id="calculator-sub" class="sub-group hidden" role="group" aria-label="Calculator type">
+                  <div class="check-row check-row-sub"><input type="radio" id="acc-calc-online" name="calculatorType" value="online-calculator" /><label for="acc-calc-online">Online Calculator</label></div>
+                  <div class="check-row check-row-sub"><input type="radio" id="acc-calc-handheld" name="calculatorType" value="handheld-calculator" /><label for="acc-calc-handheld">Handheld Calculator</label></div>
+                  <div class="check-row check-row-sub"><input type="radio" id="acc-calc-special" name="calculatorType" value="special-calculator" /><label for="acc-calc-special">Special Calculator, specify:</label></div>
+                  <div class="check-row check-row-sub pl-6"><input type="text" id="acc-calc-specify" name="calculatorSpecify" class="field-input field-input-inline" placeholder="Calculator type…" aria-label="Special calculator specification" /></div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-2 flex flex-col gap-0.5">
+              <div class="check-row"><input type="checkbox" id="acc-small-group" name="stateAccommodations" value="small-group-testing" /><label for="acc-small-group">Small group testing</label></div>
+              <div class="check-row"><input type="checkbox" id="acc-other" name="stateAccommodations" value="other" onchange="toggleSubGroup('other-sub', this.checked)" /><label for="acc-other">Other, specify:</label></div>
+              <div id="other-sub" class="sub-group hidden pl-1">
+                <input type="text" id="acc-other-specify" name="otherAccommodationSpecify" class="field-input" placeholder="Describe the accommodation…" aria-label="Other accommodation specification" />
+              </div>
+            </div>
+          </fieldset>
+        </section>
+
+        <!-- SUBMIT BAR -->
+        <div class="submit-bar">
+          <div class="flex items-center justify-between gap-4 flex-wrap">
+            <p id="formValidationMsg" class="text-[0.8rem] text-red-400 hidden" role="alert" aria-live="assertive"></p>
+            <div class="flex items-center gap-3 ml-auto">
+              <a href="https://caseload.mpowerededucation.com/" class="btn-ghost">&#8592; Back to Roster</a>
+              <button type="submit" class="btn-primary" aria-label="Save changes to this student record">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13"/><path d="M22 2L15 22l-4-9-9-4 20-7z"/></svg>
+                Save Changes
+              </button>
+            </div>
           </div>
         </div>
-        <div id="footer-academic" class="btn-row" style="display:none; margin-top:1rem;">
-          <button class="btn btn-save"   onclick="App.savePanel('academic')">Save changes</button>
-          <button class="btn btn-cancel" onclick="App.cancelPanel('academic')">Cancel</button>
-          <span id="status-academic" style="font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#4a5578; margin-left:0.25rem;"></span>
-        </div>
-      </div>
 
-      <!-- PANEL: IEP Goals & SDI
-           COL.GOALS (index 9) stores a JSON array.
-           v1.1 shape: { goal_id, description, domain, standard_alignment:{},
-                         sdi:{strategy,…}, artifact_type, progress_monitoring:{} }
-           [SHIM] Legacy shape { id?, description, sdi:string } handled by
-           _normaliseGoalObj() before any render or save.
-      -->
-      <div class="panel" id="panel-goals">
-        <div class="section-header">
-          <span class="section-title">IEP Goals &amp; SDI</span>
-          <button class="btn btn-edit" onclick="App.editPanel('goals')">Edit</button>
-        </div>
-
-        <!-- View state -->
-        <div id="view-goals">
-          <div id="goals-list"></div>
-        </div>
-
-        <!-- Edit state — vertical stack, full-width textareas -->
-        <div id="edit-goals" style="display:none;">
-          <div id="goal-rows" style="margin-bottom:0.75rem;"></div>
-          <button class="btn btn-edit" onclick="App.addGoalRow('', '')" style="font-size:0.65rem;">
-            + Add Goal &amp; SDI
-          </button>
-        </div>
-
-        <div id="footer-goals" class="btn-row" style="display:none; margin-top:1rem;">
-          <button class="btn btn-save"   onclick="App.savePanel('goals')">Save changes</button>
-          <button class="btn btn-cancel" onclick="App.cancelPanel('goals')">Cancel</button>
-          <span id="status-goals" style="font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#4a5578; margin-left:0.25rem;"></span>
-        </div>
-      </div>
-
-      <!-- PANEL: Accommodations -->
-      <div class="panel" id="panel-accommodations">
-        <div class="section-header">
-          <span class="section-title">Accommodations</span>
-          <button class="btn btn-edit" onclick="App.editPanel('accommodations')">Edit</button>
-        </div>
-        <ul id="view-accommodations" style="list-style:none; padding:0; margin:0;"></ul>
-        <div id="edit-accommodations" style="display:none;">
-          <textarea class="field-textarea" id="in-accommodations" style="width:100%; min-height:90px; resize:vertical;"></textarea>
-          <p style="font-size:0.7rem; color:#4a5578; font-family:'JetBrains Mono',monospace; margin-top:0.35rem;">One accommodation per line.</p>
-        </div>
-        <div id="footer-accommodations" class="btn-row" style="display:none; margin-top:1rem;">
-          <button class="btn btn-save"   onclick="App.savePanel('accommodations')">Save changes</button>
-          <button class="btn btn-cancel" onclick="App.cancelPanel('accommodations')">Cancel</button>
-          <span id="status-accommodations" style="font-family:'JetBrains Mono',monospace; font-size:0.65rem; color:#4a5578; margin-left:0.25rem;"></span>
-        </div>
-      </div>
+      </form>
 
     </div><!-- /content-area -->
   </main>
 
   <div id="toast" role="status" aria-live="polite"></div>
 
-  <!-- ══ Delete Student confirmation modal ══════════════════════════
-       Shown by App.showDeleteModal(). Sends action:'deleteStudent'
-       to the GAS backend and redirects to the dashboard on success.
-       FERPA note: only the opaque DatabaseID is sent — no PII.
-  ════════════════════════════════════════════════════════════════ -->
+  <!-- Delete confirmation modal -->
   <div id="delete-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
     <div id="delete-modal">
       <h2 id="delete-modal-title">⚠ Delete Student Record?</h2>
-      <p>
-        This will <strong>permanently remove</strong> the record for
-        <strong id="delete-modal-name">this student</strong>
-        from your Google Sheet. This action cannot be undone.
-      </p>
+      <p>This will <strong>permanently remove</strong> the record for <strong id="delete-modal-name">this student</strong> from your Google Sheet. This action cannot be undone.</p>
       <div class="modal-btn-row">
-        <button id="delete-cancel-btn"  onclick="App.hideDeleteModal()">Cancel</button>
+        <button id="delete-cancel-btn" onclick="App.hideDeleteModal()">Cancel</button>
         <button id="delete-confirm-btn" onclick="App.confirmDelete()">Yes, delete permanently</button>
       </div>
       <p id="delete-modal-status" style="font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#f87171;margin:0.75rem 0 0;min-height:1rem;"></p>
@@ -1154,6 +1224,21 @@
         _record = match;
         populateView(_record);
         showState('data');
+
+        // Hydrate the edit form with the loaded record
+        hydrateForm({
+          firstName         : _record[COL.FIRST_NAME],
+          lastName          : _record[COL.LAST_NAME],
+          tag               : _record[COL.TAG],
+          databaseId        : _record[COL.ID],
+          iepStart          : _record[COL.IEP_START],
+          iepEnd            : _record[COL.IEP_END],
+          primaryDisability : _record[COL.DISABILITY],
+          supplementalAids  : _record[COL.SUPPLEMENTAL],
+          goals             : (function(raw){
+            try { return JSON.parse(raw||'[]'); } catch(e){ return []; }
+          }(_record[COL.GOALS])),
+        });
       })
       .catch(function(err) {
         showState('error');
@@ -1181,6 +1266,318 @@
   }());
 
   document.addEventListener('DOMContentLoaded', App.init);
+
+  /* ================================================================
+     FORM UTILITIES — shared with student-form.html patterns
+  ================================================================ */
+  'use strict';
+
+  /* ── Sub-group toggle ── */
+  function toggleSubGroup(groupId, show) {
+    var group = document.getElementById(groupId);
+    if (!group) return;
+    if (show) {
+      group.classList.remove('hidden');
+    } else {
+      group.classList.add('hidden');
+      group.querySelectorAll('input[type="radio"]').forEach(function(r) { r.checked = false; });
+      group.querySelectorAll('input[type="text"]').forEach(function(t) { t.value = ''; });
+    }
+  }
+
+  /* ── IEP countdown ── */
+  function updateIepCountdown() {
+    var endEl  = document.getElementById('iepEnd');
+    var banner = document.getElementById('iepCountdown');
+    if (!endEl || !banner) return;
+    var endVal = endEl.value;
+    if (!endVal) { banner.classList.add('hidden'); return; }
+    var today    = new Date(); today.setHours(0,0,0,0);
+    var endDate  = new Date(endVal + 'T00:00:00');
+    var diffDays = Math.ceil((endDate - today) / 86400000);
+    var msg, color, bg, border;
+    if (diffDays < 0) {
+      msg='⚠ IEP expired '+Math.abs(diffDays)+' day'+(Math.abs(diffDays)!==1?'s':'')+' ago — annual review overdue.';color='#f87171';bg='rgba(248,113,113,0.06)';border='rgba(248,113,113,0.3)';
+    } else if (diffDays===0) {
+      msg='⚠ IEP annual review is due today.';color='#f59e0b';bg='rgba(245,158,11,0.06)';border='rgba(245,158,11,0.3)';
+    } else if (diffDays<=30) {
+      msg='⚡ '+diffDays+' day'+(diffDays!==1?'s':'')+' until annual review — action required soon.';color='#f59e0b';bg='rgba(245,158,11,0.06)';border='rgba(245,158,11,0.28)';
+    } else if (diffDays<=60) {
+      msg='· '+diffDays+' days until IEP annual review.';color='#6c8fff';bg='rgba(108,143,255,0.06)';border='rgba(108,143,255,0.2)';
+    } else {
+      msg='✓ '+diffDays+' days remaining in this IEP period.';color='#34d399';bg='rgba(52,211,153,0.06)';border='rgba(52,211,153,0.22)';
+    }
+    banner.textContent=msg; banner.style.color=color; banner.style.background=bg; banner.style.borderColor=border;
+    banner.classList.remove('hidden');
+  }
+
+  /* ── Goal row management ── */
+  var goalCounter = 0;
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function addGoalRow(prefill) {
+    goalCounter++;
+    var id   = goalCounter;
+    var desc = (prefill && prefill.description) ? prefill.description : '';
+    var sdi  = '';
+    if (prefill && prefill.sdi) {
+      sdi = (typeof prefill.sdi === 'object') ? (prefill.sdi.strategy || '') : String(prefill.sdi);
+    }
+    var row = document.createElement('div');
+    row.className = 'goal-row';
+    row.setAttribute('role','listitem');
+    row.setAttribute('data-goal-id', id);
+    row.setAttribute('aria-label','Goal entry '+id);
+    row.innerHTML =
+      '<div class="flex items-center justify-between gap-2 mb-0.5">' +
+        '<span class="eyebrow mb-0" style="color:#4a5578;">Goal '+id+'</span>' +
+        '<button type="button" class="btn-danger-ghost" onclick="removeGoalRow('+id+')" aria-label="Remove goal '+id+'">' +
+          '<svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+          ' Remove' +
+        '</button>' +
+      '</div>' +
+      '<div><label class="field-label" for="goalDesc-'+id+'">Goal Description</label>' +
+        '<textarea id="goalDesc-'+id+'" name="goalDesc-'+id+'" class="field-textarea" style="min-height:72px;" ' +
+          'placeholder="By [date], [student] will [observable behavior] with [criterion] as measured by [method]…" ' +
+          'aria-label="Goal description for goal '+id+'">'+escapeHtml(desc)+'</textarea></div>' +
+      '<div><label class="field-label" for="goalSdi-'+id+'">SDI ' +
+          '<span class="ml-1 font-normal normal-case text-slate-500" style="font-size:0.68rem;">(Specially Designed Instruction)</span></label>' +
+        '<textarea id="goalSdi-'+id+'" name="goalSdi-'+id+'" class="field-textarea" style="min-height:60px;" ' +
+          'placeholder="Describe the instructional methods, content modifications, or delivery adjustments…" ' +
+          'aria-label="SDI for goal '+id+'">'+escapeHtml(sdi)+'</textarea></div>';
+    var container = document.getElementById('goalsContainer');
+    container.appendChild(row);
+    updateGoalsEmptyState();
+    var ta = document.getElementById('goalDesc-'+id);
+    if (ta) ta.focus();
+  }
+
+  function removeGoalRow(id) {
+    var container = document.getElementById('goalsContainer');
+    var row = container.querySelector('[data-goal-id="'+id+'"]');
+    if (row) {
+      row.style.transition='opacity 0.18s, transform 0.18s';
+      row.style.opacity='0'; row.style.transform='translateY(-4px)';
+      setTimeout(function(){ if (row.parentNode) row.parentNode.removeChild(row); updateGoalsEmptyState(); }, 180);
+    }
+  }
+
+  function updateGoalsEmptyState() {
+    var container  = document.getElementById('goalsContainer');
+    var emptyState = document.getElementById('goalsEmptyState');
+    if (!container || !emptyState) return;
+    emptyState.classList.toggle('hidden', container.querySelectorAll('[data-goal-id]').length > 0);
+  }
+
+  /* ── Collect goals — Data Contract v1.1 ── */
+  function _generateLocalId() {
+    return 'LOCAL-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
+  }
+
+  function collectGoals() {
+    var container = document.getElementById('goalsContainer');
+    if (!container) return [];
+    var goals = [];
+    container.querySelectorAll('[data-goal-id]').forEach(function(row) {
+      var id = row.getAttribute('data-goal-id');
+      var descEl = document.getElementById('goalDesc-'+id);
+      var sdiEl  = document.getElementById('goalSdi-'+id);
+      var desc   = descEl ? descEl.value.trim() : '';
+      var sdi    = sdiEl  ? sdiEl.value.trim()  : '';
+      if (!desc && !sdi) return;
+      goals.push({
+        goal_id     : _generateLocalId(),
+        description : desc,
+        domain      : 'literacy',
+        standard_alignment : { code:'', description:'', grade_band:'' },
+        sdi         : { strategy: sdi, evidence_base:'', delivery_model:'small_group', frequency:'' },
+        artifact_type: 'graphic_organizer',
+        progress_monitoring: { metric:'accuracy', unit:'percent', baseline:null, target:null, mastery_criterion:'' }
+      });
+    });
+    return goals;
+  }
+
+  /* ── Collect state accommodations ── */
+  function collectStateAccommodations() {
+    var checked = [];
+    document.querySelectorAll('input[name="stateAccommodations"]:checked').forEach(function(cb){ checked.push(cb.value); });
+    return {
+      selections:        checked,
+      readersType:       (document.querySelector('input[name="readersType"]:checked')||{}).value||null,
+      interpreterType:   (document.querySelector('input[name="interpretersType"]:checked')||{}).value||null,
+      interpreterLang:   ((document.getElementById('acc-interp-lang-specify')||{}).value||'').trim()||null,
+      extendedTimeType:  (document.querySelector('input[name="extendedTimeType"]:checked')||{}).value||null,
+      calculatorType:    (document.querySelector('input[name="calculatorType"]:checked')||{}).value||null,
+      calculatorSpecify: ((document.getElementById('acc-calc-specify')||{}).value||'').trim()||null,
+      otherSpecify:      ((document.getElementById('acc-other-specify')||{}).value||'').trim()||null,
+    };
+  }
+
+  /* ================================================================
+     hydrateForm(student)
+     Populates all 6 form sections from a student JSON object.
+     Accepts the Master Data Contract payload shape produced by
+     student-form.html's handleSubmit() or the GAS getRoster row.
+
+     @param {object} student — { student:{firstName,lastName,tag},
+                                  iepTimeline:{startDate,endDate},
+                                  primaryDisability, goals:[],
+                                  supplementalAids, stateAccommodations:{} }
+     Also accepts the flat Sheets row array via COL indices
+     when called from App.init() after getRoster.
+  ================================================================ */
+  function hydrateForm(student) {
+    if (!student) return;
+
+    /* ── Section 1 ── */
+    var s = student.student || {};
+    _setVal('firstName',  s.firstName  || student.firstName  || '');
+    _setVal('lastName',   s.lastName   || student.lastName   || '');
+    _setVal('studentTag', s.tag        || student.tag        || student.studentTag || '');
+
+    /* ── Section 2 ── */
+    var t = student.iepTimeline || {};
+    _setVal('iepStart', t.startDate || student.iepStart || '');
+    _setVal('iepEnd',   t.endDate   || student.iepEnd   || '');
+    updateIepCountdown();
+
+    /* ── Section 3 ── */
+    _setVal('primaryDisability', student.primaryDisability || student.disability || '');
+
+    /* ── Section 4 — goals ── */
+    var container = document.getElementById('goalsContainer');
+    if (container) {
+      container.innerHTML = '';
+      goalCounter = 0;
+      var goals = student.goals || [];
+      if (goals.length) {
+        goals.forEach(function(g) { addGoalRow(g); });
+      } else {
+        addGoalRow(); // seed one blank row
+      }
+    }
+
+    /* ── Section 5 ── */
+    _setVal('supplementalAids', student.supplementalAids || student.supplemental || '');
+
+    /* ── Section 6 — state accommodations ── */
+    var acc = student.stateAccommodations || {};
+    var sels = acc.selections || [];
+    document.querySelectorAll('input[name="stateAccommodations"]').forEach(function(cb) {
+      cb.checked = sels.indexOf(cb.value) !== -1;
+      if (cb.checked) toggleSubGroup(cb.id.replace('acc-','') + '-sub', true);
+    });
+    if (acc.readersType)      _setRadio('readersType',       acc.readersType);
+    if (acc.interpreterType)  _setRadio('interpretersType',  acc.interpreterType);
+    if (acc.interpreterLang)  _setVal('acc-interp-lang-specify', acc.interpreterLang);
+    if (acc.extendedTimeType) _setRadio('extendedTimeType',  acc.extendedTimeType);
+    if (acc.calculatorType)   _setRadio('calculatorType',    acc.calculatorType);
+    if (acc.calculatorSpecify)_setVal('acc-calc-specify',    acc.calculatorSpecify);
+    if (acc.otherSpecify)     _setVal('acc-other-specify',   acc.otherSpecify);
+
+    /* ── Update page title ── */
+    var fn = s.firstName || student.firstName || '';
+    var ln = s.lastName  || student.lastName  || '';
+    var nameEl = document.getElementById('display-name');
+    var idEl   = document.getElementById('display-id');
+    if (nameEl) nameEl.textContent = [fn,ln].filter(Boolean).join(' ') || 'Edit Student';
+    if (idEl)   idEl.textContent   = 'DatabaseID: ' + (student.databaseId || student.id || '—');
+    document.title = ([fn,ln].filter(Boolean).join(' ') || 'Edit Student') + ' — M-Powered Education';
+  }
+
+  function _setVal(id, val) { var el=document.getElementById(id); if(el) el.value=String(val||''); }
+  function _setRadio(name, val) {
+    var el=document.querySelector('input[name="'+name+'"][value="'+val+'"]');
+    if(el) el.checked=true;
+  }
+
+  /* ================================================================
+     handleUpdate(event)
+     Collects all 6 sections and sends action:'updateStudent' to GAS.
+     Mirrors handleSubmit() in student-form.html.
+  ================================================================ */
+  function handleUpdate(event) {
+    event.preventDefault();
+    var msgEl = document.getElementById('formValidationMsg');
+    msgEl.classList.add('hidden');
+
+    var required = [
+      { id:'firstName',         label:'First Name'      },
+      { id:'lastName',          label:'Last Name'       },
+      { id:'iepStart',          label:'IEP Start Date'  },
+      { id:'iepEnd',            label:'IEP End Date'    },
+      { id:'primaryDisability', label:'Primary Disability' },
+    ];
+    var missing = required.filter(function(f){ var el=document.getElementById(f.id); return !el||!el.value.trim(); });
+    if (missing.length) {
+      msgEl.textContent='Please complete: '+missing.map(function(f){return f.label;}).join(', ')+'.';
+      msgEl.classList.remove('hidden');
+      document.getElementById(missing[0].id).focus();
+      return;
+    }
+
+    var params     = new URLSearchParams(window.location.search);
+    var studentId  = params.get('id') || '';
+
+    var payload = {
+      action    : 'updateStudent',
+      studentId : studentId,
+      student   : {
+        firstName : document.getElementById('firstName').value.trim(),
+        lastName  : document.getElementById('lastName').value.trim(),
+        tag       : document.getElementById('studentTag').value.trim(),
+      },
+      iepTimeline: {
+        startDate: document.getElementById('iepStart').value,
+        endDate:   document.getElementById('iepEnd').value,
+      },
+      primaryDisability   : document.getElementById('primaryDisability').value.trim(),
+      goals               : collectGoals(),
+      supplementalAids    : document.getElementById('supplementalAids').value.trim(),
+      stateAccommodations : collectStateAccommodations(),
+      updatedAt           : new Date().toISOString(),
+    };
+
+    // Disable submit while saving
+    var submitBtn = document.querySelector('#modifyStudentForm button[type="submit"]');
+    if (submitBtn) { submitBtn.disabled=true; submitBtn.textContent='Saving…'; }
+
+    var GAS_URL_FORM = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
+    fetch(GAS_URL_FORM.split('#')[0].split('?')[0], {
+      method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(payload)
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (data.result!=='success') throw new Error(data.error||'GAS error');
+      msgEl.style.color='#34d399';
+      msgEl.textContent='✓ Student record updated successfully.';
+      msgEl.classList.remove('hidden');
+      setTimeout(function(){ msgEl.classList.add('hidden'); msgEl.style.color=''; }, 4000);
+    })
+    .catch(function(err){
+      console.error('[handleUpdate]', err);
+      msgEl.style.color='';
+      msgEl.textContent='Save failed: '+(err.message||'unknown error');
+      msgEl.classList.remove('hidden');
+    })
+    .finally(function(){
+      if (submitBtn) { submitBtn.disabled=false; submitBtn.textContent='Save Changes'; }
+    });
+  }
+
+  /* Wire IEP date inputs to the countdown indicator */
+  document.addEventListener('DOMContentLoaded', function() {
+    var s = document.getElementById('iepStart');
+    var e = document.getElementById('iepEnd');
+    if (s) s.addEventListener('change', updateIepCountdown);
+    if (e) e.addEventListener('change', updateIepCountdown);
+  });
 
   /* ══════════════════════════════════════════════════════════════
      launchTracker(studentTag, goalId)
