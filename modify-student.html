@@ -850,27 +850,6 @@
       if (acc.calculatorSpecify){ var el=document.getElementById('acc-calc-specify');         if(el) el.value=acc.calculatorSpecify; }
       if (acc.otherSpecify)     { var el=document.getElementById('acc-other-specify');         if(el) el.value=acc.otherSpecify; }
     }
-      if (!raw && raw !== 0) return [];
-      if (Array.isArray(raw)) return raw.map(function(i){return String(i||'').trim();}).filter(Boolean);
-      var s = String(raw).trim();
-      if (!s || s === '[]') return [];
-      if (s.charAt(0) === '[') {
-        try {
-          var parsed = JSON.parse(s);
-          if (Array.isArray(parsed)) {
-            return parsed.map(function(i) {
-              if (typeof i === 'object' && i !== null) {
-                if (i.selections && Array.isArray(i.selections)) return i.selections.join(', ');
-                return Object.values(i).filter(function(v){return typeof v==='string';}).join(' — ');
-              }
-              return String(i||'').trim();
-            }).filter(Boolean);
-          }
-        } catch(e) {}
-      }
-      return [s];
-    }
-
     function _esc(s) { return String(s || ''); }
 
     // ── renderGoals — v1.1 view-mode card renderer ─────────────────
