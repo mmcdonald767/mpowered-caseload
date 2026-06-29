@@ -1541,17 +1541,20 @@ function parseAccommodations(raw) {
 
         // Hydrate the edit form with the loaded record
         hydrateForm({
-          firstName         : _record[COL.FIRST_NAME],
-          lastName          : _record[COL.LAST_NAME],
-          tag               : _record[COL.TAG],
-          databaseId        : _record[COL.ID],
-          iepStart          : _record[COL.IEP_START],
-          iepEnd            : _record[COL.IEP_END],
-          primaryDisability : _record[COL.DISABILITY],
-          supplementalAids  : _record[COL.SUPPLEMENTAL],
-          goals             : (function(raw){
+          firstName            : _record[COL.FIRST_NAME],
+          lastName             : _record[COL.LAST_NAME],
+          tag                  : _record[COL.TAG],
+          databaseId           : _record[COL.ID],
+          iepStart             : _record[COL.IEP_START],
+          iepEnd               : _record[COL.IEP_END],
+          primaryDisability    : _record[COL.DISABILITY],
+          supplementalAids     : _record[COL.SUPPLEMENTAL],
+          goals                : (function(raw){
             try { return JSON.parse(raw||'[]'); } catch(e){ return []; }
           }(_record[COL.GOALS])),
+          // Pass the raw cell value so hydrateForm can parse it with
+          // _parseStateAccommodations instead of falling back to an empty {}.
+          _rawAccommodations   : _record[COL.ACCOMMODATIONS],
         });
       })
       .catch(function(err) {
@@ -1741,11 +1744,26 @@ function parseAccommodations(raw) {
     }
 
     /* ── Section 6 — state accommodations ── */
-    var acc = student.stateAccommodations || {};
+    // Prefer the raw cell string (_rawAccommodations) so _parseStateAccommodations
+    // can handle all storage shapes (plain string[], JSON object, legacy text).
+    // Fall back to a pre-parsed stateAccommodations object only when explicitly
+    // supplied and non-empty (e.g. from student-form.html's handleSubmit payload).
+    var rawAccStr;
+    if (student._rawAccommodations !== undefined && student._rawAccommodations !== null) {
+      // Direct cell value from getRoster row — most reliable path
+      rawAccStr = student._rawAccommodations;
+    } else if (student.stateAccommodations && typeof student.stateAccommodations === 'object'
+               && Object.keys(student.stateAccommodations).length > 0) {
+      // Pre-parsed object supplied by an external caller (student-form submit flow)
+      rawAccStr = JSON.stringify(student.stateAccommodations);
+    } else {
+      rawAccStr = '';
+    }
+    var acc = App._parseStateAccommodations(rawAccStr);
     if (typeof App._hydrateAssessmentsForm === 'function') {
       App._hydrateAssessmentsForm(acc);
     }
-    App.renderStateAccommodations(JSON.stringify(acc));
+    App.renderStateAccommodations(rawAccStr);
 
     /* ── Update page title / heading ── */
     var fn = s.firstName || student.firstName || '';
