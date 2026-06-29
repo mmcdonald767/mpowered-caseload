@@ -473,6 +473,7 @@
             <fieldset>
               <legend class="sr-only">State assessment accommodation options</legend>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-0">
+                <!-- Left column (7 top-level items) -->
                 <div class="flex flex-col gap-0.5">
                   <div class="check-row"><input type="checkbox" id="acc-paraphrasing" name="stateAccommodations" value="paraphrasing" /><label for="acc-paraphrasing">Paraphrasing</label></div>
                   <div class="check-row"><input type="checkbox" id="acc-manipulatives" name="stateAccommodations" value="manipulatives" /><label for="acc-manipulatives">Manipulatives</label></div>
@@ -485,14 +486,15 @@
                     <div class="check-row check-row-sub"><input type="radio" id="acc-reader-online" name="readersType" value="online-text-reader" /><label for="acc-reader-online">Online/Text Reader</label></div>
                     <div class="check-row check-row-sub"><input type="radio" id="acc-reader-human" name="readersType" value="human-reader" /><label for="acc-reader-human">Human Reader</label></div>
                   </div>
+                </div>
+                <!-- Right column (6 top-level items) -->
+                <div class="flex flex-col gap-0.5">
                   <div class="check-row"><input type="checkbox" id="acc-interpreters" name="stateAccommodations" value="interpreters" onchange="toggleSubGroup('interpreters-sub', this.checked)" /><label for="acc-interpreters">Interpreters <span class="text-slate-500">(Select one)</span></label></div>
                   <div id="interpreters-sub" class="sub-group hidden" role="group" aria-label="Interpreter type">
                     <div class="check-row check-row-sub"><input type="radio" id="acc-interp-asl" name="interpretersType" value="asl" /><label for="acc-interp-asl">American Sign Language</label></div>
                     <div class="check-row check-row-sub"><input type="radio" id="acc-interp-other-lang" name="interpretersType" value="other-language" /><label for="acc-interp-other-lang">Other Language, specify:</label></div>
                     <div class="check-row check-row-sub pl-6"><input type="text" id="acc-interp-lang-specify" name="interpretersLangSpecify" class="field-input field-input-inline" placeholder="Language…" aria-label="Interpreter language specification" /></div>
                   </div>
-                </div>
-                <div class="flex flex-col gap-0.5">
                   <div class="check-row"><input type="checkbox" id="acc-scribes" name="stateAccommodations" value="scribes" /><label for="acc-scribes">Scribes</label></div>
                   <div class="check-row"><input type="checkbox" id="acc-extended-time" name="stateAccommodations" value="extended-time" onchange="toggleSubGroup('extended-time-sub', this.checked)" /><label for="acc-extended-time">Extended Time <span class="text-slate-500">(Select one)</span></label></div>
                   <div id="extended-time-sub" class="sub-group hidden" role="group" aria-label="Extended time type">
