@@ -1245,7 +1245,11 @@ function parseAccommodations(raw) {
                 : String(g.sdi || '');
               var measStr = (g.progress_monitoring && g.progress_monitoring.method_of_measurement)
                 ? g.progress_monitoring.method_of_measurement : '';
-              addGoalRow(g.description, sdiStr, measStr);
+              var targetVal = (g.progress_monitoring && g.progress_monitoring.target != null)
+                ? g.progress_monitoring.target : '';
+              var masteryVal = (g.progress_monitoring && g.progress_monitoring.mastery_criterion)
+                ? g.progress_monitoring.mastery_criterion : '';
+              addGoalRow(g.description, sdiStr, measStr, targetVal, masteryVal);
             });
         }
       }
@@ -1280,7 +1284,7 @@ function parseAccommodations(raw) {
     // then SDI textarea (120px min), then remove button in header.
     // [SHIM] Callers pass g.description and g.sdi.strategy; all other
     // v1.1 sub-fields are preserved via the round-trip merge in savePanel.
-    function addGoalRow(desc, sdi, measurement) {
+    function addGoalRow(desc, sdi, measurement, target, mastery) {
       var container = document.getElementById('goal-rows');
       if (!container) return;
       var rowNum = container.querySelectorAll('.goal-edit-card').length + 1;
@@ -1373,6 +1377,44 @@ function parseAccommodations(raw) {
       measSel.value = (measurement && typeof measurement === 'string') ? measurement : '';
       card.appendChild(measSel);
 
+      // Accuracy / Criterion row — two inputs side by side
+      var criterionRow = document.createElement('div');
+      criterionRow.style.cssText = 'display:grid;grid-template-columns:1fr 2fr;gap:0.75rem;margin-top:0.1rem;';
+
+      // Target Criterion (numeric, e.g. 80)
+      var targetWrap = document.createElement('div');
+      targetWrap.style.cssText = 'display:flex;flex-direction:column;gap:0.3rem;';
+      var targetLbl = document.createElement('label');
+      targetLbl.className = 'field-label';
+      targetLbl.textContent = 'Target (%)';
+      var targetInput = document.createElement('input');
+      targetInput.type = 'number';
+      targetInput.className = 'field-input goal-target-input';
+      targetInput.placeholder = 'e.g. 80';
+      targetInput.min = '0';
+      targetInput.max = '100';
+      targetInput.value = (target !== null && target !== undefined && target !== '') ? target : '';
+      targetWrap.appendChild(targetLbl);
+      targetWrap.appendChild(targetInput);
+      criterionRow.appendChild(targetWrap);
+
+      // Mastery Criterion (text, e.g. '3 out of 4 trials')
+      var masteryWrap = document.createElement('div');
+      masteryWrap.style.cssText = 'display:flex;flex-direction:column;gap:0.3rem;';
+      var masteryLbl = document.createElement('label');
+      masteryLbl.className = 'field-label';
+      masteryLbl.textContent = 'Mastery Criterion';
+      var masteryInput = document.createElement('input');
+      masteryInput.type = 'text';
+      masteryInput.className = 'field-input goal-mastery-input';
+      masteryInput.placeholder = 'e.g. 3 out of 4 trials';
+      masteryInput.value = (mastery && typeof mastery === 'string') ? mastery : '';
+      masteryWrap.appendChild(masteryLbl);
+      masteryWrap.appendChild(masteryInput);
+      criterionRow.appendChild(masteryWrap);
+
+      card.appendChild(criterionRow);
+
       container.appendChild(card);
       descTA.focus();
     }
@@ -1409,15 +1451,19 @@ function parseAccommodations(raw) {
 
         var merged = Array.prototype.slice.call(goalCards)
           .map(function(cardEl, i) {
-            var newDesc = ((cardEl.querySelector('.goal-input')||{}).value||'').trim();
-            var newStrat= ((cardEl.querySelector('.sdi-input') ||{}).value||'').trim();
-            var newMeas = ((cardEl.querySelector('.measurement-select')||{}).value||'').trim();
+            var newDesc   = ((cardEl.querySelector('.goal-input')         ||{}).value||'').trim();
+            var newStrat  = ((cardEl.querySelector('.sdi-input')          ||{}).value||'').trim();
+            var newMeas   = ((cardEl.querySelector('.measurement-select') ||{}).value||'').trim();
+            var newTarget = ((cardEl.querySelector('.goal-target-input')  ||{}).value||'').trim();
+            var newMastery= ((cardEl.querySelector('.goal-mastery-input') ||{}).value||'').trim();
             if (!newDesc && !newStrat) return null;  // skip blank cards
 
             var base = existing[i] ? _buildGoalShell(existing[i]) : _buildGoalShell({});
             base.description  = newDesc;
             base.sdi.strategy = newStrat;
             base.progress_monitoring.method_of_measurement = newMeas;
+            base.progress_monitoring.target                = newTarget !== '' ? (parseFloat(newTarget)||null) : null;
+            base.progress_monitoring.mastery_criterion     = newMastery;
 
             if (!base.goal_id) {
               base.goal_id = 'LOCAL-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
@@ -1712,12 +1758,16 @@ function parseAccommodations(raw) {
     if (!container) return [];
     var goals = [];
     container.querySelectorAll('.goal-edit-card').forEach(function(card) {
-      var descEl = card.querySelector('.goal-input');
-      var sdiEl  = card.querySelector('.sdi-input');
-      var measEl = card.querySelector('.measurement-select');
-      var desc   = descEl ? descEl.value.trim() : '';
-      var sdi    = sdiEl  ? sdiEl.value.trim()  : '';
-      var meas   = measEl ? measEl.value.trim()  : '';
+      var descEl   = card.querySelector('.goal-input');
+      var sdiEl    = card.querySelector('.sdi-input');
+      var measEl   = card.querySelector('.measurement-select');
+      var targetEl = card.querySelector('.goal-target-input');
+      var mastEl   = card.querySelector('.goal-mastery-input');
+      var desc     = descEl   ? descEl.value.trim()   : '';
+      var sdi      = sdiEl    ? sdiEl.value.trim()    : '';
+      var meas     = measEl   ? measEl.value.trim()   : '';
+      var targetRaw= targetEl ? targetEl.value.trim() : '';
+      var mastery  = mastEl   ? mastEl.value.trim()   : '';
       if (!desc && !sdi) return;
       goals.push({
         goal_id     : _generateLocalId(),
@@ -1726,7 +1776,13 @@ function parseAccommodations(raw) {
         standard_alignment : { code:'', description:'', grade_band:'' },
         sdi         : { strategy: sdi, evidence_base:'', delivery_model:'small_group', frequency:'' },
         artifact_type: 'graphic_organizer',
-        progress_monitoring: { metric:'accuracy', unit:'percent', baseline:null, target:null, mastery_criterion:'', method_of_measurement: meas }
+        progress_monitoring: {
+          metric: 'accuracy', unit: 'percent',
+          baseline: null,
+          target: targetRaw !== '' ? (parseFloat(targetRaw)||null) : null,
+          mastery_criterion: mastery,
+          method_of_measurement: meas
+        }
       });
     });
     return goals;
