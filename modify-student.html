@@ -650,6 +650,15 @@
       return d.getUTCFullYear() + '-' + String(d.getUTCMonth()+1).padStart(2,'0') + '-' + String(d.getUTCDate()).padStart(2,'0');
     }
 
+    // Converts any raw date value to MM/DD/YYYY for read-only display.
+    // Delegates normalisation to _toDateInputValue so all input shapes
+    // (ISO timestamp, Date object, MM/DD/YYYY string) are handled identically.
+    function _toDisplayDate(raw) {
+      var ymd = _toDateInputValue(raw);           // → 'YYYY-MM-DD' or ''
+      if (!ymd) return '';
+      return ymd.slice(5,7) + '/' + ymd.slice(8,10) + '/' + ymd.slice(0,4);
+    }
+
     function setPanelStatus(panel, msg, colour) {
       var el = document.getElementById('status-' + panel);
       if (el) { el.textContent = msg; el.style.color = colour || '#4a5578'; }
@@ -1144,8 +1153,8 @@ function parseAccommodations(raw) {
       setText('rv-studentId', row[COL.ID]);
 
       // Section 2 — academic / IEP / supplemental read-only fields
-      setText('rv-iepStart',     row[COL.IEP_START]);
-      setText('rv-iepEnd',       row[COL.IEP_END]);
+      setText('rv-iepStart',     _toDisplayDate(row[COL.IEP_START]));
+      setText('rv-iepEnd',       _toDisplayDate(row[COL.IEP_END]));
       setText('rv-disability',   row[COL.DISABILITY]);
       setText('rv-supplemental', row[COL.SUPPLEMENTAL]);
 
