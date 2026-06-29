@@ -776,7 +776,8 @@
           metric: String(pmSrc.metric||'accuracy'), unit: String(pmSrc.unit||'percent'),
           baseline: (pmSrc.baseline!=null) ? parseFloat(pmSrc.baseline)||null : null,
           target:   (pmSrc.target  !=null) ? parseFloat(pmSrc.target)  ||null : null,
-          mastery_criterion: String(pmSrc.mastery_criterion||'')
+          mastery_criterion: String(pmSrc.mastery_criterion||''),
+          method_of_measurement: String(pmSrc.method_of_measurement||'')
         }
       };
     }
@@ -1062,9 +1063,15 @@ function parseAccommodations(raw) {
         var hasBL = pm.baseline !== null && pm.baseline !== undefined;
         var hasTG = pm.target   !== null && pm.target   !== undefined;
         var unit  = pm.unit === 'percent' ? '%' : (' '+(pm.unit||''));
-        if (pm.metric || hasBL || hasTG || pm.mastery_criterion) {
+        if (pm.metric || hasBL || hasTG || pm.mastery_criterion || pm.method_of_measurement) {
           var pmRow = document.createElement('div');
           pmRow.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;gap:0.6rem;margin-top:0.55rem;padding-top:0.45rem;border-top:1px solid #1e2335;';
+          if (pm.method_of_measurement) {
+            var mmBadge = document.createElement('span');
+            mmBadge.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:0.6rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#4a5578;background:rgba(255,255,255,0.03);border:1px solid #1e2335;border-radius:4px;padding:0.15rem 0.5rem;';
+            mmBadge.textContent = pm.method_of_measurement;
+            pmRow.appendChild(mmBadge);
+          }
           if (pm.metric) {
             var mBadge = document.createElement('span');
             mBadge.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#4a5578;';
@@ -1236,7 +1243,9 @@ function parseAccommodations(raw) {
               var sdiStr = (g.sdi && typeof g.sdi === 'object')
                 ? (g.sdi.strategy || '')
                 : String(g.sdi || '');
-              addGoalRow(g.description, sdiStr);
+              var measStr = (g.progress_monitoring && g.progress_monitoring.method_of_measurement)
+                ? g.progress_monitoring.method_of_measurement : '';
+              addGoalRow(g.description, sdiStr, measStr);
             });
         }
       }
@@ -1271,7 +1280,7 @@ function parseAccommodations(raw) {
     // then SDI textarea (120px min), then remove button in header.
     // [SHIM] Callers pass g.description and g.sdi.strategy; all other
     // v1.1 sub-fields are preserved via the round-trip merge in savePanel.
-    function addGoalRow(desc, sdi) {
+    function addGoalRow(desc, sdi, measurement) {
       var container = document.getElementById('goal-rows');
       if (!container) return;
       var rowNum = container.querySelectorAll('.goal-edit-card').length + 1;
@@ -1333,6 +1342,37 @@ function parseAccommodations(raw) {
       sdiTA.value = _esc(sdi);
       card.appendChild(sdiTA);
 
+      // Method of Measurement — standardised dropdown
+      var measLbl = document.createElement('label');
+      measLbl.className = 'field-label';
+      measLbl.style.marginTop = '0.1rem';
+      measLbl.textContent = 'Method of Measurement';
+      card.appendChild(measLbl);
+
+      var measSel = document.createElement('select');
+      measSel.className = 'field-select measurement-select';
+      var measOptions = [
+        { value: '',                                    label: 'Select method…' },
+        { value: 'Curriculum-Based Assessments / Probes', label: 'Curriculum-Based Assessments / Probes' },
+        { value: 'Work Samples',                        label: 'Work Samples' },
+        { value: 'Systematic Direct Observations',      label: 'Systematic Direct Observations' },
+        { value: 'Rubrics',                             label: 'Rubrics' },
+        { value: 'Checklists',                          label: 'Checklists' },
+        { value: 'Running Records',                     label: 'Running Records' },
+        { value: 'Rating Scales',                       label: 'Rating Scales' },
+        { value: 'Portfolios',                          label: 'Portfolios' },
+      ];
+      measOptions.forEach(function(opt) {
+        var o = document.createElement('option');
+        o.value = opt.value;
+        o.textContent = opt.label;
+        if (opt.value === '' ) o.disabled = false; // allow blank as default
+        measSel.appendChild(o);
+      });
+      // Restore saved value; blank/missing → stays on 'Select method…'
+      measSel.value = (measurement && typeof measurement === 'string') ? measurement : '';
+      card.appendChild(measSel);
+
       container.appendChild(card);
       descTA.focus();
     }
@@ -1371,11 +1411,13 @@ function parseAccommodations(raw) {
           .map(function(cardEl, i) {
             var newDesc = ((cardEl.querySelector('.goal-input')||{}).value||'').trim();
             var newStrat= ((cardEl.querySelector('.sdi-input') ||{}).value||'').trim();
+            var newMeas = ((cardEl.querySelector('.measurement-select')||{}).value||'').trim();
             if (!newDesc && !newStrat) return null;  // skip blank cards
 
             var base = existing[i] ? _buildGoalShell(existing[i]) : _buildGoalShell({});
             base.description  = newDesc;
             base.sdi.strategy = newStrat;
+            base.progress_monitoring.method_of_measurement = newMeas;
 
             if (!base.goal_id) {
               base.goal_id = 'LOCAL-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
@@ -1672,8 +1714,10 @@ function parseAccommodations(raw) {
     container.querySelectorAll('.goal-edit-card').forEach(function(card) {
       var descEl = card.querySelector('.goal-input');
       var sdiEl  = card.querySelector('.sdi-input');
+      var measEl = card.querySelector('.measurement-select');
       var desc   = descEl ? descEl.value.trim() : '';
       var sdi    = sdiEl  ? sdiEl.value.trim()  : '';
+      var meas   = measEl ? measEl.value.trim()  : '';
       if (!desc && !sdi) return;
       goals.push({
         goal_id     : _generateLocalId(),
@@ -1682,7 +1726,7 @@ function parseAccommodations(raw) {
         standard_alignment : { code:'', description:'', grade_band:'' },
         sdi         : { strategy: sdi, evidence_base:'', delivery_model:'small_group', frequency:'' },
         artifact_type: 'graphic_organizer',
-        progress_monitoring: { metric:'accuracy', unit:'percent', baseline:null, target:null, mastery_criterion:'' }
+        progress_monitoring: { metric:'accuracy', unit:'percent', baseline:null, target:null, mastery_criterion:'', method_of_measurement: meas }
       });
     });
     return goals;
