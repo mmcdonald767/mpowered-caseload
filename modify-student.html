@@ -8,6 +8,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <!-- pdf.js: client-side IEP text extraction — the document itself never leaves the browser -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -185,6 +187,16 @@
       margin-left: 0.4rem;
     }
     #view-s6-list { display: flex; flex-direction: column; gap: 0.35rem; }
+
+    /* ── IEP import dropzone (new-student mode) ── */
+    .iep-import-card { background: #171b26; border: 1px solid rgba(108,143,255,0.35); border-radius: 12px; padding: 1.1rem 1.3rem; margin-bottom: 1.5rem; }
+    .iep-import-title { font-size: 0.8rem; font-weight: 600; color: #e8ecf4; margin: 0 0 0.25rem; }
+    .iep-import-sub { font-size: 0.72rem; color: #7d8fb3; line-height: 1.5; margin: 0 0 0.75rem; }
+    .iep-dropzone { display: flex; align-items: center; justify-content: center; gap: 0.6rem; border: 1.5px dashed #2e3650; border-radius: 8px; background: #0f1117; color: #64748b; font-size: 0.78rem; padding: 0.9rem 1rem; cursor: pointer; transition: border-color .15s, background .15s, color .15s; text-align: center; }
+    .iep-dropzone:hover { border-color: #3b5bdb; color: #94a3b8; }
+    .iep-dropzone.dragover { border-color: #6c8fff; background: rgba(108,143,255,0.08); color: #c7d4ff; }
+    .iep-dropzone.busy { pointer-events: none; opacity: 0.65; }
+    .iep-import-status { font-size: 0.72rem; line-height: 1.55; margin-top: 0.6rem; display: none; }
   </style>
 </head>
 
@@ -239,6 +251,20 @@
 
     <!-- Student record form -->
     <div id="content-area" style="display:none;">
+
+      <!-- IEP PDF import (shown only in ?id=new mode) -->
+      <div id="iep-import-card" class="iep-import-card" style="display:none;">
+        <p class="iep-import-title">Create from an IEP document</p>
+        <p class="iep-import-sub">Drop the student's IEP PDF and the fields below will be pre-filled — name, IEP dates, disability, goals, and accommodations. Everything stays editable: <strong style="color:#e8ecf4;">review each section before saving.</strong> The PDF is read locally in your browser; only the extracted text is sent to your M-Powered endpoint for parsing.</p>
+        <div id="iep-dropzone" class="iep-dropzone" role="button" tabindex="0" aria-label="Drop an IEP PDF here, or click to browse">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <span id="iep-dropzone-label">Drop an IEP PDF here, or click to browse — or fill the sections in manually</span>
+        </div>
+        <input type="file" id="iep-file-input" accept="application/pdf,.pdf" style="display:none;" />
+        <p id="iep-import-status" class="iep-import-status"></p>
+      </div>
 
       <!-- Page heading -->
       <div style="margin-bottom:2rem;">
@@ -1613,6 +1639,7 @@ function parseAccommodations(raw) {
         setText('display-id',   'Unsaved record');
         document.querySelectorAll('.btn-save').forEach(function(b){ b.textContent = 'Add student'; });
         document.getElementById('nav-position-label').textContent = 'New';
+        _initIepImport();
         showState('data');
         return;
       }
@@ -1664,6 +1691,164 @@ function parseAccommodations(raw) {
         showState('error');
         document.getElementById('fallback-message').textContent = 'Could not load record: '+(err.message||'unknown error');
       });
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  IEP PDF IMPORT (new-student mode)
+    //  Extraction is local (pdf.js); the extracted TEXT goes to the
+    //  parseIepDocument GAS route, which returns structured fields.
+    //  Those populate _record + the read-only view; the teacher then
+    //  reviews/edits through the normal panels, and the existing
+    //  addStudent save path commits the whole record.
+    // ═══════════════════════════════════════════════════════════════
+
+    function _iepStatus(msg, tone) {
+      var s = document.getElementById('iep-import-status');
+      if (!s) return;
+      s.style.display = 'block';
+      s.style.color = tone === 'error' ? '#f87171' : (tone === 'ok' ? '#34d399' : '#7d8fb3');
+      s.textContent = msg;
+    }
+
+    function _initIepImport() {
+      var card  = document.getElementById('iep-import-card');
+      var zone  = document.getElementById('iep-dropzone');
+      var input = document.getElementById('iep-file-input');
+      if (!card || !zone || !input) return;
+      card.style.display = 'block';
+
+      zone.addEventListener('click', function() { input.click(); });
+      zone.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+      });
+      input.addEventListener('change', function() {
+        _handleIepFile(input.files[0]);
+        input.value = '';
+      });
+      ['dragenter','dragover'].forEach(function(evt) {
+        zone.addEventListener(evt, function(e) { e.preventDefault(); e.stopPropagation(); zone.classList.add('dragover'); });
+      });
+      ['dragleave','drop'].forEach(function(evt) {
+        zone.addEventListener(evt, function(e) { e.preventDefault(); e.stopPropagation(); zone.classList.remove('dragover'); });
+      });
+      zone.addEventListener('drop', function(e) {
+        var files = e.dataTransfer && e.dataTransfer.files;
+        if (files && files.length) _handleIepFile(files[0]);
+      });
+      window.addEventListener('dragover', function(e) { e.preventDefault(); });
+      window.addEventListener('drop',     function(e) { e.preventDefault(); });
+    }
+
+    function _handleIepFile(file) {
+      if (!file) return;
+      var isPdf = file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
+      if (!isPdf) { _iepStatus('"' + file.name + '" is not a PDF.', 'error'); return; }
+      _extractIepPdf(file);
+    }
+
+    function _extractIepPdf(file) {
+      if (typeof pdfjsLib === 'undefined') {
+        _iepStatus('PDF library failed to load — check your connection.', 'error');
+        return;
+      }
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+      var zone  = document.getElementById('iep-dropzone');
+      var label = document.getElementById('iep-dropzone-label');
+      zone.classList.add('busy');
+      label.textContent = 'Extracting text from "' + file.name + '"…';
+
+      file.arrayBuffer()
+        .then(function(buffer) { return pdfjsLib.getDocument({ data: buffer }).promise; })
+        .then(function(pdf) {
+          var chain = Promise.resolve([]);
+          for (var p = 1; p <= pdf.numPages; p++) {
+            (function(pageNum) {
+              chain = chain.then(function(pages) {
+                return pdf.getPage(pageNum)
+                  .then(function(page) { return page.getTextContent(); })
+                  .then(function(content) {
+                    var pageText = '';
+                    content.items.forEach(function(item) {
+                      pageText += item.str + (item.hasEOL ? '\n' : ' ');
+                    });
+                    pages.push(pageText.replace(/[ \t]+/g, ' ').replace(/ ?\n ?/g, '\n').trim());
+                    return pages;
+                  });
+              });
+            })(p);
+          }
+          return chain;
+        })
+        .then(function(pages) {
+          var fullText = pages.join('\n\n').trim();
+          if (!fullText) {
+            _iepStatus('No selectable text found — this looks like a scanned PDF. OCR is not supported in-browser.', 'error');
+            return;
+          }
+          _iepStatus('Extracted ' + fullText.length.toLocaleString() + ' characters. Reading the IEP…');
+          return _gasPost({ action: 'parseIepDocument', iep_text: fullText })
+            .then(function(data) { _applyImportedIep(data.parsed || {}); });
+        })
+        .catch(function(err) {
+          _iepStatus(/password/i.test(String(err && err.message))
+            ? 'This PDF is password-protected and cannot be read.'
+            : 'Import failed: ' + (err && err.message ? err.message : 'unknown error'), 'error');
+        })
+        .then(function() {
+          zone.classList.remove('busy');
+          label.textContent = 'Drop an IEP PDF here, or click to browse — or fill the sections in manually';
+        });
+    }
+
+    function _applyImportedIep(p) {
+      // Populate the working record. Empty strings for anything the
+      // parser could not find — never invented values.
+      _record[COL.TAG]          = String(p.tag || '').trim() || _record[COL.TAG];
+      _record[COL.FIRST_NAME]   = String(p.first_name || '').trim();
+      _record[COL.LAST_NAME]    = String(p.last_name || '').trim();
+      _record[COL.IEP_START]    = String(p.iep_start || '').trim();
+      _record[COL.IEP_END]      = String(p.iep_end || '').trim();
+      _record[COL.DISABILITY]   = String(p.primary_disability || '').trim();
+      _record[COL.SUPPLEMENTAL] = String(p.supplemental_aids || '').trim();
+
+      // Goals map onto the v1.1 shape this page round-trips.
+      var goals = Array.isArray(p.goals) ? p.goals.map(function(g) {
+        var tgt = parseFloat(g.target);
+        return {
+          description: String(g.description || '').trim(),
+          sdi: { strategy: String(g.sdi || '').trim() },
+          progress_monitoring: {
+            method_of_measurement: String(g.measurement || '').trim(),
+            target: isNaN(tgt) ? null : tgt,
+            mastery_criterion: String(g.mastery || '').trim()
+          }
+        };
+      }).filter(function(g) { return g.description; }) : [];
+      _record[COL.GOALS] = JSON.stringify(goals);
+
+      var accs = Array.isArray(p.accommodations)
+        ? p.accommodations.map(function(a) { return String(a).trim(); }).filter(Boolean) : [];
+      _record[COL.ACCOMMODATIONS] = JSON.stringify(accs);
+
+      // Refresh the read-only view + header from the populated record.
+      populateView(_record);
+      var first = _record[COL.FIRST_NAME], last = _record[COL.LAST_NAME];
+      setText('display-name', (last && first) ? (last + ', ' + first) : (first || last || 'New Student'));
+      setText('display-id', 'Unsaved record — review and save');
+
+      var summary = 'Imported: ' +
+        [ (first || last) ? 'name' : null,
+          _record[COL.IEP_START] || _record[COL.IEP_END] ? 'IEP dates' : null,
+          _record[COL.DISABILITY] ? 'disability' : null,
+          goals.length ? goals.length + ' goal(s)' : null,
+          accs.length ? accs.length + ' accommodation(s)' : null
+        ].filter(Boolean).join(', ') +
+        '. Review each section, then save any panel to create the record.';
+      var notes = Array.isArray(p.confidence_notes) ? p.confidence_notes.filter(Boolean) : [];
+      if (notes.length) summary += ' Parser notes: ' + notes.join(' | ');
+      _iepStatus(summary, 'ok');
     }
 
     // ── Public API ─────────────────────────────────────────────────
