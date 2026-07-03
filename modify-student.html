@@ -553,8 +553,8 @@
                   <div class="check-row"><input type="checkbox" id="acc-scribes" name="stateAccommodations" value="scribes" /><label for="acc-scribes">Scribes</label></div>
                   <div class="check-row"><input type="checkbox" id="acc-extended-time" name="stateAccommodations" value="extended-time" onchange="toggleSubGroup('extended-time-sub', this.checked)" /><label for="acc-extended-time">Extended Time <span class="text-slate-500">(Select one)</span></label></div>
                   <div id="extended-time-sub" class="sub-group hidden" role="group" aria-label="Extended time type">
-                    <div class="check-row check-row-sub"><input type="radio" id="acc-time-half" name="extendedTimeType" value="time-and-a-half" /><label for="acc-time-half">Time and a Half</label></div>
-                    <div class="check-row check-row-sub"><input type="radio" id="acc-time-double" name="extendedTimeType" value="double-time" /><label for="acc-time-double">Double Time</label></div>
+                    <div class="check-row check-row-sub"><input type="radio" id="acc-time-half" name="extendedTimeType" value="time-and-a-half" /><label for="acc-time-half">Time and a Half (1.5x)</label></div>
+                    <div class="check-row check-row-sub"><input type="radio" id="acc-time-double" name="extendedTimeType" value="double-time" /><label for="acc-time-double">Double Time (2x)</label></div>
                   </div>
                   <div class="check-row"><input type="checkbox" id="acc-calculator" name="stateAccommodations" value="calculator" onchange="toggleSubGroup('calculator-sub', this.checked)" /><label for="acc-calculator">Calculator <span class="text-slate-500">(Select one)</span></label></div>
                   <div id="calculator-sub" class="sub-group hidden" role="group" aria-label="Calculator type">
@@ -930,7 +930,7 @@
       // Sub-label maps
       var READER_LABELS    = { 'online-text-reader':'Online/Text Reader', 'human-reader':'Human Reader' };
       var INTERP_LABELS    = { 'asl':'ASL', 'other-language':'Other Language' };
-      var TIME_LABELS      = { 'time-and-a-half':'Time and a Half', 'double-time':'Double Time' };
+      var TIME_LABELS      = { 'time-and-a-half':'Time and a Half (1.5x)', 'double-time':'Double Time (2x)' };
       var CALC_LABELS      = { 'online-calculator':'Online Calculator', 'handheld-calculator':'Handheld Calculator', 'special-calculator':'Special Calculator' };
 
       if (!sels.length) {
@@ -1951,9 +1951,21 @@ function parseAccommodations(raw) {
       }).filter(function(g) { return g.description; }) : [];
       _record[COL.GOALS] = JSON.stringify(goals);
 
-      var accs = Array.isArray(p.accommodations)
-        ? p.accommodations.map(function(a) { return String(a).trim(); }).filter(Boolean) : [];
-      _record[COL.ACCOMMODATIONS] = JSON.stringify(accs);
+      // State assessment accommodations: prefer the structured object
+      // (canonical Section 06 shape — round-trips into the edit form
+      // checkboxes and carries sub-types like the extended-time
+      // multiplier). Legacy plain-string array is the fallback.
+      var sa = p.state_accommodations;
+      var accCount = 0;
+      if (sa && typeof sa === 'object' && Array.isArray(sa.selections) && sa.selections.length) {
+        _record[COL.ACCOMMODATIONS] = JSON.stringify(sa);
+        accCount = sa.selections.length;
+      } else {
+        var accs = Array.isArray(p.accommodations)
+          ? p.accommodations.map(function(a) { return String(a).trim(); }).filter(Boolean) : [];
+        _record[COL.ACCOMMODATIONS] = JSON.stringify(accs);
+        accCount = accs.length;
+      }
 
       // Refresh the read-only view + header from the populated record.
       populateView(_record);
@@ -1967,7 +1979,7 @@ function parseAccommodations(raw) {
           _record[COL.DISABILITY] ? 'disability' : null,
           _record[COL.POST_SECONDARY] ? 'post-secondary plan' : null,
           goals.length ? goals.length + ' goal(s)' : null,
-          accs.length ? accs.length + ' accommodation(s)' : null
+          accCount ? accCount + ' accommodation(s)' : null
         ].filter(Boolean).join(', ') +
         '. Review each section, then click "Save Student" at the bottom to create the record.';
       var notes = Array.isArray(p.confidence_notes) ? p.confidence_notes.filter(Boolean) : [];
