@@ -396,6 +396,10 @@
               <span class="field-label">Supplemental Aids &amp; Services</span>
               <span class="field-value" id="rv-supplemental"></span>
             </div>
+            <div class="field">
+              <span class="field-label">Post-Secondary Plan</span>
+              <span class="field-value" id="rv-postSecondary"></span>
+            </div>
           </div>
 
           <!-- EDIT -->
@@ -438,6 +442,11 @@
                 <label class="field-label" for="supplementalAids">Supplemental Aids &amp; Services</label>
                 <textarea id="supplementalAids" name="supplementalAids" class="field-textarea" placeholder="List accommodations, modifications, and supplemental aids…" aria-label="Supplemental aids and services description"></textarea>
                 <p class="mt-1.5 text-[0.72rem] text-slate-500">Include all IDEA-required accommodations and modifications listed in the IEP.</p>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="field-label" for="postSecondaryPlan">Post-Secondary Plan</label>
+                <textarea id="postSecondaryPlan" name="postSecondaryPlan" class="field-textarea" placeholder="e.g. Two-year culinary program at BCTC, then work as a line cook…" aria-label="Post-secondary transition plan description"></textarea>
+                <p class="mt-1.5 text-[0.72rem] text-slate-500">The student's post-secondary transition goal. This feeds the SDI Scaffold Engine's interest context for asset generation.</p>
               </div>
             </div>
           </div>
@@ -593,6 +602,7 @@
   //   0 Timestamp | 1 DatabaseID | 2 Tag | 3 First | 4 Last
   //   5 IEP Start | 6 IEP End   | 7 Disability | 8 Supplemental
   //   9 Goals (JSON v1.1 array) | 10 Accommodations (JSON array)
+  //  11 Post-Secondary Plan (plain text)
   // ─────────────────────────────────────────────────────────────────
   var COL = {
     TIMESTAMP:      0,
@@ -605,7 +615,8 @@
     DISABILITY:     7,
     SUPPLEMENTAL:   8,
     GOALS:          9,
-    ACCOMMODATIONS: 10
+    ACCOMMODATIONS: 10,
+    POST_SECONDARY: 11
   };
 
   var GAS_URL = 'https://script.google.com/macros/s/AKfycbz4YTW46DN8u3bbvc_6n4PpzswBBCBdmoIfa_mXEPLhTly-1EDlHWPiQqpfBLQIdXic/exec';
@@ -1194,6 +1205,7 @@ function parseAccommodations(raw) {
       setText('rv-iepEnd',       _toDisplayDate(row[COL.IEP_END]));
       setText('rv-disability',   row[COL.DISABILITY]);
       setText('rv-supplemental', row[COL.SUPPLEMENTAL]);
+      setText('rv-postSecondary', row[COL.POST_SECONDARY]);
 
       // IEP countdown in read-only view
       _renderIepCountdownView(row[COL.IEP_END]);
@@ -1278,6 +1290,7 @@ function parseAccommodations(raw) {
         setInput('iepEnd',            _toDateInputValue(_record[COL.IEP_END]));
         setInput('primaryDisability', _record[COL.DISABILITY]);
         setInput('supplementalAids',  _record[COL.SUPPLEMENTAL]);
+        setInput('postSecondaryPlan', _record[COL.POST_SECONDARY]);
       }
       if (panel === 'goals') {
         var container = document.getElementById('goal-rows');
@@ -1486,6 +1499,7 @@ function parseAccommodations(raw) {
         updates[COL.IEP_END]      = getInput('in-iepEnd')     || getInput('iepEnd');
         updates[COL.SUPPLEMENTAL] = getInput('in-supplemental')
           || (document.getElementById('supplementalAids') ? document.getElementById('supplementalAids').value.trim() : '');
+        updates[COL.POST_SECONDARY] = getInput('postSecondaryPlan');
       }
       if (panel === 'goals') {
         // [SHIM] Round-trip merge: read description + sdi.strategy from textareas.
@@ -1643,7 +1657,7 @@ function parseAccommodations(raw) {
 
       if (_studentId.toLowerCase() === 'new') {
         _isNew  = true;
-        _record = ['','','','','','','','','','[]','[]'];
+        _record = ['','','','','','','','','','[]','[]',''];
         document.title = 'New Student — M-Powered Education';
         if (navNew) navNew.classList.add('active');
         setText('display-name', 'New Student');
