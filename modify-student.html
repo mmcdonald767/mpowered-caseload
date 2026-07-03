@@ -87,6 +87,13 @@
     .field-input:focus, .field-textarea:focus, .field-select:focus { border-color: rgba(108,143,255,0.6); box-shadow: 0 0 0 3px rgba(108,143,255,0.12); }
     /* Multi-line read-only values: preserve the one-item-per-line formatting */
     #rv-supplemental, #rv-postSecondary { white-space: pre-line; }
+    /* ── Save Student bar (whole-record commit) ── */
+    .save-student-bar { display: flex; align-items: center; gap: 1rem; background: #171b26; border: 1px solid rgba(108,143,255,0.35); border-radius: 12px; padding: 1rem 1.3rem; margin-top: 1.5rem; }
+    .save-student-copy { flex: 1; min-width: 0; }
+    .save-student-title { font-size: 0.85rem; font-weight: 600; color: #e8ecf4; margin: 0 0 0.15rem; }
+    .save-student-sub { font-size: 0.72rem; color: #7d8fb3; line-height: 1.5; margin: 0; }
+    .save-student-status { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #4a5578; text-align: right; max-width: 40%; }
+    .btn-save-student { padding: 0.6rem 1.5rem; font-size: 0.85rem; white-space: nowrap; }
 
     /* ── Select dropdown ── */
     .field-select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a5578' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.65rem center; padding-right: 2rem; cursor: pointer; }
@@ -577,6 +584,21 @@
         </section>
 
       </form>
+
+      <!-- ═══════════════════════════════════════════════════════
+           SAVE STUDENT — whole-record commit bar
+           Primary path after an IEP import (every extracted field
+           already lives in the working record); also saves all
+           sections at once for existing records.
+      ═══════════════════════════════════════════════════════ -->
+      <div id="save-student-bar" class="save-student-bar">
+        <div class="save-student-copy">
+          <p class="save-student-title">Done reviewing?</p>
+          <p class="save-student-sub">Saves every section at once. First and last name are required; individual panel saves above also commit as you go.</p>
+        </div>
+        <span id="save-student-status" class="save-student-status" aria-live="polite"></span>
+        <button type="button" id="btn-save-student" class="btn btn-save btn-save-student" onclick="App.saveStudent()">Save Student</button>
+      </div>
 
     </div><!-- /content-area -->
   </main>
@@ -1548,6 +1570,79 @@ function parseAccommodations(raw) {
       _saveRecord(_studentId, updates, panel, saveBtn, cancelBtn);
     }
 
+    // ── saveStudent — whole-record commit ─────────────────────────
+    //  One-click save for the entire record. Primary path after an
+    //  IEP import, where every extracted field already lives in
+    //  _record; for existing records it pushes all columns at once.
+    //  Guards:
+    //   1. Open edit panels hold values in inputs, not in _record —
+    //      committing while a panel is open would silently drop those
+    //      edits, so the teacher must Save changes / Cancel first.
+    //   2. Mandatory fields: first AND last name (nameless rows are
+    //      filtered out of every caseload view, so a record without
+    //      them would save but never be reachable again).
+    function saveStudent() {
+      var btn    = document.getElementById('btn-save-student');
+      var status = document.getElementById('save-student-status');
+      function setStatus(msg, color) {
+        if (status) { status.textContent = msg; status.style.color = color || ''; }
+      }
+
+      var open = Object.keys(_editing).filter(function(p) { return _editing[p]; });
+      if (open.length) {
+        setStatus('Finish the open section' + (open.length > 1 ? 's' : '') + ' first — Save changes or Cancel: ' + open.join(', ') + '.', '#f59e0b');
+        showToast('Save or cancel open sections first', 'error');
+        return;
+      }
+
+      var first = String(_record[COL.FIRST_NAME] || '').trim();
+      var last  = String(_record[COL.LAST_NAME]  || '').trim();
+      if (!first || !last) {
+        setStatus('First and last name are required before saving.', '#f87171');
+        showToast('Missing required fields', 'error');
+        editPanel('identity');
+        return;
+      }
+
+      if (btn) btn.disabled = true;
+      setStatus('Saving…', '#6c8fff');
+
+      var payload;
+      if (_isNew) {
+        payload = { action: 'addStudent', student: _record };
+      } else {
+        // Full-column update: everything except Timestamp (server-owned)
+        // and DatabaseID (immutable key).
+        var updates = {};
+        for (var c = COL.TAG; c <= COL.POST_SECONDARY; c++) {
+          updates[c] = (_record[c] != null) ? _record[c] : '';
+        }
+        payload = { action: 'updateStudent', studentId: _studentId, updates: updates };
+      }
+
+      _gasPost(payload)
+      .then(function(data) {
+        if (_isNew) {
+          _isNew = false;
+          if (data.studentId) { _studentId = String(data.studentId); _record[COL.ID] = _studentId; }
+          document.querySelectorAll('.btn-save').forEach(function(b) { b.textContent = 'Save changes'; });
+        }
+        if (data.row && Array.isArray(data.row)) _record = data.row;
+        populateView(_record);
+        setText('display-id', 'DatabaseID: ' + (_record[COL.ID] || '—'));
+        setStatus('Saved.', '#34d399');
+        showToast('Student saved', 'success');
+      })
+      .catch(function(err) {
+        console.error('[saveStudent]', err);
+        setStatus('Save failed — ' + (err.message || 'unknown error'), '#f87171');
+        showToast('Save failed', 'error');
+      })
+      .finally(function() {
+        if (btn) btn.disabled = false;
+      });
+    }
+
     function _saveRecord(studentId, updates, panel, saveBtn, cancelBtn) {
       Object.keys(updates).forEach(function(col) { _record[parseInt(col,10)] = updates[col]; });
 
@@ -1874,7 +1969,7 @@ function parseAccommodations(raw) {
           goals.length ? goals.length + ' goal(s)' : null,
           accs.length ? accs.length + ' accommodation(s)' : null
         ].filter(Boolean).join(', ') +
-        '. Review each section, then save any panel to create the record.';
+        '. Review each section, then click "Save Student" at the bottom to create the record.';
       var notes = Array.isArray(p.confidence_notes) ? p.confidence_notes.filter(Boolean) : [];
       if (notes.length) summary += ' Parser notes: ' + notes.join(' | ');
       _iepStatus(summary, 'ok');
@@ -1885,6 +1980,7 @@ function parseAccommodations(raw) {
       editPanel:                  editPanel,
       cancelPanel:                cancelPanel,
       savePanel:                  savePanel,
+      saveStudent:                saveStudent,
       addGoalRow:                 addGoalRow,
       navigateStudent:            navigateStudent,
       showDeleteModal:            showDeleteModal,
