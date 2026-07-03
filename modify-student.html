@@ -1632,6 +1632,10 @@ function parseAccommodations(raw) {
         setText('display-id', 'DatabaseID: ' + (_record[COL.ID] || '—'));
         setStatus('Saved.', '#34d399');
         showToast('Student saved', 'success');
+        // Return the teacher to the top of the record — confirms the
+        // saved header state (name + new DatabaseID) and puts the
+        // caseload nav back in reach for moving to the next student.
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       })
       .catch(function(err) {
         console.error('[saveStudent]', err);
