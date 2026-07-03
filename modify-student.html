@@ -85,6 +85,8 @@
     .field-input, .field-textarea, .field-select { background: #0f1117; border: 1px solid #252c42; border-radius: 7px; color: #e8ecf4; font-family: 'Inter', system-ui, sans-serif; font-size: 0.875rem; padding: 0.45rem 0.7rem; width: 100%; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
     .field-textarea { resize: vertical; line-height: 1.55; }
     .field-input:focus, .field-textarea:focus, .field-select:focus { border-color: rgba(108,143,255,0.6); box-shadow: 0 0 0 3px rgba(108,143,255,0.12); }
+    /* Multi-line read-only values: preserve the one-item-per-line formatting */
+    #rv-supplemental, #rv-postSecondary { white-space: pre-line; }
 
     /* ── Select dropdown ── */
     .field-select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234a5578' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.65rem center; padding-right: 2rem; cursor: pointer; }
@@ -1837,6 +1839,7 @@ function parseAccommodations(raw) {
       _record[COL.IEP_END]      = String(p.iep_end || '').trim();
       _record[COL.DISABILITY]   = String(p.primary_disability || '').trim();
       _record[COL.SUPPLEMENTAL] = String(p.supplemental_aids || '').trim();
+      _record[COL.POST_SECONDARY] = String(p.post_secondary_plan || '').trim();
 
       // Goals map onto the v1.1 shape this page round-trips.
       var goals = Array.isArray(p.goals) ? p.goals.map(function(g) {
@@ -1867,6 +1870,7 @@ function parseAccommodations(raw) {
         [ (first || last) ? 'name' : null,
           _record[COL.IEP_START] || _record[COL.IEP_END] ? 'IEP dates' : null,
           _record[COL.DISABILITY] ? 'disability' : null,
+          _record[COL.POST_SECONDARY] ? 'post-secondary plan' : null,
           goals.length ? goals.length + ' goal(s)' : null,
           accs.length ? accs.length + ' accommodation(s)' : null
         ].filter(Boolean).join(', ') +
