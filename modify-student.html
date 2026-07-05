@@ -39,6 +39,12 @@
     .nav-link-primary.active { background: rgba(52,211,153,0.18); border-color: rgba(52,211,153,0.6); }
 
     .nav-divider { width: 1px; height: 18px; background: #252c42; margin: 0 0.5rem; flex-shrink: 0; }
+    /* ── Unified nav additions ── */
+    .site-nav { overflow-x: auto; scrollbar-width: none; }
+    .site-nav::-webkit-scrollbar { display: none; }
+    .nav-link { flex-shrink: 0; }
+    .nav-link.active { box-shadow: inset 0 0 0 1px rgba(108,143,255,0.35); }
+    @media (max-width: 760px) { .site-brand-text { display: none; } }
 
     /* btn-ghost: +17% from 0.72rem → 0.84rem */
     .btn-ghost { display: inline-flex; align-items: center; gap: 0.4rem; background: transparent; color: #7d8fb3; font-family: 'JetBrains Mono', monospace; font-size: 0.84rem; font-weight: 500; border: 1px solid #252c42; border-radius: 7px; padding: 0.4rem 0.85rem; cursor: pointer; transition: color 0.14s, border-color 0.14s; }
@@ -222,36 +228,63 @@
 <body class="bg-[#0f1117] text-slate-100 min-h-screen flex flex-col">
 
   <!-- ═══ SHARED NAV ═══ -->
+  <!-- ════════════════════════════════════════════════════════════
+       M-POWERED UNIFIED NAVIGATION
+       Logo → dashboard home · subdomain switcher with active state
+       · Profile placeholder · universal Sign Out.
+  ════════════════════════════════════════════════════════════ -->
   <header class="site-header" role="banner">
     <div class="site-header-inner">
-      <!-- Logo mark + wordmark -->
-      <a href="https://caseload.mpowerededucation.com/" class="site-brand" aria-label="M-Powered Education home">
+      <!-- Logo acts as the Home / Dashboard link -->
+      <a href="https://www.mpowerededucation.com/dashboard.html" class="site-brand" aria-label="M-Powered dashboard home">
         <img src="/assets/m-powered-logo.svg"
              onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';"
              class="site-logo" alt="M-Powered logo" />
         <span class="site-logo-fallback" style="display:none;" aria-hidden="true">M</span>
-        M-Powered Education
+        <span class="site-brand-text">M-Powered Education</span>
       </a>
-
-      <nav class="site-nav" aria-label="Site navigation">
-        <!-- Workspace link -->
-        <a href="https://caseload.mpowerededucation.com/" class="nav-link" id="nav-workspace">Workspace</a>
-        <!-- Dashboard link — root URL, not /caseload.html -->
-        <a href="https://caseload.mpowerededucation.com/" class="nav-link" id="nav-dashboard">Dashboard</a>
-        <a href="/modify-student.html?id=new" class="nav-link-primary" id="nav-new-student">+ New Student</a>
-
+      <nav class="site-nav" aria-label="M-Powered workspaces">
+        <!-- Subdomain switcher — .active applied by unified-nav script -->
+        <a href="https://iep.mpowerededucation.com/"      class="nav-link" data-subdomain="iep">Goal Architect</a>
+        <a href="https://sdi.mpowerededucation.com/"      class="nav-link" data-subdomain="sdi">SDI Engine</a>
+        <a href="https://data.mpowerededucation.com/"     class="nav-link" data-subdomain="data">Data Utility</a>
+        <a href="https://caseload.mpowerededucation.com/" class="nav-link" data-subdomain="caseload">Caseload</a>
         <div class="nav-divider" role="separator" aria-hidden="true"></div>
-
-        <!-- Caseload prev/next arrows -->
+        <!-- Caseload prev/next arrows — context-aware student navigation -->
         <button id="btn-prev-student" class="nav-arrow" aria-label="Previous student" title="Previous student" onclick="App.navigateStudent(-1)">&#8592;</button>
-        <span id="nav-position-label" style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#4a5578;min-width:3rem;text-align:center;">—</span>
+        <span id="nav-position-label" style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#4a5578;min-width:3rem;text-align:center;">&mdash;</span>
         <button id="btn-next-student" class="nav-arrow" aria-label="Next student" title="Next student" onclick="App.navigateStudent(1)">&#8594;</button>
-
         <div class="nav-divider" role="separator" aria-hidden="true"></div>
-        <button onclick="App.logout()" class="btn-ghost" aria-label="Sign out">Sign Out</button>
+        <a href="/modify-student.html?id=new" class="nav-link-primary" id="nav-new-student">+ New Student</a>
+        <a href="#" class="nav-link" id="nav-profile" title="Profile — coming soon">Profile</a>
+        <button type="button" class="btn-ghost" onclick="logout()" aria-label="Sign out">Sign Out</button>
       </nav>
     </div>
   </header>
+
+  <script>
+    // ── Unified nav: active state + universal logout ──────────────
+    (function () {
+      'use strict';
+      var sub = window.location.hostname.split('.')[0];
+      var links = document.querySelectorAll('.site-nav .nav-link[data-subdomain]');
+      for (var i = 0; i < links.length; i++) {
+        if (links[i].getAttribute('data-subdomain') === sub) {
+          links[i].classList.add('active');
+          links[i].setAttribute('aria-current', 'page');
+        }
+      }
+    })();
+    function logout() {
+      // Universal sign-out: clear every client-side auth artifact,
+      // then land on the main dashboard (its guard takes over from
+      // there if re-authentication is required).
+      try { localStorage.clear(); }   catch (e) {}
+      try { sessionStorage.clear(); } catch (e) {}
+      document.cookie = 'mp_session=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.mpowerededucation.com; Secure; SameSite=Lax';
+      window.location.href = 'https://www.mpowerededucation.com/dashboard.html';
+    }
+  </script>
   <!-- ═══ END NAV ═══ -->
 
   <main class="flex-1" style="max-width:760px; margin:0 auto; width:100%; padding:2rem 1.5rem;" role="main">
