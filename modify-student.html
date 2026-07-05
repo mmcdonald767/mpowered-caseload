@@ -87,6 +87,15 @@
     .field-input:focus, .field-textarea:focus, .field-select:focus { border-color: rgba(108,143,255,0.6); box-shadow: 0 0 0 3px rgba(108,143,255,0.12); }
     /* Multi-line read-only values: preserve the one-item-per-line formatting */
     #rv-supplemental, #rv-postSecondary { white-space: pre-line; }
+    /* Caseload segment flag (Section 01 view) */
+    .segment-flag {
+      display: inline-block; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+      border-radius: 20px; padding: 0.2rem 0.65rem; border: 1px solid transparent;
+    }
+    .flag-primary { color: #34d399; background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.3); }
+    .flag-ext     { color: #fbbf24; background: rgba(251,191,36,0.08);  border-color: rgba(251,191,36,0.3); }
+    .flag-none    { color: #4a5578; background: rgba(74,85,120,0.08);   border-color: rgba(74,85,120,0.25); }
     /* ── Save Student bar (whole-record commit) ── */
     .save-student-bar { display: flex; align-items: center; gap: 1rem; background: #171b26; border: 1px solid rgba(108,143,255,0.35); border-radius: 12px; padding: 1rem 1.3rem; margin-top: 1.5rem; }
     .save-student-copy { flex: 1; min-width: 0; }
@@ -342,6 +351,14 @@
               <span class="field-label">Database ID</span>
               <span class="field-value" id="rv-studentId"></span>
             </div>
+            <div class="field">
+              <span class="field-label">Group / Period</span>
+              <span class="field-value" id="rv-groupPeriod"></span>
+            </div>
+            <div class="field">
+              <span class="field-label">Caseload Status</span>
+              <span class="field-value"><span class="segment-flag flag-none" id="rv-segment">&mdash;</span></span>
+            </div>
           </div>
 
           <!-- EDIT -->
@@ -360,6 +377,20 @@
                   <span class="ml-1 font-normal normal-case text-slate-500" style="font-size:0.68rem;">(initials, student ID, or pseudo-anonymous code)</span>
                 </label>
                 <input id="studentTag" name="studentTag" type="text" class="field-input" placeholder="e.g. JS-9W or ID-4482" autocomplete="off" />
+              </div>
+              <div class="sm:col-span-2">
+                <label class="field-label" for="groupPeriod">Group / Period
+                  <span class="ml-1 font-normal normal-case text-slate-500" style="font-size:0.68rem;">(class period or section &mdash; drives the Data Tools triage filters)</span>
+                </label>
+                <input id="groupPeriod" name="groupPeriod" type="text" class="field-input" placeholder="e.g. 1st Period, P2, Co-taught Math" autocomplete="off" />
+              </div>
+              <div class="sm:col-span-2">
+                <div class="check-row" style="align-items:flex-start;">
+                  <input type="checkbox" id="primaryCaseload" style="margin-top:0.15rem;" />
+                  <label for="primaryCaseload">Primary caseload student
+                    <span class="block font-normal normal-case text-slate-500" style="font-size:0.68rem;line-height:1.5;">Unchecked = co-taught / external &mdash; a student you track or support but who is not on your primary caseload. Controls which triage segment they appear in on the Data Tools hub.</span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
@@ -627,6 +658,7 @@
   //   5 IEP Start | 6 IEP End   | 7 Disability | 8 Supplemental
   //   9 Goals (JSON v1.1 array) | 10 Accommodations (JSON array)
   //  11 Post-Secondary Plan (plain text)
+  //  12 Group_Period (plain text) | 13 Caseload_Toggle ('TRUE' = primary)
   // ─────────────────────────────────────────────────────────────────
   var COL = {
     TIMESTAMP:      0,
@@ -640,8 +672,17 @@
     SUPPLEMENTAL:   8,
     GOALS:          9,
     ACCOMMODATIONS: 10,
-    POST_SECONDARY: 11
+    POST_SECONDARY: 11,
+    GROUP_PERIOD:   12,
+    CASELOAD:       13
   };
+
+  // Caseload_Toggle convention (shared with the Data Tools triage):
+  // 'TRUE' (or true/yes/primary/1) = primary caseload; anything else —
+  // including blank — is treated as Co-Taught / External.
+  function isPrimaryCaseload(raw) {
+    return raw === true || /^(true|yes|primary|1)$/i.test(String(raw || '').trim());
+  }
 
   var GAS_URL = 'https://script.google.com/macros/s/AKfycbz4YTW46DN8u3bbvc_6n4PpzswBBCBdmoIfa_mXEPLhTly-1EDlHWPiQqpfBLQIdXic/exec';
 
@@ -1222,6 +1263,21 @@ function parseAccommodations(raw) {
       setText('rv-firstName', row[COL.FIRST_NAME]);
       setText('rv-lastName',  row[COL.LAST_NAME]);
       setText('rv-tag',       row[COL.TAG]);
+      setText('rv-groupPeriod', row[COL.GROUP_PERIOD]);
+      var segEl = document.getElementById('rv-segment');
+      if (segEl) {
+        var rawToggle = String(row[COL.CASELOAD] || '').trim();
+        if (isPrimaryCaseload(row[COL.CASELOAD])) {
+          segEl.textContent = 'My Caseload';
+          segEl.className = 'segment-flag flag-primary';
+        } else if (rawToggle) {
+          segEl.textContent = 'Co-Taught / External';
+          segEl.className = 'segment-flag flag-ext';
+        } else {
+          segEl.textContent = 'Unassigned';
+          segEl.className = 'segment-flag flag-none';
+        }
+      }
       setText('rv-studentId', row[COL.ID]);
 
       // Section 2 — academic / IEP / supplemental read-only fields
@@ -1308,6 +1364,15 @@ function parseAccommodations(raw) {
         setInput('firstName',  _record[COL.FIRST_NAME]);
         setInput('lastName',   _record[COL.LAST_NAME]);
         setInput('studentTag', _record[COL.TAG]);
+        setInput('groupPeriod', _record[COL.GROUP_PERIOD]);
+        var pcBox = document.getElementById('primaryCaseload');
+        if (pcBox) {
+          // Blank toggle on a brand-new record defaults to checked —
+          // a student the teacher is creating by hand is presumably
+          // theirs. Existing records keep the stored value verbatim.
+          var rawT = String(_record[COL.CASELOAD] || '').trim();
+          pcBox.checked = rawT ? isPrimaryCaseload(_record[COL.CASELOAD]) : _isNew;
+        }
       }
       if (panel === 'academic') {
         setInput('iepStart',          _toDateInputValue(_record[COL.IEP_START]));
@@ -1514,6 +1579,9 @@ function parseAccommodations(raw) {
 
       if (panel === 'identity') {
         updates[COL.TAG]        = getInput('studentTag');
+        updates[COL.GROUP_PERIOD] = getInput('groupPeriod');
+        var pcSave = document.getElementById('primaryCaseload');
+        updates[COL.CASELOAD] = pcSave ? (pcSave.checked ? 'TRUE' : 'FALSE') : '';
         updates[COL.FIRST_NAME] = getInput('firstName');
         updates[COL.LAST_NAME]  = getInput('lastName');
       }
@@ -1614,7 +1682,7 @@ function parseAccommodations(raw) {
         // Full-column update: everything except Timestamp (server-owned)
         // and DatabaseID (immutable key).
         var updates = {};
-        for (var c = COL.TAG; c <= COL.POST_SECONDARY; c++) {
+        for (var c = COL.TAG; c <= COL.CASELOAD; c++) {
           updates[c] = (_record[c] != null) ? _record[c] : '';
         }
         payload = { action: 'updateStudent', studentId: _studentId, updates: updates };
@@ -1758,7 +1826,7 @@ function parseAccommodations(raw) {
 
       if (_studentId.toLowerCase() === 'new') {
         _isNew  = true;
-        _record = ['','','','','','','','','','[]','[]',''];
+        _record = ['','','','','','','','','','[]','[]','','','TRUE'];
         document.title = 'New Student — M-Powered Education';
         if (navNew) navNew.classList.add('active');
         setText('display-name', 'New Student');
