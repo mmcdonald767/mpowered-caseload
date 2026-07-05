@@ -405,7 +405,10 @@
         btn.textContent = 'Edit / Track';
         btn.setAttribute('aria-label', 'Edit record for ' + (firstName || '') + ' ' + (lastName || ''));
         btn.addEventListener('click', function () {
-          window.location.href = '/modify-student.html?id=' + encodeURIComponent(dbId);
+          // nav_context scopes modify-student's prev/next arrows to
+          // the same list this roster shows: primary caseload only.
+          window.location.href = '/modify-student.html?id=' + encodeURIComponent(dbId) +
+            '&nav_context=caseload';
         });
         tdAct.appendChild(btn);
         tr.appendChild(tdAct);

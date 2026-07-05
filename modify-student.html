@@ -695,10 +695,17 @@
     var _editing   = { identity: false, academic: false, goals: false, accommodations: false, assessments: false };
 
     // ── Caseload nav state ─────────────────────────────────────────
-    // _roster: student rows (header stripped, blanks filtered).
+    // _roster: student rows (header stripped, blanks filtered), scoped
+    //          to the active nav context when one is present.
     // _rosterIndex: 0-based position of the currently displayed student.
+    // _navContext: viewing context from ?nav_context= —
+    //   'caseload'      → primary-caseload students only
+    //   'external'      → co-taught / external students only
+    //   'group:<value>' → students whose Group_Period equals <value>
+    //   '' / unknown    → full roster (default)
     var _roster      = [];
     var _rosterIndex = -1;
+    var _navContext  = '';
 
     // ── Network ────────────────────────────────────────────────────
     function _gasPost(payload) {
@@ -788,15 +795,56 @@
     }
 
     // ── Caseload navigation ────────────────────────────────────────
+
+    // Does a row belong to the active nav context?
+    function _matchesNavContext(row) {
+      if (!_navContext) return true;
+      if (_navContext === 'caseload') return isPrimaryCaseload(row[COL.CASELOAD]);
+      if (_navContext === 'external') return !isPrimaryCaseload(row[COL.CASELOAD]);
+      if (_navContext.indexOf('group:') === 0) {
+        return String(row[COL.GROUP_PERIOD] || '').trim() === _navContext.slice(6);
+      }
+      return true;  // unknown context value → no filtering
+    }
+
+    function _navContextLabel() {
+      if (_navContext === 'caseload') return 'My Caseload';
+      if (_navContext === 'external') return 'Co-Taught / External';
+      if (_navContext.indexOf('group:') === 0) return _navContext.slice(6) || 'group';
+      return '';
+    }
+
     function _initCaseloadNav(dataRows, currentId) {
-      _roster = dataRows.filter(function (r) {
+      var named = dataRows.filter(function (r) {
         return Array.isArray(r) && (String(r[COL.FIRST_NAME]||'').trim() || String(r[COL.LAST_NAME]||'').trim());
       });
+
       var norm = normalise(currentId);
+      var findIndex = function (rows) {
+        for (var i = 0; i < rows.length; i++) {
+          if (normalise(rows[i][COL.ID]) === norm) return i;
+        }
+        return -1;
+      };
+
+      // Scope to the nav context; fall back to the FULL roster if the
+      // context matches no students, or if the current student isn't
+      // in it (stale/incorrect context on a direct link) — navigation
+      // must never dead-end.
+      _roster      = named;
       _rosterIndex = -1;
-      for (var i = 0; i < _roster.length; i++) {
-        if (normalise(_roster[i][COL.ID]) === norm) { _rosterIndex = i; break; }
+      if (_navContext) {
+        var scoped = named.filter(_matchesNavContext);
+        var idxInScoped = findIndex(scoped);
+        if (scoped.length && idxInScoped !== -1) {
+          _roster      = scoped;
+          _rosterIndex = idxInScoped;
+        } else {
+          _navContext = '';  // context unusable — drop it entirely
+        }
       }
+      if (_rosterIndex === -1) _rosterIndex = findIndex(_roster);
+
       _updateNavArrows();
     }
 
@@ -805,26 +853,32 @@
       var btnPrev = document.getElementById('btn-prev-student');
       var btnNext = document.getElementById('btn-next-student');
       if (!label || !btnPrev || !btnNext) return;
-      var total = _roster.length;
-      if (total <= 1 || _rosterIndex < 0) {
-        label.textContent = total > 0 ? '1 / ' + total : '—';
-        btnPrev.setAttribute('aria-disabled','true');
-        btnNext.setAttribute('aria-disabled','true');
-        return;
-      }
-      label.textContent = (_rosterIndex + 1) + ' / ' + total;
-      btnPrev.removeAttribute('aria-disabled');
-      btnNext.removeAttribute('aria-disabled');
+      var total   = _roster.length;
+      var ctx     = _navContextLabel();
+      var navigable = total > 1 && _rosterIndex >= 0;
+
+      label.textContent = _rosterIndex >= 0
+        ? (_rosterIndex + 1) + ' / ' + total
+        : (total > 0 ? '1 / ' + total : '—');
+      label.title = ctx ? 'Navigating within: ' + ctx : 'Navigating the full roster';
+
+      btnPrev.setAttribute('aria-disabled', navigable ? 'false' : 'true');
+      btnNext.setAttribute('aria-disabled', navigable ? 'false' : 'true');
+      if (!navigable) return;
     }
 
-    // navigateStudent(dir) — dir: -1 prev, +1 next. Loops at boundaries.
+    // navigateStudent(dir) — dir: -1 prev, +1 next. Loops at the
+    // boundaries of the context-scoped list and carries the context
+    // through the URL so it survives the page reload.
     function navigateStudent(dir) {
-      if (!_roster.length || _rosterIndex < 0) return;
+      if (!_roster.length || _rosterIndex < 0 || _roster.length < 2) return;
       var total   = _roster.length;
       var nextIdx = ((_rosterIndex + dir) + total) % total;
       var nextId  = String(_roster[nextIdx][COL.ID] || '').trim();
       if (!nextId) return;
-      window.location.href = '/modify-student.html?id=' + encodeURIComponent(nextId);
+      var url = '/modify-student.html?id=' + encodeURIComponent(nextId);
+      if (_navContext) url += '&nav_context=' + encodeURIComponent(_navContext);
+      window.location.href = url;
     }
 
     // ── Data helpers ───────────────────────────────────────────────
@@ -1816,6 +1870,7 @@ function parseAccommodations(raw) {
     function init() {
       var params = new URLSearchParams(window.location.search);
       _studentId = params.get('id');
+      _navContext = String(params.get('nav_context') || '').trim();
       var navNew = document.getElementById('nav-new-student');
 
       if (!_studentId || !_studentId.trim()) {
