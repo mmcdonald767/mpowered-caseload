@@ -259,7 +259,8 @@
     // 0-indexed, must match Code.gs and modify-student.html exactly:
     //   0  Timestamp | 1  DatabaseID | 2  Tag | 3  First Name | 4  Last Name
     //   5  IEP Start | 6  IEP End   | 7  Disability | 8  Supplemental
-    //   9  Goals (JSON) | 10 SDI (JSON)  (not displayed in roster)
+    //   9  Goals (JSON) | 10 Accommodations (JSON) | 11 Post-Secondary
+    //  12  Group_Period | 13 Caseload_Toggle ('TRUE' = primary caseload)
     var COL_ID         = 1;   // DatabaseID
     var COL_TAG        = 2;   // Identifier / Tag
     var COL_FIRST      = 3;   // First Name
@@ -267,6 +268,16 @@
     var COL_IEP_START  = 5;
     var COL_IEP_END    = 6;
     var COL_DISABILITY = 7;
+    var COL_CASELOAD   = 13;  // Caseload_Toggle
+
+    // Shared convention (modify-student.html / Data Tools triage):
+    // 'TRUE' (or true/yes/primary/1) = primary caseload. Anything
+    // else — including blank — is co-taught / external and is NOT
+    // listed on this page; those students remain reachable from the
+    // Data Tools triage and by direct modify-student.html?id= link.
+    function isPrimaryCaseload(raw) {
+      return raw === true || /^(true|yes|primary|1)$/i.test(String(raw || '').trim());
+    }
 
     // ── GAS POST helper ───────────────────────────────────────────
     function _gasPost(payload) {
@@ -321,12 +332,26 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      // Row 0 is the sheet header — skip it; filter blank rows
-      var students = (rows.length > 1 ? rows.slice(1) : []).filter(function (row) {
+      // Row 0 is the sheet header — skip it; filter blank rows, then
+      // keep ONLY primary-caseload students (Caseload_Toggle TRUE).
+      var named = (rows.length > 1 ? rows.slice(1) : []).filter(function (row) {
         return row && (String(row[COL_FIRST] || '').trim() || String(row[COL_LAST] || '').trim());
       });
+      var students = named.filter(function (row) {
+        return isPrimaryCaseload(row[COL_CASELOAD]);
+      });
+      var hiddenCount = named.length - students.length;
 
-      if (!students.length) { _showRosterState('empty'); return; }
+      if (!students.length) {
+        _showRosterState('empty');
+        var emptyMsg = document.querySelector('#rosterEmpty p');
+        if (emptyMsg && hiddenCount > 0) {
+          emptyMsg.textContent = 'No primary-caseload students to show. ' + hiddenCount +
+            ' co-taught / external student' + (hiddenCount === 1 ? ' is' : 's are') +
+            ' hidden from this roster — manage them from the Data Tools hub.';
+        }
+        return;
+      }
 
       var frag = document.createDocumentFragment();
 
@@ -390,6 +415,21 @@
 
       tbody.appendChild(frag);
       _showRosterState('data');
+
+      // Footnote: report hidden co-taught/external students so a
+      // filtered roster never reads as missing records.
+      var note = document.getElementById('rosterHiddenNote');
+      if (!note) {
+        note = document.createElement('p');
+        note.id = 'rosterHiddenNote';
+        note.style.cssText = "font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#4a5578;margin:0.9rem 0 0;";
+        var wrap = document.getElementById('rosterTableWrap');
+        if (wrap) wrap.appendChild(note);
+      }
+      note.textContent = hiddenCount > 0
+        ? hiddenCount + ' co-taught / external student' + (hiddenCount === 1 ? '' : 's') +
+          ' hidden from this roster — manage them from the Data Tools hub.'
+        : '';
     }
 
     // ── Date helpers ──────────────────────────────────────────────
