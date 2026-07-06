@@ -371,7 +371,11 @@
       ============================================================ -->
       <div id="manual-sections-wrapper">
 
-      <form id="modifyStudentForm" onsubmit="handleUpdate(event)" novalidate>
+      <!-- onsubmit only prevents the native browser form-submit (e.g. pressing
+           Enter in a text field) from reloading the page. All real saves go
+           through App.saveStudent() / App.savePanel() via explicit buttons —
+           this form is never actually submitted. -->
+      <form id="modifyStudentForm" onsubmit="event.preventDefault();" novalidate>
 
         <!-- ═══════════════════════════════════════════════════════
              SECTION 1 — STUDENT BASICS
@@ -2379,48 +2383,6 @@ function parseAccommodations(raw) {
   }
 
 
-  /* ── Collect goals — Data Contract v1.1 ── */
-  function _generateLocalId() {
-    return 'LOCAL-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
-  }
-
-  function collectGoals() {
-    // Delegates to App.savePanel — this stub is kept for handleUpdate compatibility.
-    // Actual goal collection uses #goal-rows .goal-edit-card via savePanel('goals').
-    var container = document.getElementById('goal-rows');
-    if (!container) return [];
-    var goals = [];
-    container.querySelectorAll('.goal-edit-card').forEach(function(card) {
-      var descEl   = card.querySelector('.goal-input');
-      var sdiEl    = card.querySelector('.sdi-input');
-      var measEl   = card.querySelector('.measurement-select');
-      var targetEl = card.querySelector('.goal-target-input');
-      var mastEl   = card.querySelector('.goal-mastery-input');
-      var desc     = descEl   ? descEl.value.trim()   : '';
-      var sdi      = sdiEl    ? sdiEl.value.trim()    : '';
-      var meas     = measEl   ? measEl.value.trim()   : '';
-      var targetRaw= targetEl ? targetEl.value.trim() : '';
-      var mastery  = mastEl   ? mastEl.value.trim()   : '';
-      if (!desc && !sdi) return;
-      goals.push({
-        goal_id     : _generateLocalId(),
-        description : desc,
-        domain      : 'literacy',
-        standard_alignment : { code:'', description:'', grade_band:'' },
-        sdi         : { strategy: sdi, evidence_base:'', delivery_model:'small_group', frequency:'' },
-        artifact_type: 'graphic_organizer',
-        progress_monitoring: {
-          metric: 'accuracy', unit: 'percent',
-          baseline: null,
-          target: targetRaw !== '' ? (parseFloat(targetRaw)||null) : null,
-          mastery_criterion: mastery,
-          method_of_measurement: meas
-        }
-      });
-    });
-    return goals;
-  }
-
   /* ── Collect state accommodations ── */
   function collectStateAccommodations() {
     var checked = [];
@@ -2520,80 +2482,14 @@ function parseAccommodations(raw) {
     if(el) el.checked=true;
   }
 
-  /* ================================================================
-     handleUpdate(event)
-     Collects all 6 sections and sends action:'updateStudent' to GAS.
-     Mirrors handleSubmit() in student-form.html.
-  ================================================================ */
-  function handleUpdate(event) {
-    event.preventDefault();
-    var msgEl = document.getElementById('formValidationMsg');
-    msgEl.classList.add('hidden');
-
-    var required = [
-      { id:'firstName',         label:'First Name'      },
-      { id:'lastName',          label:'Last Name'       },
-      { id:'iepStart',          label:'IEP Start Date'  },
-      { id:'iepEnd',            label:'IEP End Date'    },
-      { id:'primaryDisability', label:'Primary Disability' },
-    ];
-    var missing = required.filter(function(f){ var el=document.getElementById(f.id); return !el||!el.value.trim(); });
-    if (missing.length) {
-      msgEl.textContent='Please complete: '+missing.map(function(f){return f.label;}).join(', ')+'.';
-      msgEl.classList.remove('hidden');
-      document.getElementById(missing[0].id).focus();
-      return;
-    }
-
-    var params     = new URLSearchParams(window.location.search);
-    var studentId  = params.get('id') || '';
-
-    var payload = {
-      action    : 'updateStudent',
-      studentId : studentId,
-      student   : {
-        firstName : document.getElementById('firstName').value.trim(),
-        lastName  : document.getElementById('lastName').value.trim(),
-        tag       : document.getElementById('studentTag').value.trim(),
-      },
-      iepTimeline: {
-        startDate: document.getElementById('iepStart').value,
-        endDate:   document.getElementById('iepEnd').value,
-      },
-      primaryDisability   : document.getElementById('primaryDisability').value.trim(),
-      goals               : collectGoals(),
-      supplementalAids    : document.getElementById('supplementalAids').value.trim(),
-      stateAccommodations : collectStateAccommodations(),
-      updatedAt           : new Date().toISOString(),
-    };
-
-    // Disable submit while saving
-    var submitBtn = document.querySelector('#modifyStudentForm button[type="submit"]');
-    if (submitBtn) { submitBtn.disabled=true; submitBtn.textContent='Saving…'; }
-
-    var GAS_URL_FORM = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
-    fetch(GAS_URL_FORM.split('#')[0].split('?')[0], {
-      method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify(payload)
-    })
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if (data.result!=='success') throw new Error(data.error||'GAS error');
-      msgEl.style.color='#34d399';
-      msgEl.textContent='✓ Student record updated successfully.';
-      msgEl.classList.remove('hidden');
-      setTimeout(function(){ msgEl.classList.add('hidden'); msgEl.style.color=''; }, 4000);
-    })
-    .catch(function(err){
-      console.error('[handleUpdate]', err);
-      msgEl.style.color='';
-      msgEl.textContent='Save failed: '+(err.message||'unknown error');
-      msgEl.classList.remove('hidden');
-    })
-    .finally(function(){
-      if (submitBtn) { submitBtn.disabled=false; submitBtn.textContent='Save Changes'; }
-    });
-  }
+  // handleUpdate() removed: a dead legacy write path that bypassed the
+  // beta gate entirely (posted straight to a deprecated GAS deployment
+  // with no userEmail, using a payload shape the current backend
+  // doesn't parse). It was reachable only via native form submission
+  // (e.g. pressing Enter in a text field) — see the form tag's
+  // onsubmit above, which now simply prevents that default browser
+  // behavior. Every real save goes through App.saveStudent() /
+  // App.savePanel(), which are gated through _gasPost.
 
   /* Wire IEP date inputs to the countdown indicator (edit mode) */
   document.addEventListener('DOMContentLoaded', function() {
