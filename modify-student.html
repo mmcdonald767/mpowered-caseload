@@ -222,6 +222,20 @@
     .iep-dropzone.dragover { border-color: #6c8fff; background: rgba(108,143,255,0.08); color: #c7d4ff; }
     .iep-dropzone.busy { pointer-events: none; opacity: 0.65; }
     .iep-import-status { font-size: 0.72rem; line-height: 1.55; margin-top: 0.6rem; display: none; }
+    /* ── PDF-first intake: manual sections muted until a PDF import
+         completes or the teacher explicitly chooses Manual Entry ── */
+    .pdf-first-muted { opacity: 0.35; pointer-events: none; filter: grayscale(0.4); transition: opacity 0.2s ease, filter 0.2s ease; }
+    .iep-import-divider { display: flex; align-items: center; gap: 0.75rem; margin: 0.85rem 0; }
+    .iep-import-divider::before, .iep-import-divider::after { content: ''; flex: 1; height: 1px; background: #252c42; }
+    .iep-import-divider span { font-size: 0.66rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4a5578; white-space: nowrap; }
+    .btn-manual-entry {
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      width: 100%; background: transparent; color: #7d8fb3;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 600;
+      border: 1px solid #252c42; border-radius: 8px; padding: 0.65rem 1rem;
+      cursor: pointer; transition: color 0.14s, border-color 0.14s, background 0.14s;
+    }
+    .btn-manual-entry:hover { color: #e8ecf4; border-color: #6c8fff; background: rgba(108,143,255,0.06); }
   </style>
 </head>
 
@@ -316,6 +330,10 @@
         </div>
         <input type="file" id="iep-file-input" accept="application/pdf,.pdf" style="display:none;" />
         <p id="iep-import-status" class="iep-import-status"></p>
+        <div class="iep-import-divider"><span>or</span></div>
+        <button type="button" id="btn-manual-entry" class="btn-manual-entry" aria-label="Skip the PDF import and fill in the student record by hand">
+          Manual Entry &mdash; register a student without an IEP on file
+        </button>
       </div>
 
       <!-- Page heading -->
@@ -346,6 +364,13 @@
       <!-- ============================================================
            FORM — 6 sections mirroring student-form.html
       ============================================================ -->
+      <!-- ============================================================
+           MANUAL SECTIONS — muted by default in PDF-first (?id=new)
+           mode until a PDF import completes or Manual Entry is chosen.
+           Never muted for existing records (id != new).
+      ============================================================ -->
+      <div id="manual-sections-wrapper">
+
       <form id="modifyStudentForm" onsubmit="handleUpdate(event)" novalidate>
 
         <!-- ═══════════════════════════════════════════════════════
@@ -664,6 +689,8 @@
         <button type="button" id="btn-save-student" class="btn btn-save btn-save-student" onclick="App.saveStudent()">Save Student</button>
       </div>
 
+      </div><!-- /manual-sections-wrapper -->
+
     </div><!-- /content-area -->
   </main>
 
@@ -725,6 +752,11 @@
     var _record    = null;
     var _studentId = null;
     var _isNew     = false;
+    // PDF-first intake: true once the manual sections have been
+    // un-muted, either by a successful PDF import or by the teacher
+    // clicking Manual Entry. Irrelevant (and never consulted) once
+    // _isNew is false.
+    var _manualRevealed = false;
     var _editing   = { identity: false, academic: false, goals: false, accommodations: false, assessments: false };
 
     // ── Caseload nav state ─────────────────────────────────────────
@@ -740,8 +772,17 @@
     var _rosterIndex = -1;
     var _navContext  = '';
 
-    // ── Network ────────────────────────────────────────────────────
+    // ── Network — beta-gated POST wrapper ───────────────────────
+    //  Every payload is stamped with the signed-in teacher's email so
+    //  Code.gs's beta gate can authorize the request. Responses
+    //  carrying code 401 (no/unrecognized identity) or 403 (not
+    //  enrolled) are intercepted here so no caller has to special-case
+    //  them — identical contract across dashboard.html, student-form.html,
+    //  and this file.
     function _gasPost(payload) {
+      payload = payload || {};
+      payload.userEmail = sessionStorage.getItem('mp_beta_email') || '';
+
       var url = GAS_URL.split('#')[0].split('?')[0];
       return fetch(url, {
         method:  'POST',
@@ -749,8 +790,39 @@
         body:    JSON.stringify(payload)
       })
       .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-      .then(function (d) { if (d.result !== 'success') throw new Error(d.error || 'GAS error'); return d; });
+      .then(function (d) {
+        // 401 — no/unrecognized identity: stop and force a real
+        // re-authentication at the login gateway.
+        if (d && d.code === 401) {
+          _clearBetaSession();
+          window.location.href = 'https://www.mpowerededucation.com/index.html?error=unauthorized';
+          return new Promise(function () {}); // halt — navigation is underway
+        }
+        // 403 — recognized but not an enrolled beta role.
+        if (d && d.code === 403) {
+          _clearBetaSession();
+          alert('Access Denied: Your account is not enrolled in the closed beta.');
+          throw new Error('Access denied — not enrolled in the closed beta.');
+        }
+        if (d.result !== 'success') throw new Error(d.error || 'GAS error');
+        return d;
+      });
     }
+
+    // ── Beta-session cleanup ─────────────────────────────────────
+    //  Called on 401/403 so a rejected auth session never lingers —
+    //  the user is forced through a real re-authentication rather
+    //  than silently retrying with the same stale identity.
+    function _clearBetaSession() {
+      try {
+        sessionStorage.removeItem('oauth_token');
+        sessionStorage.removeItem('mp_beta_email');
+        sessionStorage.removeItem('mp_beta_role');
+        sessionStorage.removeItem('mp_beta_display_name');
+        sessionStorage.removeItem('mp_beta_auth_time');
+      } catch (e) {}
+    }
+
 
     // ── Page state ─────────────────────────────────────────────────
     function showState(state) {
@@ -1655,13 +1727,16 @@ function parseAccommodations(raw) {
     }
 
     // ── savePanel ─────────────────────────────────────────────────
-    function savePanel(panel) {
-      var saveBtn   = document.querySelector('#footer-'+panel+' .btn-save');
-      var cancelBtn = document.querySelector('#footer-'+panel+' .btn-cancel');
-      if (saveBtn)   saveBtn.disabled   = true;
-      if (cancelBtn) cancelBtn.disabled = true;
-      setPanelStatus(panel, 'Saving…', '#6c8fff');
-
+    // ── _buildPanelUpdates(panel) ───────────────────────────────────
+    //  Reads the CURRENT edit-form inputs for one panel and returns
+    //  the {canonicalIndex: value} updates object — pure, no network,
+    //  no DOM state changes. Shared by:
+    //   - savePanel(), which sends it straight to the backend for an
+    //     existing record's individual-section edits.
+    //   - saveStudent()'s new-record path, which merges every open
+    //     panel's updates into _record locally before the single
+    //     consolidated addStudent call (see saveStudent below).
+    function _buildPanelUpdates(panel) {
       var updates = {};
 
       if (panel === 'identity') {
@@ -1722,6 +1797,18 @@ function parseAccommodations(raw) {
         updates[COL.ACCOMMODATIONS] = JSON.stringify(collectStateAccommodations());
       }
 
+      return updates;
+    }
+
+    function savePanel(panel) {
+      var saveBtn   = document.querySelector('#footer-'+panel+' .btn-save');
+      var cancelBtn = document.querySelector('#footer-'+panel+' .btn-cancel');
+      if (saveBtn)   saveBtn.disabled   = true;
+      if (cancelBtn) cancelBtn.disabled = true;
+      setPanelStatus(panel, 'Saving…', '#6c8fff');
+
+      var updates = _buildPanelUpdates(panel);
+
       _saveRecord(_studentId, updates, panel, saveBtn, cancelBtn);
     }
 
@@ -1745,9 +1832,26 @@ function parseAccommodations(raw) {
 
       var open = Object.keys(_editing).filter(function(p) { return _editing[p]; });
       if (open.length) {
-        setStatus('Finish the open section' + (open.length > 1 ? 's' : '') + ' first — Save changes or Cancel: ' + open.join(', ') + '.', '#f59e0b');
-        showToast('Save or cancel open sections first', 'error');
-        return;
+        if (_isNew) {
+          // New record, nothing saved yet: an open panel here is just
+          // the PDF-first / Manual Entry flow mid-review. Merge each
+          // open panel's current inputs into _record locally (no
+          // network — _buildPanelUpdates is pure) and close it, so one
+          // "Save Student" click truly is the single consolidated
+          // commit regardless of how many sections were left open.
+          open.forEach(function(p) {
+            var updates = _buildPanelUpdates(p);
+            Object.keys(updates).forEach(function(col) { _record[parseInt(col,10)] = updates[col]; });
+            _closePanel(p);
+          });
+        } else {
+          // Existing record: a panel left open holds edits that live
+          // only in its inputs. Block rather than guess at intent —
+          // the teacher must explicitly Save changes or Cancel.
+          setStatus('Finish the open section' + (open.length > 1 ? 's' : '') + ' first — Save changes or Cancel: ' + open.join(', ') + '.', '#f59e0b');
+          showToast('Save or cancel open sections first', 'error');
+          return;
+        }
       }
 
       var first = String(_record[COL.FIRST_NAME] || '').trim();
@@ -1992,12 +2096,45 @@ function parseAccommodations(raw) {
       s.textContent = msg;
     }
 
+    // ── _revealManualSections() ─────────────────────────────────────
+    //  Un-mutes the form + Save Student bar and opens all four edit
+    //  panels at once, so whether the trigger was a successful PDF
+    //  import or the Manual Entry button, the teacher lands on the
+    //  same fully-editable, ready-to-review state. Idempotent.
+    function _revealManualSections() {
+      if (_manualRevealed) return;
+      _manualRevealed = true;
+      var wrap = document.getElementById('manual-sections-wrapper');
+      if (wrap) wrap.classList.remove('pdf-first-muted');
+      ['identity', 'academic', 'goals', 'assessments'].forEach(function(p) { editPanel(p); });
+    }
+
+    // ── activateManualEntry() ───────────────────────────────────────
+    //  "Manual Entry" button — for registering a student with no IEP
+    //  on file yet. Hides the now-irrelevant import prompt and reveals
+    //  the full manual form, per the PDF-first design.
+    function activateManualEntry() {
+      var card = document.getElementById('iep-import-card');
+      if (card) card.style.display = 'none';
+      _revealManualSections();
+      var first = document.getElementById('firstName');
+      if (first) first.focus();
+    }
+
     function _initIepImport() {
       var card  = document.getElementById('iep-import-card');
       var zone  = document.getElementById('iep-dropzone');
       var input = document.getElementById('iep-file-input');
+      var manualBtn = document.getElementById('btn-manual-entry');
       if (!card || !zone || !input) return;
       card.style.display = 'block';
+
+      // PDF-first default: mute the manual sections until a PDF
+      // import completes or the teacher chooses Manual Entry below.
+      var wrap = document.getElementById('manual-sections-wrapper');
+      if (wrap) wrap.classList.add('pdf-first-muted');
+
+      if (manualBtn) manualBtn.addEventListener('click', activateManualEntry);
 
       zone.addEventListener('click', function() { input.click(); });
       zone.addEventListener('keydown', function(e) {
@@ -2145,6 +2282,11 @@ function parseAccommodations(raw) {
       var notes = Array.isArray(p.confidence_notes) ? p.confidence_notes.filter(Boolean) : [];
       if (notes.length) summary += ' Parser notes: ' + notes.join(' | ');
       _iepStatus(summary, 'ok');
+
+      // PDF-first: the import succeeded, so reveal the (now-populated)
+      // sections for review — same end state as Manual Entry, reached
+      // via the other path.
+      _revealManualSections();
     }
 
     // ── Public API ─────────────────────────────────────────────────
