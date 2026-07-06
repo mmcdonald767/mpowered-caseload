@@ -290,7 +290,7 @@
   <script>
     'use strict';
 
-    var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbybVEYwsl68FUfUBlOM5aWJXgtbH38mjcjFns0QkY5Patls-QJiSOO3eazstDhOMfJg/exec';
+    var GAS_WEBHOOK_URL = 'https://script.google.com/macros/s/AKfycbz4YTW46DN8u3bbvc_6n4PpzswBBCBdmoIfa_mXEPLhTly-1EDlHWPiQqpfBLQIdXic/exec';
 
     // ── Column schema ─────────────────────────────────────────────
     // 0-indexed, must match Code.gs and modify-student.html exactly:
@@ -316,8 +316,17 @@
       return raw === true || /^(true|yes|primary|1)$/i.test(String(raw || '').trim());
     }
 
-    // ── GAS POST helper ───────────────────────────────────────────
+    // ── GAS POST helper — beta-gated ───────────────────────────────
+    //  Every payload is stamped with the signed-in teacher's email so
+    //  Code.gs's beta gate can authorize the request. Responses
+    //  carrying code 401 (no/unrecognized identity) or 403 (not
+    //  enrolled) are intercepted here — identical contract across
+    //  dashboard.html, modify-student.html, tracker.html,
+    //  probe-generator.html, the SDI Engine, and the Data Tools hub.
     function _gasPost(payload) {
+      payload = payload || {};
+      payload.userEmail = sessionStorage.getItem('mp_beta_email') || '';
+
       var cleanUrl = GAS_WEBHOOK_URL.split('#')[0].split('?')[0];
       return fetch(cleanUrl, {
         method:  'POST',
@@ -329,10 +338,37 @@
         return res.json();
       })
       .then(function (data) {
+        // 401 — no/unrecognized identity: stop and force a real
+        // re-authentication at the login gateway.
+        if (data && data.code === 401) {
+          _clearBetaSession();
+          window.location.href = 'https://www.mpowerededucation.com/index.html?error=unauthorized';
+          return new Promise(function () {}); // halt — navigation is underway
+        }
+        // 403 — recognized but not an enrolled beta role.
+        if (data && data.code === 403) {
+          _clearBetaSession();
+          alert('Access Denied: Your account is not enrolled in the closed beta.');
+          throw new Error('Access denied — not enrolled in the closed beta.');
+        }
         if (data.result !== 'success')
           throw new Error(data.error || 'GAS returned result: "' + data.result + '"');
         return data;
       });
+    }
+
+    // ── Beta-session cleanup ─────────────────────────────────────
+    //  Called on 401/403 so a rejected auth session never lingers —
+    //  the user is forced through a real re-authentication rather
+    //  than silently retrying with the same stale identity.
+    function _clearBetaSession() {
+      try {
+        sessionStorage.removeItem('oauth_token');
+        sessionStorage.removeItem('mp_beta_email');
+        sessionStorage.removeItem('mp_beta_role');
+        sessionStorage.removeItem('mp_beta_display_name');
+        sessionStorage.removeItem('mp_beta_auth_time');
+      } catch (e) {}
     }
 
     // ── UI state ──────────────────────────────────────────────────
