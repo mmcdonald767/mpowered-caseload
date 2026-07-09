@@ -568,24 +568,14 @@
              (Primary disability merged into Section 2 above;
               Section 3 is now Goals only — matching clinical flow)
         ═══════════════════════════════════════════════════════ -->
-<div style="display:flex; align-items:center; gap:0.5rem;">
-  <div id="monitorFormModule" class="flex flex-col gap-2">
-    <div class="flex items-center gap-2">
-      <button type="button" id="btnGenMonitorForm" class="btn-mini btn-mini-green" onclick="generateMonitoringForm()">
-        <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i>
-        Generate Monitoring Form
-      </button>
-      <span id="monitorFormStatus" class="hidden text-xs font-mono text-textSecondary" role="status" aria-live="polite"></span>
-    </div>
-    <div id="monitorFormResult" class="hidden rounded-lg border border-borderSubtle bg-surface px-3 py-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
-      <span class="font-mono text-textMuted"><span id="monitorFormVersion" class="text-accentGreen font-semibold"></span><span id="monitorFormMeta"></span></span>
-      <a id="monitorFormLiveLink" href="#" target="_blank" rel="noopener" class="text-accentBlue hover:text-accentBlueHover underline underline-offset-2">Open live form</a>
-      <a id="monitorFormEditLink" href="#" target="_blank" rel="noopener" class="text-textSecondary hover:text-textPrimary underline underline-offset-2">Edit in Forms</a>
-      <button type="button" id="btnCopyMonitorLink" class="btn-mini" onclick="copyMonitoringLink()">Copy link</button>
-    </div>
-  </div>
-  <button type="button" class="btn btn-edit" onclick="App.editPanel('goals')">Edit</button>
-</div>
+        <section class="panel" id="panel-goals" aria-labelledby="hd-s3" style="margin-bottom:1.25rem;">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow" id="hd-s3">Section 03 &middot; IEP Goals</p>
+              <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">Measurable Annual Goals &amp; SDI</h2>
+            </div>
+            <button type="button" class="btn btn-edit" onclick="App.editPanel('goals')">Edit</button>
+          </div>
 
           <!-- VIEW -->
           <div id="view-goals">
@@ -704,6 +694,43 @@
         <span id="save-student-status" class="save-student-status" aria-live="polite"></span>
         <button type="button" id="btn-save-student" class="btn btn-save btn-save-student" onclick="App.saveStudent()">Save Student</button>
       </div>
+
+
+      <!-- ═══════════════════════════════════════════════════
+           SECTION 7 — PROGRESS MONITORING FORM
+           One persistent Google Form per student per IEP cycle.
+           Sits below the record sections because it operates on
+           the SAVED record (FormRegistry-backed), not on unsaved
+           panel edits. Inherits pdf-first muting: a brand-new
+           record has no tag to register a form against.
+      ═══════════════════════════════════════════════════ -->
+      <section class="panel" id="panel-monitoring" aria-labelledby="hd-s7" style="margin-top:1.25rem;">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow" id="hd-s7">Section 07 &middot; Progress Monitoring</p>
+            <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">Weekly Data Collection Form</h2>
+          </div>
+          <button type="button" id="btnGenMonitorForm" class="btn btn-save" onclick="generateMonitoringForm()">Generate Monitoring Form</button>
+        </div>
+
+        <p class="text-[0.78rem] text-slate-400" style="max-width:62ch;margin-bottom:0.85rem;">
+          Creates one persistent Google Form for this student spanning the IEP cycle —
+          teacher sign-off, session date, and a Setting / Accuracy / Score / Notes block per
+          goal. Regenerating after goal changes retires the old form and mints a new version;
+          responses flow into GoalData through the Data Utility’s Bulk Import.
+        </p>
+
+        <p id="monitorFormStatus" style="display:none;font-family:'JetBrains Mono',monospace;font-size:0.68rem;margin:0 0 0.6rem;" role="status" aria-live="polite"></p>
+
+        <div id="monitorFormResult" style="display:none;background:rgba(108,143,255,0.05);border:1px solid #252c42;border-radius:8px;padding:0.6rem 0.85rem;flex-wrap:wrap;align-items:center;gap:0.35rem 1.1rem;font-size:0.72rem;">
+          <span style="font-family:'JetBrains Mono',monospace;color:#4a5578;">
+            <span id="monitorFormVersion" style="color:#34d399;font-weight:600;"></span><span id="monitorFormMeta"></span>
+          </span>
+          <a id="monitorFormLiveLink" href="#" target="_blank" rel="noopener" style="color:#6c8fff;text-decoration:underline;text-underline-offset:2px;">Open live form</a>
+          <a id="monitorFormEditLink" href="#" target="_blank" rel="noopener" style="color:#7d8fb3;text-decoration:underline;text-underline-offset:2px;">Edit in Forms</a>
+          <button type="button" id="btnCopyMonitorLink" class="btn btn-edit" onclick="copyMonitoringLink()">Copy link</button>
+        </div>
+      </section>
 
       </div><!-- /manual-sections-wrapper -->
 
@@ -2640,10 +2667,10 @@ function parseAccommodations(raw) {
     var el = document.getElementById('monitorFormStatus');
     if (!el) return;
     el.textContent = msg || '';
-    el.classList.toggle('hidden', !msg);
+    el.style.display = msg ? 'block' : 'none';
     el.style.color = tone === 'ok'  ? '#34d399'
                    : tone === 'err' ? '#f87171'
-                   : '#94a3b8';
+                   : '#7d8fb3';
   }
 
   function _monShowResult(data) {
@@ -2655,7 +2682,7 @@ function parseAccommodations(raw) {
       ' · sheet: ' + data.responseSheet;
     document.getElementById('monitorFormLiveLink').href = data.publishedUrl;
     document.getElementById('monitorFormEditLink').href = data.editUrl;
-    wrap.classList.remove('hidden');
+    wrap.style.display = 'flex';
   }
 
   function generateMonitoringForm() {
