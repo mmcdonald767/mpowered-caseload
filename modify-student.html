@@ -568,14 +568,24 @@
              (Primary disability merged into Section 2 above;
               Section 3 is now Goals only — matching clinical flow)
         ═══════════════════════════════════════════════════════ -->
-        <section class="panel" id="panel-goals" aria-labelledby="hd-s3" style="margin-bottom:1.25rem;">
-          <div class="section-heading">
-            <div>
-              <p class="eyebrow" id="hd-s3">Section 03 &middot; IEP Goals</p>
-              <h2 class="text-[1rem] font-semibold text-slate-100 leading-tight">Measurable Annual Goals</h2>
-            </div>
-            <button type="button" class="btn btn-edit" onclick="App.editPanel('goals')">Edit</button>
-          </div>
+<div style="display:flex; align-items:center; gap:0.5rem;">
+  <div id="monitorFormModule" class="flex flex-col gap-2">
+    <div class="flex items-center gap-2">
+      <button type="button" id="btnGenMonitorForm" class="btn-mini btn-mini-green" onclick="generateMonitoringForm()">
+        <i data-lucide="clipboard-list" class="w-3.5 h-3.5"></i>
+        Generate Monitoring Form
+      </button>
+      <span id="monitorFormStatus" class="hidden text-xs font-mono text-textSecondary" role="status" aria-live="polite"></span>
+    </div>
+    <div id="monitorFormResult" class="hidden rounded-lg border border-borderSubtle bg-surface px-3 py-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+      <span class="font-mono text-textMuted"><span id="monitorFormVersion" class="text-accentGreen font-semibold"></span><span id="monitorFormMeta"></span></span>
+      <a id="monitorFormLiveLink" href="#" target="_blank" rel="noopener" class="text-accentBlue hover:text-accentBlueHover underline underline-offset-2">Open live form</a>
+      <a id="monitorFormEditLink" href="#" target="_blank" rel="noopener" class="text-textSecondary hover:text-textPrimary underline underline-offset-2">Edit in Forms</a>
+      <button type="button" id="btnCopyMonitorLink" class="btn-mini" onclick="copyMonitoringLink()">Copy link</button>
+    </div>
+  </div>
+  <button type="button" class="btn btn-edit" onclick="App.editPanel('goals')">Edit</button>
+</div>
 
           <!-- VIEW -->
           <div id="view-goals">
@@ -1507,6 +1517,7 @@ function parseAccommodations(raw) {
       // Reveal the Delete button only for saved (non-new) records
       var delBtn = document.getElementById('btn-delete-student');
       if (delBtn) delBtn.style.display = _isNew ? 'none' : 'inline-flex';
+   loadExistingMonitoringForm();
     }
 
     // Render the IEP countdown in the view-mode banner (#iepCountdownView)
@@ -2564,6 +2575,140 @@ function parseAccommodations(raw) {
       'Goal ID       : ' + goalId     + '\n\n' +
       '(Data/Click Tracker — coming soon)'
     );
+  }
+   /* ================================================================
+     MONITORING FORM GENERATION
+     One long-term Google Form per student per IEP cycle. The backend
+     is idempotent: an unchanged goal set returns the EXISTING form
+     (no duplicate); a drifted goal set retires the old version and
+     mints v(n+1). Old versions remain importable in the Data Utility.
+  ================================================================ */
+
+  var MONITOR_CFG = {
+    gasUrl: 'https://script.google.com/macros/s/AKfycbwhMJNCd2pPr4PhH90vhfMOj_XFfyDDSzE3iaqPQ4ThM-59XRVI9UH76ABrbm_iQFsF/exec',
+
+    // Return the loaded student's stable tag (DatabaseID). Wire this
+    // to however modify-student holds the current record.
+    getStudentTag: function () {
+      // Access the DatabaseID from your column map (COL.ID)
+      return _record ? String(_record[COL.ID] || '').trim() : '';
+    },
+
+    // Return the current goal set. collectGoals() already produces
+    // [{ id, description, sdi }] — reuse it verbatim if present.
+   getGoals: function () {
+      // Use your existing internal helper which is already scoped in this file
+      return _record ? parseGoals(_record[COL.GOALS]) : [];
+    }
+  };
+
+  function _monStatus(msg, tone) {
+    var el = document.getElementById('monitorFormStatus');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.classList.toggle('hidden', !msg);
+    el.style.color = tone === 'ok'  ? '#34d399'
+                   : tone === 'err' ? '#f87171'
+                   : '#94a3b8';
+  }
+
+  function _monShowResult(data) {
+    var wrap = document.getElementById('monitorFormResult');
+    if (!wrap) return;
+    document.getElementById('monitorFormVersion').textContent = 'v' + data.version;
+    document.getElementById('monitorFormMeta').textContent =
+      ' · ' + data.goalCount + ' goal' + (data.goalCount === 1 ? '' : 's') +
+      ' · sheet: ' + data.responseSheet;
+    document.getElementById('monitorFormLiveLink').href = data.publishedUrl;
+    document.getElementById('monitorFormEditLink').href = data.editUrl;
+    wrap.classList.remove('hidden');
+  }
+
+  function generateMonitoringForm() {
+    var btn = document.getElementById('btnGenMonitorForm');
+    var tag = MONITOR_CFG.getStudentTag();
+    var goals = MONITOR_CFG.getGoals();
+
+    if (!tag) {
+      _monStatus('Save the student record first — a DatabaseID tag is required.', 'err');
+      return;
+    }
+    if (!goals.length) {
+      _monStatus('Add at least one IEP goal before generating a monitoring form.', 'err');
+      return;
+    }
+    var incomplete = goals.filter(function (g) { return !g.id || !String(g.description || '').trim(); });
+    if (incomplete.length) {
+      _monStatus('Every goal needs a description before the form can be generated.', 'err');
+      return;
+    }
+
+    if (btn) btn.disabled = true;
+    _monStatus('Generating monitoring form…');
+
+    fetch(MONITOR_CFG.gasUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action:     'exportMonitoringForm',
+        studentTag: tag,
+        goals:      goals
+      })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (data.result !== 'success') throw new Error(data.error || 'Unknown backend error');
+      _monShowResult(data);
+      _monStatus(
+        data.reused
+          ? '✓ Active form is current for this goal set — existing links returned.'
+          : '✓ Monitoring form v' + data.version + ' created and registered.'
+          , 'ok'
+      );
+    })
+    .catch(function (err) {
+      _monStatus('Form generation failed: ' + err.message, 'err');
+    })
+    .then(function () {
+      if (btn) btn.disabled = false;
+      if (window.lucide) lucide.createIcons();
+    });
+  }
+
+  function copyMonitoringLink() {
+    var a = document.getElementById('monitorFormLiveLink');
+    if (!a || !a.href || a.getAttribute('href') === '#') return;
+    navigator.clipboard.writeText(a.href).then(function () {
+      _monStatus('✓ Live form link copied.', 'ok');
+    });
+  }
+
+  // Optional: on student load, surface an already-registered active
+  // form so the strip is populated without regenerating. Call
+  // loadExistingMonitoringForm() from your record-load handler.
+  function loadExistingMonitoringForm() {
+    var tag = MONITOR_CFG.getStudentTag();
+    if (!tag) return;
+    fetch(MONITOR_CFG.gasUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'getMonitoringForms', studentTag: tag })
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (data.result !== 'success') return;
+      var active = (data.forms || []).filter(function (f) { return f.status === 'active'; })[0];
+      if (active) {
+        _monShowResult({
+          version:       active.version,
+          goalCount:     active.goalCount,
+          responseSheet: active.responseSheet,
+          publishedUrl:  active.publishedUrl,
+          editUrl:       active.editUrl
+        });
+      }
+    })
+    .catch(function () { /* silent — strip simply stays hidden */ });
   }
   </script>
 </body>
