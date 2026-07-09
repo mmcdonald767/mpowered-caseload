@@ -1517,7 +1517,14 @@ function parseAccommodations(raw) {
       // Reveal the Delete button only for saved (non-new) records
       var delBtn = document.getElementById('btn-delete-student');
       if (delBtn) delBtn.style.display = _isNew ? 'none' : 'inline-flex';
-   loadExistingMonitoringForm();
+
+      // Monitoring strip: only saved records can have a registered
+      // form, and a strip failure must never take down record
+      // hydration (this runs in BOTH the load and IEP-import flows).
+      if (!_isNew) {
+        try { loadExistingMonitoringForm(); }
+        catch (e) { console.warn('[monitoring] strip skipped:', e); }
+      }
     }
 
     // Render the IEP countdown in the view-mode banner (#iepCountdownView)
@@ -2351,6 +2358,34 @@ function parseAccommodations(raw) {
 
     // ── Public API ─────────────────────────────────────────────────
     return {
+      // ── Monitoring Hub accessors ─────────────────────────────────
+      //  Read-only bridges across the closure boundary: the monitoring
+      //  module lives OUTSIDE this IIFE, so it can never touch _record,
+      //  COL, or parseGoals directly. These are the only sanctioned
+      //  crossing points.
+      //  · Tag is COL.TAG — the opaque FERPA-safe token (Data Contract
+      //    v1.1, same key launchTracker sends), NOT the DatabaseID.
+      //  · Goals are adapted from the v1.1 shell to the backend's
+      //    { id, description, sdi:string } contract. Fallback id
+      //    'LOCAL-legacy-'+idx mirrors the launchTracker convention
+      //    for goals that pre-date goal_id docking.
+      getMonitorTag: function () {
+        return _record ? String(_record[COL.TAG] || '').trim() : '';
+      },
+      getMonitorGoals: function () {
+        if (!_record) return [];
+        return parseGoals(_record[COL.GOALS]).map(function (g, idx) {
+          var s = (g.sdi && typeof g.sdi === 'object') ? g.sdi : {};
+          return {
+            id:          g.goal_id || ('LOCAL-legacy-' + idx),
+            description: String(g.description || ''),
+            sdi:         [s.strategy, s.delivery_model, s.frequency]
+                           .filter(Boolean).join(' \u00b7 ')
+          };
+        });
+      },
+      isNewRecord: function () { return _isNew; },
+
       editPanel:                  editPanel,
       cancelPanel:                cancelPanel,
       savePanel:                  savePanel,
@@ -2587,18 +2622,17 @@ function parseAccommodations(raw) {
   var MONITOR_CFG = {
     gasUrl: 'https://script.google.com/macros/s/AKfycbwhMJNCd2pPr4PhH90vhfMOj_XFfyDDSzE3iaqPQ4ThM-59XRVI9UH76ABrbm_iQFsF/exec',
 
-    // Return the loaded student's stable tag (DatabaseID). Wire this
-    // to however modify-student holds the current record.
+    // _record, COL, and parseGoals are PRIVATE to the App IIFE — this
+    // module runs in the outer script scope and must go through the
+    // App accessors. Tag = COL.TAG (FERPA-safe token, matches the
+    // tracker's GoalData.StudentTag key); goals arrive pre-adapted to
+    // the backend's { id, description, sdi:string } contract.
     getStudentTag: function () {
-      // Access the DatabaseID from your column map (COL.ID)
-      return _record ? String(_record[COL.ID] || '').trim() : '';
+      return App.getMonitorTag();
     },
 
-    // Return the current goal set. collectGoals() already produces
-    // [{ id, description, sdi }] — reuse it verbatim if present.
-   getGoals: function () {
-      // Use your existing internal helper which is already scoped in this file
-      return _record ? parseGoals(_record[COL.GOALS]) : [];
+    getGoals: function () {
+      return App.getMonitorGoals();
     }
   };
 
