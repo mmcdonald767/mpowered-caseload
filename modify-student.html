@@ -699,10 +699,10 @@
       <!-- ═══════════════════════════════════════════════════
            SECTION 7 — PROGRESS MONITORING FORM
            One persistent Google Form per student per IEP cycle.
-           Sits below the record sections because it operates on
-           the SAVED record (FormRegistry-backed), not on unsaved
-           panel edits. Inherits pdf-first muting: a brand-new
-           record has no tag to register a form against.
+           Sits below the record sections: it operates on the SAVED
+           record (FormRegistry-backed), not on unsaved panel edits.
+           Inherits pdf-first muting — a brand-new record has no tag
+           to register a form against.
       ═══════════════════════════════════════════════════ -->
       <section class="panel" id="panel-monitoring" aria-labelledby="hd-s7" style="margin-top:1.25rem;">
         <div class="section-heading">
@@ -2647,7 +2647,11 @@ function parseAccommodations(raw) {
   ================================================================ */
 
   var MONITOR_CFG = {
-    gasUrl: 'https://script.google.com/macros/s/AKfycbwhMJNCd2pPr4PhH90vhfMOj_XFfyDDSzE3iaqPQ4ThM-59XRVI9UH76ABrbm_iQFsF/exec',
+    // Reuses the page's GAS_URL constant: the monitoring routes live in
+    // THIS page's Apps Script project. The previous hardcoded URL pointed
+    // at the dashboard intake webhook — a different deployment with no
+    // monitoring routes — which is what produced the "reading 'tag'" error.
+    gasUrl: GAS_URL,
 
     // _record, COL, and parseGoals are PRIVATE to the App IIFE — this
     // module runs in the outer script scope and must go through the
