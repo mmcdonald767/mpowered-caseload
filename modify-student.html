@@ -717,7 +717,7 @@
           Creates one persistent Google Form for this student spanning the IEP cycle —
           teacher sign-off, session date, and a Setting / Accuracy / Score / Notes block per
           goal. Regenerating after goal changes retires the old form and mints a new version;
-          responses flow into GoalData through the Data Utility’s Bulk Import.
+          responses flow into GoalData through the Data Utility&#39;s Bulk Import.
         </p>
 
         <p id="monitorFormStatus" style="display:none;font-family:'JetBrains Mono',monospace;font-size:0.68rem;margin:0 0 0.6rem;" role="status" aria-live="polite"></p>
@@ -730,6 +730,95 @@
           <a id="monitorFormEditLink" href="#" target="_blank" rel="noopener" style="color:#7d8fb3;text-decoration:underline;text-underline-offset:2px;">Edit in Forms</a>
           <button type="button" id="btnCopyMonitorLink" class="btn btn-edit" onclick="copyMonitoringLink()">Copy link</button>
         </div>
+
+        <!-- ── Data Request Schedule ────────────────────────────────
+             Sends automated email data-requests to gen-ed / co-teachers
+             on a configurable cadence. Config is stored in the
+             EmailRequestConfig sheet (keyed by StudentTag + sped-teacher
+             email) and evaluated by the checkAndSendDataRequests() daily
+             time-driven trigger in Code.gs.
+        ─────────────────────────────────────────────────────────── -->
+        <hr style="border:none;border-top:1px solid #1e2335;margin:1.25rem 0;" />
+
+        <div class="section-heading" style="margin-bottom:0.75rem;">
+          <div>
+            <p class="eyebrow" style="margin-bottom:0.2rem;">Data Request Schedule</p>
+            <p class="text-[0.78rem] text-slate-400" style="margin:0;">
+              Automatically emails co-teachers and gen-ed teachers a brief data-request
+              with a direct link to this student&#39;s progress-monitoring form.
+            </p>
+          </div>
+          <button type="button" id="btnToggleEmailCfg" class="btn btn-edit"
+                  onclick="toggleEmailConfig()" aria-expanded="false" aria-controls="emailConfigPanel">
+            Configure
+          </button>
+        </div>
+
+        <!-- Summary strip — visible when a config is loaded and panel is collapsed -->
+        <p id="emailConfigSummary" style="display:none;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#7d8fb3;margin:0 0 0.5rem;" aria-live="polite"></p>
+
+        <!-- Configuration panel (hidden by default; opened by Configure button) -->
+        <div id="emailConfigPanel" style="display:none;background:rgba(108,143,255,0.04);border:1px solid #252c42;border-radius:10px;padding:1rem 1.1rem;margin-top:0.5rem;">
+
+          <div style="margin-bottom:0.85rem;">
+            <label class="field-label" for="emailRecipients" style="display:block;margin-bottom:0.3rem;">
+              Recipient emails
+              <span style="color:#4a5578;font-weight:400;margin-left:0.4rem;">(comma-separated)</span>
+            </label>
+            <input type="text" id="emailRecipients" class="field-input"
+                   placeholder="teacher1@school.edu, teacher2@school.edu"
+                   aria-describedby="emailRecipientsHint" />
+            <p id="emailRecipientsHint" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:#4a5578;margin:0.3rem 0 0;">
+              General-education and co-teacher addresses who will receive the automated data requests.
+            </p>
+          </div>
+
+          <div style="margin-bottom:0.85rem;">
+            <label class="field-label" for="emailFrequency" style="display:block;margin-bottom:0.3rem;">Frequency</label>
+            <select id="emailFrequency" class="field-select">
+              <option value="weekly-friday">Weekly — every Friday</option>
+              <option value="weekly-monday">Weekly — every Monday</option>
+              <option value="biweekly">Every two weeks (bi-weekly)</option>
+              <option value="monthly">Monthly (first of the month)</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom:0.85rem;">
+            <label class="field-label" for="emailSubjectTemplate" style="display:block;margin-bottom:0.3rem;">
+              Email subject line
+            </label>
+            <input type="text" id="emailSubjectTemplate" class="field-input"
+                   placeholder="Auto-generated from student initials and week date"
+                   aria-describedby="emailSubjectHint"
+                   oninput="_emailSubjectEdited = true" />
+            <p id="emailSubjectHint" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:#4a5578;margin:0.3rem 0 0;">
+              Defaults to <span style="font-family:'JetBrains Mono',monospace;">[Initials] Week of [DATE] Data Collection</span>.
+              Edit to resolve duplicate initials or customise wording.
+              <button type="button"
+                      onclick="_emailSubjectEdited=false; _refreshDefaultSubject()"
+                      style="background:none;border:none;color:#6c8fff;font-size:0.72rem;font-family:'Inter',sans-serif;cursor:pointer;padding:0;margin-left:0.35rem;text-decoration:underline;">Reset to default</button>
+            </p>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:1rem;">
+            <input type="checkbox" id="emailConfigActive"
+                   style="width:15px;height:15px;accent-color:#6c8fff;cursor:pointer;" />
+            <label for="emailConfigActive"
+                   style="font-family:'Inter',sans-serif;font-size:0.78rem;color:#7d8fb3;cursor:pointer;margin:0;">
+              Enable automated data requests for this student
+            </label>
+          </div>
+
+          <div class="btn-row">
+            <button type="button" class="btn btn-save" id="btnSaveEmailCfg"
+                    onclick="saveEmailConfig()">Save schedule</button>
+            <button type="button" class="btn btn-cancel"
+                    onclick="toggleEmailConfig()">Close</button>
+          </div>
+
+          <p id="emailConfigStatus" style="display:none;font-family:'JetBrains Mono',monospace;font-size:0.68rem;margin:0.6rem 0 0;" role="status" aria-live="polite"></p>
+        </div>
+
       </section>
 
       </div><!-- /manual-sections-wrapper -->
@@ -2592,6 +2681,30 @@ function parseAccommodations(raw) {
       },
       isNewRecord: function () { return _isNew; },
 
+      // ── Email-request config accessors ────────────────────────
+      //  The email-config module runs OUTSIDE the IIFE and calls
+      //  _gasPost through these bridges (same pattern as monitoring).
+      getEmailConfigTag: function () {
+        return _record ? String(_record[COL.TAG] || '').trim() : '';
+      },
+      getEmailConfigStudentName: function () {
+        if (!_record) return '';
+        var first = String(_record[COL.FIRST_NAME] || '').trim();
+        var last  = String(_record[COL.LAST_NAME]  || '').trim();
+        return (last && first) ? (first + ' ' + last) : (first || last || '');
+      },
+      getEmailConfigFormUrl: function () {
+        // Returns the live monitoring-form URL from the DOM strip, if
+        // one has been generated — so the email body can include it.
+        var a = document.getElementById('monitorFormLiveLink');
+        return (a && a.href && a.getAttribute('href') !== '#') ? a.href : '';
+      },
+      gasPostPublic: function (payload) {
+        // Thin public shim: the outer script calls this to POST to GAS
+        // without needing to re-implement the auth-stamping logic.
+        return _gasPost(payload);
+      },
+
       editPanel:                  editPanel,
       cancelPanel:                cancelPanel,
       savePanel:                  savePanel,
@@ -2952,7 +3065,222 @@ function parseAccommodations(raw) {
         });
       }
     })
-    .catch(function () { /* silent — strip simply stays hidden */ });
+    .catch(function () { /* silent — strip simply stays hidden */ })
+    .then(function () {
+      // After the monitoring strip settles, load any saved email config.
+      // This fires on every saved-record load, so the summary strip and
+      // panel fields are always pre-populated when the teacher opens them.
+      if (!App.isNewRecord()) loadExistingEmailConfig();
+    });
+  }
+
+  /* ================================================================
+     EMAIL DATA REQUEST SCHEDULE
+     Stores and retrieves per-student email-dispatch configurations.
+     The actual sending is handled by the Code.gs time-driven trigger
+     checkAndSendDataRequests(), which runs daily and evaluates the
+     EmailRequestConfig sheet against today's date and day-of-week.
+
+     All GAS calls go through App.gasPostPublic() so auth-stamping and
+     401/403 gating stay centralised inside the App IIFE.
+  ================================================================ */
+
+  var FREQ_LABELS = {
+    'weekly-friday': 'Weekly — every Friday',
+    'weekly-monday': 'Weekly — every Monday',
+    'biweekly':      'Every two weeks (bi-weekly)',
+    'monthly':       'Monthly (first of the month)'
+  };
+
+  // Tracks whether the teacher has manually edited the subject field.
+  // While false the field is kept in sync with the default template;
+  // once true it is left alone until the teacher clicks "Reset to default".
+  var _emailSubjectEdited = false;
+
+  // ── _buildDefaultSubject ────────────────────────────────────────
+  //  Computes the default subject line from the current record.
+  //  Format: "[AB] Week of MM/DD/YYYY Data Collection"
+  //  Initials: first letter of first name + first letter of last name
+  //  (uppercased). If only one name part is available, use up to two
+  //  chars of that part so the field is never blank.
+  //  "Week of" date: the Monday of the CURRENT week, formatted M/D/YYYY,
+  //  matching how teachers typically reference the school week.
+  function _buildDefaultSubject() {
+    var name = App.getEmailConfigStudentName();
+    var parts = name.trim().split(/\s+/);
+    var initials;
+    if (parts.length >= 2) {
+      initials = (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    } else if (parts.length === 1 && parts[0]) {
+      initials = parts[0].slice(0, 2).toUpperCase();
+    } else {
+      initials = '–';  // em-dash placeholder when no name is loaded yet
+    }
+
+    // Monday of the current week
+    var now = new Date();
+    var day = now.getDay();  // 0 = Sun, 1 = Mon, …
+    var diff = (day === 0) ? -6 : 1 - day;  // back-step to Monday
+    var monday = new Date(now);
+    monday.setDate(now.getDate() + diff);
+    var weekOf = (monday.getMonth() + 1) + '/' + monday.getDate() + '/' + monday.getFullYear();
+
+    return '[' + initials + '] Week of ' + weekOf + ' Data Collection';
+  }
+
+  // ── _refreshDefaultSubject ───────────────────────────────────────
+  //  Writes the computed default into the subject field IF the
+  //  teacher has not manually edited it in this session.  Called:
+  //    · on panel open (toggleEmailConfig)
+  //    · after record load (loadExistingEmailConfig, when no saved
+  //      custom template is present)
+  //    · when the teacher clicks "Reset to default"
+  function _refreshDefaultSubject() {
+    var el = document.getElementById('emailSubjectTemplate');
+    if (!el) return;
+    el.value = _buildDefaultSubject();
+    _emailSubjectEdited = false;
+  }
+
+  function _emailCfgStatus(msg, tone) {
+    var el = document.getElementById('emailConfigStatus');
+    if (!el) return;
+    el.textContent = msg || '';
+    el.style.display = msg ? 'block' : 'none';
+    el.style.color = tone === 'ok'  ? '#34d399'
+                   : tone === 'err' ? '#f87171'
+                   : '#7d8fb3';
+  }
+
+  function _emailCfgSummary(recipients, frequency, active) {
+    var el = document.getElementById('emailConfigSummary');
+    if (!el) return;
+    if (!recipients) { el.style.display = 'none'; return; }
+    var freqLabel = FREQ_LABELS[frequency] || frequency;
+    el.textContent = (active ? '✓ Active' : '⏸ Paused') + ' · ' + freqLabel +
+                     ' · ' + recipients.split(',').length + ' recipient(s)';
+    el.style.color = active ? '#34d399' : '#7d8fb3';
+    el.style.display = 'block';
+  }
+
+  // ── toggleEmailConfig ────────────────────────────────────────────
+  //  Shows/hides the configuration panel and updates the button label.
+  function toggleEmailConfig() {
+    var panel  = document.getElementById('emailConfigPanel');
+    var btn    = document.getElementById('btnToggleEmailCfg');
+    if (!panel || !btn) return;
+    var open = panel.style.display !== 'none';
+    panel.style.display = open ? 'none' : 'block';
+    btn.setAttribute('aria-expanded', open ? 'false' : 'true');
+    btn.textContent = open ? 'Configure' : 'Close';
+    if (!open) {
+      _emailCfgStatus('');  // clear stale status on re-open
+      // Populate the default subject if the field is still empty and
+      // the teacher has not previously edited it.
+      if (!_emailSubjectEdited) _refreshDefaultSubject();
+    }
+  }
+
+  // ── saveEmailConfig ──────────────────────────────────────────────
+  //  Reads the panel fields, validates, and POSTs to saveEmailRequestConfig.
+  function saveEmailConfig() {
+    var tag       = App.getEmailConfigTag();
+    var name      = App.getEmailConfigStudentName();
+    var formUrl   = App.getEmailConfigFormUrl();
+    var rawEmails = (document.getElementById('emailRecipients')      || {}).value || '';
+    var frequency = (document.getElementById('emailFrequency')       || {}).value || 'weekly-friday';
+    var active    = !!(document.getElementById('emailConfigActive')   || {}).checked;
+    var subjectEl = document.getElementById('emailSubjectTemplate');
+    // Use whatever is in the field; fall back to the computed default
+    // so we always store a non-empty template.
+    var subjectTemplate = (subjectEl && subjectEl.value.trim())
+      ? subjectEl.value.trim()
+      : _buildDefaultSubject();
+
+    if (!tag) {
+      _emailCfgStatus('Save the student record first — a tag is required before scheduling emails.', 'err');
+      return;
+    }
+
+    // Normalise and validate the recipient list.
+    var emails = rawEmails.split(',').map(function (e) { return e.trim().toLowerCase(); })
+                          .filter(function (e) { return e.length > 0; });
+    var invalid = emails.filter(function (e) { return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); });
+    if (!emails.length) {
+      _emailCfgStatus('Add at least one recipient email address.', 'err');
+      return;
+    }
+    if (invalid.length) {
+      _emailCfgStatus('These addresses look invalid: ' + invalid.join(', '), 'err');
+      return;
+    }
+
+    var btn = document.getElementById('btnSaveEmailCfg');
+    if (btn) btn.disabled = true;
+    _emailCfgStatus('Saving schedule…');
+
+    App.gasPostPublic({
+      action:          'saveEmailRequestConfig',
+      studentTag:      tag,
+      studentName:     name,
+      formUrl:         formUrl,
+      recipients:      emails.join(','),
+      frequency:       frequency,
+      active:          active,
+      subjectTemplate: subjectTemplate
+    })
+    .then(function (data) {
+      _emailCfgStatus('✓ Schedule saved. ' + (active
+        ? 'Automated requests will be dispatched on the next scheduled send.'
+        : 'Schedule is paused — no emails will be sent until re-enabled.'), 'ok');
+      _emailCfgSummary(emails.join(', '), frequency, active);
+    })
+    .catch(function (err) {
+      _emailCfgStatus('Save failed: ' + (err && err.message ? err.message : 'unknown error'), 'err');
+    })
+    .then(function () {
+      if (btn) btn.disabled = false;
+    });
+  }
+
+  // ── loadExistingEmailConfig ──────────────────────────────────────
+  //  Called on record load (from loadExistingMonitoringForm's .then).
+  //  Silently populates the panel fields and summary strip if a
+  //  config exists — the panel stays collapsed until the teacher
+  //  clicks Configure.
+  function loadExistingEmailConfig() {
+    var tag = App.getEmailConfigTag();
+    if (!tag) return;
+
+    App.gasPostPublic({ action: 'getEmailRequestConfig', studentTag: tag })
+    .then(function (data) {
+      var cfg = data.config;
+      if (!cfg || !cfg.recipients) return;
+
+      // Hydrate the form fields
+      var recInput  = document.getElementById('emailRecipients');
+      var freqSel   = document.getElementById('emailFrequency');
+      var activeCb  = document.getElementById('emailConfigActive');
+      var subjectEl = document.getElementById('emailSubjectTemplate');
+      if (recInput)  recInput.value   = cfg.recipients;
+      if (freqSel)   freqSel.value    = cfg.frequency || 'weekly-friday';
+      if (activeCb)  activeCb.checked = cfg.active === true || cfg.active === 'true';
+      if (subjectEl) {
+        if (cfg.subjectTemplate) {
+          // A saved custom template exists — load it and mark as edited
+          // so the default regeneration does not overwrite it.
+          subjectEl.value = cfg.subjectTemplate;
+          _emailSubjectEdited = true;
+        } else {
+          // No saved template yet — compute and show the default.
+          _refreshDefaultSubject();
+        }
+      }
+
+      // Show the summary strip (panel stays collapsed)
+      _emailCfgSummary(cfg.recipients, cfg.frequency, cfg.active === true || cfg.active === 'true');
+    })
+    .catch(function () { /* silent — no config yet is fine */ });
   }
   </script>
 </body>
