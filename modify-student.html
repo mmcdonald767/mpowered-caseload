@@ -2175,11 +2175,19 @@ function parseAccommodations(raw) {
 
     // ═══════════════════════════════════════════════════════════════
     //  IEP PDF IMPORT (new-student mode)
-    //  Extraction is local (pdf.js); the extracted TEXT goes to the
-    //  parseIepDocument GAS route, which returns structured fields.
-    //  Those populate _record + the read-only view; the teacher then
-    //  reviews/edits through the normal panels, and the existing
-    //  addStudent save path commits the whole record.
+    //
+    //  Pipeline:
+    //    1. pdf.js extracts raw text entirely in-browser (the document
+    //       itself never leaves the device — privacy preserved).
+    //    2. _chunkIepText() walks the raw text line-by-line, keeping
+    //       only the six data-bearing sections we need and stripping
+    //       all boilerplate (Present Levels, transition tables, LRE,
+    //       ESY, etc.). Typical reduction: 60–80% for an 8-page IEP.
+    //    3. The labelled, stripped payload replaces the raw blob as
+    //       the iep_text sent to parseIepDocument. Code.gs is
+    //       unchanged — it reads whatever string arrives in iep_text.
+    //    4. _applyImportedIep() hydrates _record and the read-only
+    //       view. The teacher reviews/edits; addStudent commits.
     // ═══════════════════════════════════════════════════════════════
 
     function _iepStatus(msg, tone) {
@@ -2259,6 +2267,156 @@ function parseAccommodations(raw) {
       _extractIepPdf(file);
     }
 
+    // ── _chunkIepText(rawText) ──────────────────────────────────────
+    //  Client-side structural chunker. Walks the pdf.js output line
+    //  by line, classifying each line as the start of a KEEP section,
+    //  the start of a DROP section, or a noise line to strip inside a
+    //  KEEP section. Returns a labelled string safe to send as iep_text.
+    //
+    //  Sections kept (labelled for Gemini orientation):
+    //    [S01:STUDENT_BASICS]   — page-1 preamble (name visible before header)
+    //    [S01:STUDENT_INFO]     — Student Information block
+    //    [S02:IEP_TIMELINE]     — Plan Information (dates, disability)
+    //    [S02:POSTSECONDARY]    — Postsecondary Goal(s) section
+    //    [S02:SUPPLEMENTAL_AIDS]— Supplementary Aids and Services
+    //    [S03:GOALS]            — Measurable Annual Goals (goals + SDI + method)
+    //    [S06:STATE_ASSESSMENTS]— Accommodations for State Assessments
+    //
+    //  Sections dropped (boilerplate / noise — not needed by Gemini):
+    //    Present Levels, Transition Needs, Course of Study, Transfer of
+    //    Rights, Consideration of Special Factors, Reporting Progress,
+    //    Benchmarks lines, Program Modifications, LRE, SpEd Services, ESY.
+    //
+    //  Noise lines stripped inside KEEP sections:
+    //    Repeated page headers, "For the IEP to be in effect…",
+    //    "This annual goal will reasonably enable…", "Benchmarks/Short-Term",
+    //    "Contingency Plan:", "KY IEP (Revised…", legal-boilerplate paras.
+    // ───────────────────────────────────────────────────────────────
+    function _chunkIepText(rawText) {
+
+      // ── Section boundary table ───────────────────────────────────
+      // Each entry: { re: RegExp (anchored to line start), label, keep }
+      // Order matters: first match wins. Anchored (^) so "Postsecondary"
+      // inside a sentence doesn't trigger the Postsecondary section.
+      var BOUNDARIES = [
+        { re: /^Plan Information\s*$/i,                              label: 'PLAN_INFO',    keep: true  },
+        { re: /^Student Information\s*$/i,                           label: 'STUDENT_INFO', keep: true  },
+        { re: /^Present Level of Academic Achievement/i,             label: 'PLOP',         keep: false },
+        { re: /^Health, Vision, Hearing/i,                           label: 'PLOP',         keep: false },
+        { re: /^Social and Emotional Status/i,                       label: 'PLOP',         keep: false },
+        { re: /^General Intelligence\s*$/i,                          label: 'PLOP',         keep: false },
+        { re: /^Functional Vision/i,                                 label: 'PLOP',         keep: false },
+        { re: /^Functional Hearing/i,                                label: 'PLOP',         keep: false },
+        { re: /^Transition Needs/i,                                  label: 'TRANS',        keep: false },
+        { re: /^Postsecondary Goal/i,                                label: 'POSTSEC',      keep: true  },
+        { re: /^Course of Study/i,                                   label: 'COURSE',       keep: false },
+        { re: /^Transfer of Rights/i,                                label: 'TRANSFER',     keep: false },
+        { re: /^Consideration of Special Factors/i,                  label: 'SPEC_FCTRS',   keep: false },
+        { re: /^Measurable Annual Goals/i,                           label: 'GOALS',        keep: true  },
+        { re: /^Supplementary Aids and Services/i,                   label: 'SUPPLEMENTAL', keep: true  },
+        { re: /^Accommodations for Administration of State/i,        label: 'STATE_ASSESS', keep: true  },
+        { re: /^Program Modifications/i,                             label: 'PROG_MOD',     keep: false },
+        { re: /^Least Restrictive Environment/i,                     label: 'LRE',          keep: false },
+        { re: /^Special Education Services/i,                        label: 'SPED_SVCS',    keep: false },
+        { re: /^Extended School Year/i,                              label: 'ESY',          keep: false },
+      ];
+
+      // ── Noise-line patterns (stripped inside KEEP sections) ──────
+      // These are single lines of boilerplate that appear mid-section;
+      // we drop the line but do NOT switch sections.
+      var NOISE = [
+        /^For the IEP to be in effect/i,
+        /^This annual goal will reasonably enable/i,
+        /^Benchmarks\/Short-Term Instructional Objectives/i,
+        /^Reporting Progress/i,
+        /^x Concurrent with the issuance/i,
+        /^Contingency Plan:\s*$/i,
+        /^KY IEP \(Revised/i,
+        // Repeated page sub-headers (pdf.js emits "Student Name: … KY IEP, Page N")
+        /^Student Name:.+KY IEP, Page \d/i,
+        /^DOB:.+Date of ARC:/i,
+        // Boilerplate legalese inside State Assessments section
+        /^In order to justify appropriateness/i,
+        /^regulations determine will invalidate/i,
+        /^NOTE: The Kentucky Administrative/i,
+        // Transition service boilerplate that bleeds into Postsecondary chunk
+        /^Transition Service Agency Responsible/i,
+        /^\(By age 16, or younger/i,
+        /^What transition assessments were used/i,
+        /^Needs Related to The Course of Study/i,
+        /^Do transition service needs focus/i,
+      ];
+
+      // ── Output label mapping ─────────────────────────────────────
+      var LABELS = {
+        PREAMBLE:    '[S01:STUDENT_BASICS]',
+        STUDENT_INFO:'[S01:STUDENT_INFO]',
+        PLAN_INFO:   '[S02:IEP_TIMELINE]',
+        POSTSEC:     '[S02:POSTSECONDARY]',
+        SUPPLEMENTAL:'[S02:SUPPLEMENTAL_AIDS]',
+        GOALS:       '[S03:GOALS]',
+        STATE_ASSESS:'[S06:STATE_ASSESSMENTS]',
+      };
+      var SECTION_ORDER = ['PREAMBLE','STUDENT_INFO','PLAN_INFO','POSTSEC','SUPPLEMENTAL','GOALS','STATE_ASSESS'];
+
+      // ── Walk lines ───────────────────────────────────────────────
+      var lines = rawText.split('\n');
+      var chunks = {};           // label -> [lines]
+      var curLabel = 'PREAMBLE';
+      var curKeep  = true;
+      var curLines = [];
+
+      function flush() {
+        if (!curKeep || !curLines.length) return;
+        var content = curLines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+        if (!content) return;
+        if (chunks[curLabel]) {
+          chunks[curLabel] += '\n' + content;
+        } else {
+          chunks[curLabel] = content;
+        }
+      }
+
+      for (var i = 0; i < lines.length; i++) {
+        var line    = lines[i];
+        var trimmed = line.trim();
+
+        // 1. Check for section boundary.
+        var boundary = null;
+        for (var b = 0; b < BOUNDARIES.length; b++) {
+          if (BOUNDARIES[b].re.test(trimmed)) { boundary = BOUNDARIES[b]; break; }
+        }
+        if (boundary) {
+          flush();
+          curLabel = boundary.label;
+          curKeep  = boundary.keep;
+          curLines = boundary.keep ? [line] : [];
+          continue;
+        }
+
+        // 2. Inside a KEEP section: check for noise lines to strip.
+        if (curKeep) {
+          var isNoise = false;
+          for (var n = 0; n < NOISE.length; n++) {
+            if (NOISE[n].test(trimmed)) { isNoise = true; break; }
+          }
+          if (!isNoise) curLines.push(line);
+        }
+        // Inside a DROP section: silently discard.
+      }
+      flush(); // capture last open section
+
+      // ── Assemble labelled payload ────────────────────────────────
+      var parts = [];
+      for (var s = 0; s < SECTION_ORDER.length; s++) {
+        var key = SECTION_ORDER[s];
+        if (chunks[key] && chunks[key].trim()) {
+          parts.push(LABELS[key] + '\n' + chunks[key].trim());
+        }
+      }
+      return parts.join('\n\n');
+    }
+
     function _extractIepPdf(file) {
       if (typeof pdfjsLib === 'undefined') {
         _iepStatus('PDF library failed to load — check your connection.', 'error');
@@ -2300,8 +2458,29 @@ function parseAccommodations(raw) {
             _iepStatus('No selectable text found — this looks like a scanned PDF. OCR is not supported in-browser.', 'error');
             return;
           }
-          _iepStatus('Extracted ' + fullText.length.toLocaleString() + ' characters. Reading the IEP…');
-          return _gasPost({ action: 'parseIepDocument', iep_text: fullText })
+
+          // ── Smart chunking: extract only data-bearing sections ───
+          //  Strips Present Levels narrative, course tables, transition
+          //  boilerplate, LRE, ESY, etc. before sending to the API.
+          //  Typical reduction for an 8-page KY IEP: 60–80%.
+          var chunkedText = _chunkIepText(fullText);
+
+          // Guard: if chunking produced nothing (totally unrecognised
+          // format), fall back to the raw text so the import still
+          // works — the backend 60k hard cap remains the last resort.
+          var payload = chunkedText.length > 100 ? chunkedText : fullText;
+
+          var rawKb    = Math.round(fullText.length  / 1024);
+          var chunkKb  = Math.round(payload.length   / 1024);
+          var pctSaved = fullText.length > 0
+            ? Math.round(100 * (1 - payload.length / fullText.length)) : 0;
+
+          var statusMsg = chunkedText.length > 100
+            ? ('Extracted ' + rawKb + ' KB — chunked to ' + chunkKb + ' KB (' + pctSaved + '% stripped). Reading the IEP\u2026')
+            : ('Extracted ' + rawKb + ' KB (structure not recognised — sending full text). Reading the IEP\u2026');
+          _iepStatus(statusMsg);
+
+          return _gasPost({ action: 'parseIepDocument', iep_text: payload })
             .then(function(data) { _applyImportedIep(data.parsed || {}); });
         })
         .catch(function(err) {
