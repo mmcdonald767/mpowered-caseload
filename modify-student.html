@@ -792,7 +792,7 @@
                    aria-describedby="emailSubjectHint"
                    oninput="_emailSubjectEdited = true" />
             <p id="emailSubjectHint" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:#4a5578;margin:0.3rem 0 0;">
-              Defaults to <span style="font-family:'JetBrains Mono',monospace;">[Initials] Week of [DATE] Data Collection</span>.
+              Defaults to <span style="font-family:'JetBrains Mono',monospace;">C.F. Week of [DATE] Data Collection</span>.
               Edit to resolve duplicate initials or customise wording.
               <button type="button"
                       onclick="_emailSubjectEdited=false; _refreshDefaultSubject()"
@@ -3099,7 +3099,7 @@ function parseAccommodations(raw) {
 
   // ── _buildDefaultSubject ────────────────────────────────────────
   //  Computes the default subject line from the current record.
-  //  Format: "[AB] Week of MM/DD/YYYY Data Collection"
+  //  Format: "A.B. Week of MM/DD/YYYY Data Collection"
   //  Initials: first letter of first name + first letter of last name
   //  (uppercased). If only one name part is available, use up to two
   //  chars of that part so the field is never blank.
@@ -3110,9 +3110,9 @@ function parseAccommodations(raw) {
     var parts = name.trim().split(/\s+/);
     var initials;
     if (parts.length >= 2) {
-      initials = (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+      initials = parts[0].charAt(0).toUpperCase() + '.' + parts[parts.length - 1].charAt(0).toUpperCase() + '.';
     } else if (parts.length === 1 && parts[0]) {
-      initials = parts[0].slice(0, 2).toUpperCase();
+      initials = parts[0].charAt(0).toUpperCase() + '.' + (parts[0].charAt(1) ? parts[0].charAt(1).toUpperCase() + '.' : '');
     } else {
       initials = '–';  // em-dash placeholder when no name is loaded yet
     }
@@ -3125,7 +3125,7 @@ function parseAccommodations(raw) {
     monday.setDate(now.getDate() + diff);
     var weekOf = (monday.getMonth() + 1) + '/' + monday.getDate() + '/' + monday.getFullYear();
 
-    return '[' + initials + '] Week of ' + weekOf + ' Data Collection';
+    return initials + ' Week of ' + weekOf + ' Data Collection';
   }
 
   // ── _refreshDefaultSubject ───────────────────────────────────────
