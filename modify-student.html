@@ -3006,18 +3006,12 @@ function parseAccommodations(raw) {
     if (btn) btn.disabled = true;
     _monStatus('Generating monitoring form…');
 
-    fetch(MONITOR_CFG.gasUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({
-        action:     'exportMonitoringForm',
-        studentTag: tag,
-        goals:      goals
-      })
+    _gasPost({
+      action:     'exportMonitoringForm',
+      studentTag: tag,
+      goals:      goals
     })
-    .then(function (r) { return r.json(); })
     .then(function (data) {
-      if (data.result !== 'success') throw new Error(data.error || 'Unknown backend error');
       _monShowResult(data);
       _monStatus(
         data.reused
@@ -3049,14 +3043,8 @@ function parseAccommodations(raw) {
   function loadExistingMonitoringForm() {
     var tag = MONITOR_CFG.getStudentTag();
     if (!tag) return;
-    fetch(MONITOR_CFG.gasUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'getMonitoringForms', studentTag: tag })
-    })
-    .then(function (r) { return r.json(); })
+    _gasPost({ action: 'getMonitoringForms', studentTag: tag })
     .then(function (data) {
-      if (data.result !== 'success') return;
       var active = (data.forms || []).filter(function (f) { return f.status === 'active'; })[0];
       if (active) {
         _monShowResult({
