@@ -461,7 +461,7 @@
 
           <!-- FOOTER -->
           <div id="footer-identity" class="btn-row" style="display:none;margin-top:1rem;">
-            <button type="button" class="btn btn-save"   onclick="App.savePanel('identity')">Save changes</button>
+            <button type="button" class="btn btn-save panel-save-btn"   onclick="App.savePanel('identity')">Save changes</button>
             <button type="button" class="btn btn-cancel" onclick="App.cancelPanel('identity')">Cancel</button>
             <span id="status-identity" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#4a5578;margin-left:0.25rem;"></span>
           </div>
@@ -557,7 +557,7 @@
 
           <!-- FOOTER -->
           <div id="footer-academic" class="btn-row" style="display:none;margin-top:1rem;">
-            <button type="button" class="btn btn-save"   onclick="App.savePanel('academic')">Save changes</button>
+            <button type="button" class="btn btn-save panel-save-btn"   onclick="App.savePanel('academic')">Save changes</button>
             <button type="button" class="btn btn-cancel" onclick="App.cancelPanel('academic')">Cancel</button>
             <span id="status-academic" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#4a5578;margin-left:0.25rem;"></span>
           </div>
@@ -596,7 +596,7 @@
 
           <!-- FOOTER -->
           <div id="footer-goals" class="btn-row" style="display:none;margin-top:1rem;">
-            <button type="button" class="btn btn-save"   onclick="App.savePanel('goals')">Save changes</button>
+            <button type="button" class="btn btn-save panel-save-btn"   onclick="App.savePanel('goals')">Save changes</button>
             <button type="button" class="btn btn-cancel" onclick="App.cancelPanel('goals')">Cancel</button>
             <span id="status-goals" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#4a5578;margin-left:0.25rem;"></span>
           </div>
@@ -672,7 +672,7 @@
 
           <!-- Save / Cancel footer -->
           <div id="footer-assessments" class="btn-row" style="display:none; margin-top:1rem;">
-            <button type="button" class="btn btn-save"   onclick="App.savePanel('assessments')">Save changes</button>
+            <button type="button" class="btn btn-save panel-save-btn"   onclick="App.savePanel('assessments')">Save changes</button>
             <button type="button" class="btn btn-cancel" onclick="App.cancelPanel('assessments')">Cancel</button>
             <span id="status-assessments" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#4a5578;margin-left:0.25rem;"></span>
           </div>
@@ -2070,7 +2070,7 @@ function parseAccommodations(raw) {
         if (_isNew) {
           _isNew = false;
           if (data.studentId) { _studentId = String(data.studentId); _record[COL.ID] = _studentId; }
-          document.querySelectorAll('.btn-save').forEach(function(b) { b.textContent = 'Save changes'; });
+          document.querySelectorAll('.panel-save-btn').forEach(function(b) { b.textContent = 'Save changes'; });
         }
         if (data.row && Array.isArray(data.row)) _record = data.row;
         populateView(_record);
@@ -2104,7 +2104,7 @@ function parseAccommodations(raw) {
         if (_isNew) {
           _isNew = false;
           if (data.studentId) { _studentId = String(data.studentId); _record[COL.ID] = _studentId; }
-          document.querySelectorAll('.btn-save').forEach(function(b){ b.textContent = 'Save changes'; });
+          document.querySelectorAll('.panel-save-btn').forEach(function(b){ b.textContent = 'Save changes'; });
         }
         if (data.row && Array.isArray(data.row)) _record = data.row;
         populateView(_record);
@@ -2209,7 +2209,7 @@ function parseAccommodations(raw) {
         if (navNew) navNew.classList.add('active');
         setText('display-name', 'New Student');
         setText('display-id',   'Unsaved record');
-        document.querySelectorAll('.btn-save').forEach(function(b){ b.textContent = 'Add student'; });
+        document.querySelectorAll('.panel-save-btn').forEach(function(b){ b.textContent = 'Add student'; });
         document.getElementById('nav-position-label').textContent = 'New';
         _initIepImport();
         showState('data');
@@ -3007,9 +3007,10 @@ function parseAccommodations(raw) {
     _monStatus('Generating monitoring form…');
 
     App.gasPostPublic({
-      action:     'exportMonitoringForm',
-      studentTag: tag,
-      goals:      goals
+      action:          'exportMonitoringForm',
+      studentTag:      tag,
+      studentInitials: _computeInitials(App.getEmailConfigStudentName()),
+      goals:           goals
     })
     .then(function (data) {
       _monShowResult(data);
@@ -3088,25 +3089,29 @@ function parseAccommodations(raw) {
   // once true it is left alone until the teacher clicks "Reset to default".
   var _emailSubjectEdited = false;
 
+  // ── _computeInitials ─────────────────────────────────────────────
+  //  Shared by the email-subject default AND the monitoring form
+  //  title, so both places compute "First-initial.Last-initial." the
+  //  same way. First letter of first name + first letter of last name
+  //  (uppercased, period after each). If only one name part is
+  //  available, uses up to two chars of that part so it's never blank.
+  function _computeInitials(name) {
+    var parts = String(name || '').trim().split(/\s+/);
+    if (parts.length >= 2 && parts[0] && parts[parts.length - 1]) {
+      return parts[0].charAt(0).toUpperCase() + '.' + parts[parts.length - 1].charAt(0).toUpperCase() + '.';
+    } else if (parts.length === 1 && parts[0]) {
+      return parts[0].charAt(0).toUpperCase() + '.' + (parts[0].charAt(1) ? parts[0].charAt(1).toUpperCase() + '.' : '');
+    }
+    return '–';  // em-dash placeholder when no name is loaded yet
+  }
+
   // ── _buildDefaultSubject ────────────────────────────────────────
   //  Computes the default subject line from the current record.
   //  Format: "A.B. Week of MM/DD/YYYY Data Collection"
-  //  Initials: first letter of first name + first letter of last name
-  //  (uppercased). If only one name part is available, use up to two
-  //  chars of that part so the field is never blank.
   //  "Week of" date: the Monday of the CURRENT week, formatted M/D/YYYY,
   //  matching how teachers typically reference the school week.
   function _buildDefaultSubject() {
-    var name = App.getEmailConfigStudentName();
-    var parts = name.trim().split(/\s+/);
-    var initials;
-    if (parts.length >= 2) {
-      initials = parts[0].charAt(0).toUpperCase() + '.' + parts[parts.length - 1].charAt(0).toUpperCase() + '.';
-    } else if (parts.length === 1 && parts[0]) {
-      initials = parts[0].charAt(0).toUpperCase() + '.' + (parts[0].charAt(1) ? parts[0].charAt(1).toUpperCase() + '.' : '');
-    } else {
-      initials = '–';  // em-dash placeholder when no name is loaded yet
-    }
+    var initials = _computeInitials(App.getEmailConfigStudentName());
 
     // Monday of the current week
     var now = new Date();
