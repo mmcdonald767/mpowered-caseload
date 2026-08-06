@@ -221,7 +221,27 @@
     .iep-dropzone:hover { border-color: #3b5bdb; color: #94a3b8; }
     .iep-dropzone.dragover { border-color: #6c8fff; background: rgba(108,143,255,0.08); color: #c7d4ff; }
     .iep-dropzone.busy { pointer-events: none; opacity: 0.65; }
-    .iep-import-status { font-size: 0.72rem; line-height: 1.55; margin-top: 0.6rem; display: none; }
+    .iep-import-status { display: none; align-items: center; gap: 0.5rem; font-size: 0.72rem; line-height: 1.55; margin-top: 0.6rem; }
+    /* ── M-branded spinner: rotating brand-gradient ring around the logo badge ── */
+    .ai-spinner { position: relative; width: 15px; height: 15px; flex-shrink: 0; }
+    .ai-spinner-ring {
+      position: absolute; inset: 0; border-radius: 50%;
+      background: conic-gradient(from 0deg, transparent 0%, #6c8fff 16%, #3b5bdb 42%, transparent 58%);
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+              mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+      animation: mp-spin 1.15s linear infinite;
+    }
+    .ai-spinner-badge {
+      position: absolute; inset: 0; margin: auto; width: 8px; height: 8px;
+      background: linear-gradient(135deg, #3b5bdb 0%, #6c8fff 100%); border-radius: 28%;
+    }
+    @keyframes mp-spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .ai-spinner-ring { animation: none; opacity: 0.55; } }
+    .iep-import-note {
+      display: block; font-size: 0.68rem; color: #7d8fb3; line-height: 1.5; max-width: 40ch;
+      margin-top: 0.3rem; opacity: 0; max-height: 0; overflow: hidden; transition: opacity 0.4s ease;
+    }
+    .iep-import-note.visible { opacity: 1; max-height: 3em; }
     /* ── PDF-first intake: manual sections muted until a PDF import
          completes or the teacher explicitly chooses Manual Entry ── */
     .pdf-first-muted { opacity: 0.35; pointer-events: none; filter: grayscale(0.4); transition: opacity 0.2s ease, filter 0.2s ease; }
@@ -332,6 +352,7 @@
         </div>
         <input type="file" id="iep-file-input" accept="application/pdf,.pdf" style="display:none;" />
         <p id="iep-import-status" class="iep-import-status"></p>
+        <div class="iep-import-note" id="iep-import-note">Still working &mdash; this can take up to a minute for a long document.</div>
         <div class="iep-import-divider"><span>or</span></div>
         <button type="button" id="btn-manual-entry" class="btn-manual-entry" aria-label="Skip the PDF import and fill in the student record by hand">
           Manual Entry &mdash; register a student without an IEP on file
@@ -889,6 +910,7 @@
     // clicking Manual Entry. Irrelevant (and never consulted) once
     // _isNew is false.
     var _manualRevealed = false;
+    var _iepPatienceTimer = null; // reveals the "still working" note if parseIepDocument runs past 12s
     var _editing   = { identity: false, academic: false, goals: false, accommodations: false, assessments: false };
 
     // ── Caseload nav state ─────────────────────────────────────────
@@ -2570,7 +2592,14 @@ function parseAccommodations(raw) {
           var statusMsg = chunkedText.length > 100
             ? ('Extracted ' + rawKb + ' KB — chunked to ' + chunkKb + ' KB (' + pctSaved + '% stripped). Reading the IEP\u2026')
             : ('Extracted ' + rawKb + ' KB (structure not recognised — sending full text). Reading the IEP\u2026');
-          _iepStatus(statusMsg);
+          var statusEl = document.getElementById('iep-import-status');
+          var noteEl   = document.getElementById('iep-import-note');
+          statusEl.style.display = 'flex';
+          statusEl.style.color   = '#9aa5cc';
+          statusEl.innerHTML     = '<span class="ai-spinner"><span class="ai-spinner-ring"></span><span class="ai-spinner-badge"></span></span><span>' + statusMsg + '</span>';
+          noteEl.classList.remove('visible');
+          clearTimeout(_iepPatienceTimer);
+          _iepPatienceTimer = setTimeout(function() { noteEl.classList.add('visible'); }, 12000);
 
           return _gasPost({ action: 'parseIepDocument', iep_text: payload })
             .then(function(data) { _applyImportedIep(data.parsed || {}); });
@@ -2581,6 +2610,8 @@ function parseAccommodations(raw) {
             : 'Import failed: ' + (err && err.message ? err.message : 'unknown error'), 'error');
         })
         .then(function() {
+          clearTimeout(_iepPatienceTimer);
+          document.getElementById('iep-import-note').classList.remove('visible');
           zone.classList.remove('busy');
           label.textContent = 'Drop an IEP PDF here, or click to browse — or fill the sections in manually';
         });
