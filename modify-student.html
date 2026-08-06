@@ -29,7 +29,7 @@
     .site-nav { display: flex; align-items: center; gap: 0.25rem; }
 
     /* nav-link: +17% from 0.7rem → 0.82rem */
-    .nav-link { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 600; color: #7d8fb3; text-decoration: none; padding: 0.35rem 0.8rem; border-radius: 6px; transition: color 0.13s, background 0.13s; }
+    .nav-link { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 600; color: #9aa5cc; text-decoration: none; padding: 0.35rem 0.8rem; border-radius: 6px; transition: color 0.13s, background 0.13s; }
     .nav-link:hover  { color: #e8ecf4; background: rgba(255,255,255,0.05); }
     .nav-link.active { color: #6c8fff; background: rgba(108,143,255,0.1); }
 
@@ -47,7 +47,7 @@
     @media (max-width: 760px) { .site-brand-text { display: none; } }
 
     /* btn-ghost: +17% from 0.72rem → 0.84rem */
-    .btn-ghost { display: inline-flex; align-items: center; gap: 0.4rem; background: transparent; color: #7d8fb3; font-family: 'JetBrains Mono', monospace; font-size: 0.84rem; font-weight: 500; border: 1px solid #252c42; border-radius: 7px; padding: 0.4rem 0.85rem; cursor: pointer; transition: color 0.14s, border-color 0.14s; }
+    .btn-ghost { display: inline-flex; align-items: center; gap: 0.4rem; background: transparent; color: #9aa5cc; font-family: 'JetBrains Mono', monospace; font-size: 0.84rem; font-weight: 500; border: 1px solid #252c42; border-radius: 7px; padding: 0.4rem 0.85rem; cursor: pointer; transition: color 0.14s, border-color 0.14s; }
     .btn-ghost:hover { color: #f87171; border-color: rgba(248,113,113,0.45); }
 
     /* Delete button — danger variant of btn-ghost */
@@ -61,17 +61,17 @@
     #delete-modal { background: #171b26; border: 1px solid rgba(248,113,113,0.35); border-radius: 14px; padding: 1.75rem 2rem; max-width: 420px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.6); animation: modalIn 0.18s ease forwards; }
     @keyframes modalIn { from { opacity:0; transform:scale(0.96) translateY(8px); } to { opacity:1; transform:scale(1) translateY(0); } }
     #delete-modal h2 { font-size: 1rem; font-weight: 700; color: #f87171; margin: 0 0 0.5rem; }
-    #delete-modal p  { font-size: 0.85rem; color: #7d8fb3; line-height: 1.55; margin: 0 0 1.25rem; }
+    #delete-modal p  { font-size: 0.85rem; color: #9aa5cc; line-height: 1.55; margin: 0 0 1.25rem; }
     #delete-modal strong { color: #e8ecf4; }
     .modal-btn-row { display: flex; gap: 0.65rem; justify-content: flex-end; flex-wrap: wrap; }
     #delete-confirm-btn { background: #f87171; color: #0f1117; border: none; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 700; padding: 0.5rem 1.1rem; border-radius: 7px; cursor: pointer; transition: background 0.13s; }
     #delete-confirm-btn:hover { background: #fca5a5; }
     #delete-confirm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    #delete-cancel-btn  { background: transparent; color: #7d8fb3; border: 1px solid #252c42; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 600; padding: 0.5rem 1.1rem; border-radius: 7px; cursor: pointer; transition: color 0.13s, border-color 0.13s; }
-    #delete-cancel-btn:hover { color: #e8ecf4; border-color: #4a5578; }
+    #delete-cancel-btn  { background: transparent; color: #9aa5cc; border: 1px solid #252c42; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 600; padding: 0.5rem 1.1rem; border-radius: 7px; cursor: pointer; transition: color 0.13s, border-color 0.13s; }
+    #delete-cancel-btn:hover { color: #e8ecf4; border-color: #8b96bf; }
 
     /* ── Caseload nav arrows ── */
-    .nav-arrow { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: rgba(108,143,255,0.06); color: #7d8fb3; border: 1px solid #252c42; border-radius: 6px; cursor: pointer; font-size: 0.85rem; line-height: 1; transition: color 0.13s, background 0.13s, border-color 0.13s; flex-shrink: 0; text-decoration: none; user-select: none; }
+    .nav-arrow { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: rgba(108,143,255,0.06); color: #9aa5cc; border: 1px solid #252c42; border-radius: 6px; cursor: pointer; font-size: 0.85rem; line-height: 1; transition: color 0.13s, background 0.13s, border-color 0.13s; flex-shrink: 0; text-decoration: none; user-select: none; }
     .nav-arrow:hover { color: #6c8fff; background: rgba(108,143,255,0.12); border-color: rgba(108,143,255,0.35); }
     .nav-arrow[aria-disabled="true"] { opacity: 0.3; pointer-events: none; }
 
@@ -83,9 +83,9 @@
     .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem; }
     @media (max-width: 560px) { .field-grid { grid-template-columns: 1fr; } }
     .field { display: flex; flex-direction: column; gap: 0.3rem; }
-    .field-label { font-family: 'JetBrains Mono', monospace; font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #4a5578; }
+    .field-label { font-family: 'JetBrains Mono', monospace; font-size: 0.63rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #8b96bf; }
     .field-value { font-size: 0.875rem; color: #c4cde4; min-height: 1.4rem; line-height: 1.4; }
-    .field-value:empty::before { content: '—'; color: #4a5578; }
+    .field-value:empty::before { content: '—'; color: #8b96bf; }
 
     /* ── Inputs, textareas, selects ── */
     .field-input, .field-textarea, .field-select { background: #0f1117; border: 1px solid #252c42; border-radius: 7px; color: #e8ecf4; font-family: 'Inter', system-ui, sans-serif; font-size: 0.875rem; padding: 0.45rem 0.7rem; width: 100%; outline: none; transition: border-color 0.15s, box-shadow 0.15s; }
@@ -101,13 +101,13 @@
     }
     .flag-primary { color: #34d399; background: rgba(52,211,153,0.08); border-color: rgba(52,211,153,0.3); }
     .flag-ext     { color: #fbbf24; background: rgba(251,191,36,0.08);  border-color: rgba(251,191,36,0.3); }
-    .flag-none    { color: #4a5578; background: rgba(74,85,120,0.08);   border-color: rgba(74,85,120,0.25); }
+    .flag-none    { color: #8b96bf; background: rgba(74,85,120,0.08);   border-color: rgba(74,85,120,0.25); }
     /* ── Save Student bar (whole-record commit) ── */
     .save-student-bar { display: flex; align-items: center; gap: 1rem; background: #171b26; border: 1px solid rgba(108,143,255,0.35); border-radius: 12px; padding: 1rem 1.3rem; margin-top: 1.5rem; }
     .save-student-copy { flex: 1; min-width: 0; }
     .save-student-title { font-size: 0.85rem; font-weight: 600; color: #e8ecf4; margin: 0 0 0.15rem; }
-    .save-student-sub { font-size: 0.72rem; color: #7d8fb3; line-height: 1.5; margin: 0; }
-    .save-student-status { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #4a5578; text-align: right; max-width: 40%; }
+    .save-student-sub { font-size: 0.72rem; color: #9aa5cc; line-height: 1.5; margin: 0; }
+    .save-student-status { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: #8b96bf; text-align: right; max-width: 40%; }
     .btn-save-student { padding: 0.6rem 1.5rem; font-size: 0.85rem; white-space: nowrap; }
 
     /* ── Select dropdown ── */
@@ -121,18 +121,18 @@
 
     /* ── Goal cards (view mode) ── */
     .goal-card { background: rgba(255,255,255,0.03); border: 1px solid #1e2335; border-radius: 10px; padding: 0.9rem 1rem; margin-bottom: 0.5rem; }
-    .goal-card-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #4a5578; margin-bottom: 0.2rem; }
+    .goal-card-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #8b96bf; margin-bottom: 0.2rem; }
     .goal-card-text  { font-size: 0.85rem; color: #c4cde4; line-height: 1.5; }
     .goal-card-sdi   { font-size: 0.78rem; color: #6c8fff; margin-top: 0.55rem; line-height: 1.4; }
-    .goal-card-sdi-label { color: #4a5578; }
-    .list-empty { font-size: 0.8rem; color: #4a5578; font-style: italic; }
+    .goal-card-sdi-label { color: #8b96bf; }
+    .list-empty { font-size: 0.8rem; color: #8b96bf; font-style: italic; }
 
     /* ── Goal edit cards (vertical stack) ── */
     .goal-edit-card { background: #0f1117; border: 1px solid #252c42; border-radius: 9px; padding: 0.9rem 1rem; margin-bottom: 0.65rem; display: flex; flex-direction: column; gap: 0.6rem; animation: goalFadeIn 0.18s ease forwards; }
     @keyframes goalFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
     .goal-edit-card-header { display: flex; align-items: center; justify-content: space-between; }
-    .goal-edit-card-num { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #4a5578; }
-    .btn-remove { background: transparent; border: 1px solid #252c42; color: #4a5578; border-radius: 6px; padding: 0.25rem 0.5rem; cursor: pointer; font-size: 0.72rem; line-height: 1; transition: color 0.13s, border-color 0.13s; font-family: 'JetBrains Mono', monospace; }
+    .goal-edit-card-num { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #8b96bf; }
+    .btn-remove { background: transparent; border: 1px solid #252c42; color: #8b96bf; border-radius: 6px; padding: 0.25rem 0.5rem; cursor: pointer; font-size: 0.72rem; line-height: 1; transition: color 0.13s, border-color 0.13s; font-family: 'JetBrains Mono', monospace; }
     .btn-remove:hover { color: #f87171; border-color: rgba(248,113,113,0.4); }
 
     /* ── Buttons ── */
@@ -142,8 +142,8 @@
     .btn-edit:hover:not(:disabled)   { background: rgba(108,143,255,0.15); border-color: rgba(108,143,255,0.5); }
     .btn-save   { background: rgba(52,211,153,0.1);  color: #34d399; border-color: rgba(52,211,153,0.3); }
     .btn-save:hover:not(:disabled)   { background: rgba(52,211,153,0.2); border-color: rgba(52,211,153,0.55); }
-    .btn-cancel { background: transparent; color: #4a5578; border-color: #252c42; }
-    .btn-cancel:hover:not(:disabled) { color: #e8ecf4; border-color: #4a5578; }
+    .btn-cancel { background: transparent; color: #8b96bf; border-color: #252c42; }
+    .btn-cancel:hover:not(:disabled) { color: #e8ecf4; border-color: #8b96bf; }
     .btn-row { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 
     /* ── Toast ── */
@@ -162,7 +162,7 @@
     .eyebrow { font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #6c8fff; margin-bottom: 0.4rem; }
     .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.1rem; }
     .ferpa-notice { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.67rem; font-weight: 600; letter-spacing: 0.06em; color: #34d399; border: 1px solid rgba(52,211,153,0.28); border-radius: 20px; padding: 0.2rem 0.6rem; background: rgba(52,211,153,0.06); flex-shrink: 0; }
-    .ferpa-line { display: flex; align-items: flex-start; gap: 0.55rem; margin-top: 0.8rem; font-size: 0.74rem; color: #4a5578; line-height: 1.55; max-width: 640px; }
+    .ferpa-line { display: flex; align-items: flex-start; gap: 0.55rem; margin-top: 0.8rem; font-size: 0.74rem; color: #8b96bf; line-height: 1.55; max-width: 640px; }
     .panel { background: #171b26; border: 1px solid #1e2335; border-radius: 14px; padding: 1.75rem; transition: border-color 0.2s; }
     .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; background: linear-gradient(135deg, #3b5bdb 0%, #6c8fff 100%); color: #fff; font-weight: 600; font-size: 0.875rem; border: none; border-radius: 9px; padding: 0.65rem 1.5rem; cursor: pointer; white-space: nowrap; text-decoration: none; box-shadow: 0 2px 12px rgba(60,91,219,0.35); transition: filter 0.12s, box-shadow 0.12s, transform 0.1s; }
     .btn-primary:hover { filter: brightness(1.1); box-shadow: 0 4px 20px rgba(60,91,219,0.55); }
@@ -182,13 +182,13 @@
     .field-textarea::placeholder { color: #3a4466; }
     .field-textarea:focus { border-color: #6c8fff; box-shadow: 0 0 0 3px rgba(108,143,255,0.18); }
     .field-label { display: block; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #6c8fff; margin-bottom: 0.4rem; }
-    .btn-danger-ghost { display: inline-flex; align-items: center; gap: 0.35rem; background: transparent; color: #4a5578; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 500; border: 1px solid #252c42; border-radius: 6px; padding: 0.3rem 0.6rem; cursor: pointer; flex-shrink: 0; transition: color 0.14s, border-color 0.14s, background 0.14s; }
+    .btn-danger-ghost { display: inline-flex; align-items: center; gap: 0.35rem; background: transparent; color: #8b96bf; font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 500; border: 1px solid #252c42; border-radius: 6px; padding: 0.3rem 0.6rem; cursor: pointer; flex-shrink: 0; transition: color 0.14s, border-color 0.14s, background 0.14s; }
     .btn-danger-ghost:hover { color: #f87171; border-color: rgba(248,113,113,0.4); background: rgba(248,113,113,0.05); }
     .goal-row { background: #1e2335; border: 1px solid #252c42; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; gap: 0.85rem; animation: goalSlideIn 0.22s ease forwards; }
     @keyframes goalSlideIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     .check-row { display: flex; align-items: flex-start; gap: 0.65rem; padding: 0.38rem 0.5rem; border-radius: 7px; cursor: pointer; transition: background 0.12s; }
     .check-row:hover { background: rgba(108,143,255,0.05); }
-    .check-row input[type="checkbox"], .check-row input[type="radio"] { appearance: none; -webkit-appearance: none; width: 15px; height: 15px; border: 1.5px solid #2e3650; border-radius: 4px; background: #1e2335; flex-shrink: 0; margin-top: 2px; cursor: pointer; transition: border-color 0.14s, background 0.14s; position: relative; }
+    .check-row input[type="checkbox"], .check-row input[type="radio"] { appearance: none; -webkit-appearance: none; width: 15px; height: 15px; border: 1.5px solid #717ca8; border-radius: 4px; background: #1e2335; flex-shrink: 0; margin-top: 2px; cursor: pointer; transition: border-color 0.14s, background 0.14s; position: relative; }
     .check-row input[type="radio"] { border-radius: 50%; }
     .check-row input[type="checkbox"]:checked, .check-row input[type="radio"]:checked { border-color: #6c8fff; background: #6c8fff; }
     .check-row input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 3px; top: 0px; width: 5px; height: 9px; border: 2px solid #fff; border-top: none; border-left: none; transform: rotate(45deg); }
@@ -216,8 +216,8 @@
     /* ── IEP import dropzone (new-student mode) ── */
     .iep-import-card { background: #171b26; border: 1px solid rgba(108,143,255,0.35); border-radius: 12px; padding: 1.1rem 1.3rem; margin-bottom: 1.5rem; }
     .iep-import-title { font-size: 0.8rem; font-weight: 600; color: #e8ecf4; margin: 0 0 0.25rem; }
-    .iep-import-sub { font-size: 0.72rem; color: #7d8fb3; line-height: 1.5; margin: 0 0 0.75rem; }
-    .iep-dropzone { display: flex; align-items: center; justify-content: center; gap: 0.6rem; border: 1.5px dashed #2e3650; border-radius: 8px; background: #0f1117; color: #64748b; font-size: 0.78rem; padding: 0.9rem 1rem; cursor: pointer; transition: border-color .15s, background .15s, color .15s; text-align: center; }
+    .iep-import-sub { font-size: 0.72rem; color: #9aa5cc; line-height: 1.5; margin: 0 0 0.75rem; }
+    .iep-dropzone { display: flex; align-items: center; justify-content: center; gap: 0.6rem; border: 1.5px dashed #717ca8; border-radius: 8px; background: #0f1117; color: #64748b; font-size: 0.78rem; padding: 0.9rem 1rem; cursor: pointer; transition: border-color .15s, background .15s, color .15s; text-align: center; }
     .iep-dropzone:hover { border-color: #3b5bdb; color: #94a3b8; }
     .iep-dropzone.dragover { border-color: #6c8fff; background: rgba(108,143,255,0.08); color: #c7d4ff; }
     .iep-dropzone.busy { pointer-events: none; opacity: 0.65; }
@@ -227,10 +227,10 @@
     .pdf-first-muted { opacity: 0.35; pointer-events: none; filter: grayscale(0.4); transition: opacity 0.2s ease, filter 0.2s ease; }
     .iep-import-divider { display: flex; align-items: center; gap: 0.75rem; margin: 0.85rem 0; }
     .iep-import-divider::before, .iep-import-divider::after { content: ''; flex: 1; height: 1px; background: #252c42; }
-    .iep-import-divider span { font-size: 0.66rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4a5578; white-space: nowrap; }
+    .iep-import-divider span { font-size: 0.66rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #8b96bf; white-space: nowrap; }
     .btn-manual-entry {
       display: flex; align-items: center; justify-content: center; gap: 0.5rem;
-      width: 100%; background: transparent; color: #7d8fb3;
+      width: 100%; background: transparent; color: #9aa5cc;
       font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 600;
       border: 1px solid #252c42; border-radius: 8px; padding: 0.65rem 1rem;
       cursor: pointer; transition: color 0.14s, border-color 0.14s, background 0.14s;
@@ -266,7 +266,7 @@
         <div class="nav-divider" role="separator" aria-hidden="true"></div>
         <!-- Caseload prev/next arrows — context-aware student navigation -->
         <button id="btn-prev-student" class="nav-arrow" aria-label="Previous student" title="Previous student" onclick="App.navigateStudent(-1)">&#8592;</button>
-        <span id="nav-position-label" style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#4a5578;min-width:3rem;text-align:center;">&mdash;</span>
+        <span id="nav-position-label" style="font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#8b96bf;min-width:3rem;text-align:center;">&mdash;</span>
         <button id="btn-next-student" class="nav-arrow" aria-label="Next student" title="Next student" onclick="App.navigateStudent(1)">&#8594;</button>
         <div class="nav-divider" role="separator" aria-hidden="true"></div>
         <a href="/modify-student.html?id=new" class="nav-link-primary" id="nav-new-student">+ New Student</a>
@@ -307,13 +307,13 @@
 
     <!-- Loading -->
     <div id="loading-overlay" style="display:none;align-items:center;justify-content:center;padding:6rem 0;" aria-live="polite">
-      <p style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#4a5578;">Retrieving student record…</p>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:#8b96bf;">Retrieving student record…</p>
     </div>
 
     <!-- Error / not found -->
     <div id="fallback-state" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:6rem 0;" role="alert">
       <h2 style="font-size:0.95rem;font-weight:600;margin-bottom:0.4rem;">Record Not Found</h2>
-      <p id="fallback-message" style="font-size:0.8rem;color:#4a5578;"></p>
+      <p id="fallback-message" style="font-size:0.8rem;color:#8b96bf;"></p>
       <a href="https://caseload.mpowerededucation.com/" style="margin-top:1.25rem;font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:#6c8fff;text-decoration:none;">← Back to dashboard</a>
     </div>
 
@@ -344,7 +344,7 @@
         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
           <div>
             <h1 id="display-name" class="text-2xl font-bold text-slate-100 tracking-tight leading-tight" style="margin:0 0 0.25rem;"></h1>
-            <p id="display-id" style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#4a5578;margin:0;"></p>
+            <p id="display-id" style="font-family:'JetBrains Mono',monospace;font-size:0.72rem;color:#8b96bf;margin:0;"></p>
             <!-- FERPA statement — kept accurate to this page's actual data
                  flows: sheet-backed records, encrypted transit, local PDF
                  extraction, transient AI parsing, teacher-gated writes. -->
@@ -463,7 +463,7 @@
           <div id="footer-identity" class="btn-row" style="display:none;margin-top:1rem;">
             <button type="button" class="btn btn-save panel-save-btn"   onclick="App.savePanel('identity')">Save changes</button>
             <button type="button" class="btn btn-cancel" onclick="App.cancelPanel('identity')">Cancel</button>
-            <span id="status-identity" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#4a5578;margin-left:0.25rem;"></span>
+            <span id="status-identity" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#8b96bf;margin-left:0.25rem;"></span>
           </div>
         </section>
 
@@ -559,7 +559,7 @@
           <div id="footer-academic" class="btn-row" style="display:none;margin-top:1rem;">
             <button type="button" class="btn btn-save panel-save-btn"   onclick="App.savePanel('academic')">Save changes</button>
             <button type="button" class="btn btn-cancel" onclick="App.cancelPanel('academic')">Cancel</button>
-            <span id="status-academic" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#4a5578;margin-left:0.25rem;"></span>
+            <span id="status-academic" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#8b96bf;margin-left:0.25rem;"></span>
           </div>
         </section>
 
@@ -598,7 +598,7 @@
           <div id="footer-goals" class="btn-row" style="display:none;margin-top:1rem;">
             <button type="button" class="btn btn-save panel-save-btn"   onclick="App.savePanel('goals')">Save changes</button>
             <button type="button" class="btn btn-cancel" onclick="App.cancelPanel('goals')">Cancel</button>
-            <span id="status-goals" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#4a5578;margin-left:0.25rem;"></span>
+            <span id="status-goals" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#8b96bf;margin-left:0.25rem;"></span>
           </div>
         </section>
 
@@ -674,7 +674,7 @@
           <div id="footer-assessments" class="btn-row" style="display:none; margin-top:1rem;">
             <button type="button" class="btn btn-save panel-save-btn"   onclick="App.savePanel('assessments')">Save changes</button>
             <button type="button" class="btn btn-cancel" onclick="App.cancelPanel('assessments')">Cancel</button>
-            <span id="status-assessments" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#4a5578;margin-left:0.25rem;"></span>
+            <span id="status-assessments" style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:#8b96bf;margin-left:0.25rem;"></span>
           </div>
         </section>
 
@@ -723,11 +723,11 @@
         <p id="monitorFormStatus" style="display:none;font-family:'JetBrains Mono',monospace;font-size:0.68rem;margin:0 0 0.6rem;" role="status" aria-live="polite"></p>
 
         <div id="monitorFormResult" style="display:none;background:rgba(108,143,255,0.05);border:1px solid #252c42;border-radius:8px;padding:0.6rem 0.85rem;flex-wrap:wrap;align-items:center;gap:0.35rem 1.1rem;font-size:0.72rem;">
-          <span style="font-family:'JetBrains Mono',monospace;color:#4a5578;">
+          <span style="font-family:'JetBrains Mono',monospace;color:#8b96bf;">
             <span id="monitorFormVersion" style="color:#34d399;font-weight:600;"></span><span id="monitorFormMeta"></span>
           </span>
           <a id="monitorFormLiveLink" href="#" target="_blank" rel="noopener" style="color:#6c8fff;text-decoration:underline;text-underline-offset:2px;">Open live form</a>
-          <a id="monitorFormEditLink" href="#" target="_blank" rel="noopener" style="color:#7d8fb3;text-decoration:underline;text-underline-offset:2px;">Edit in Forms</a>
+          <a id="monitorFormEditLink" href="#" target="_blank" rel="noopener" style="color:#9aa5cc;text-decoration:underline;text-underline-offset:2px;">Edit in Forms</a>
           <button type="button" id="btnCopyMonitorLink" class="btn btn-edit" onclick="copyMonitoringLink()">Copy link</button>
         </div>
 
@@ -755,7 +755,7 @@
         </div>
 
         <!-- Summary strip — visible when a config is loaded and panel is collapsed -->
-        <p id="emailConfigSummary" style="display:none;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#7d8fb3;margin:0 0 0.5rem;" aria-live="polite"></p>
+        <p id="emailConfigSummary" style="display:none;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:#9aa5cc;margin:0 0 0.5rem;" aria-live="polite"></p>
 
         <!-- Configuration panel (hidden by default; opened by Configure button) -->
         <div id="emailConfigPanel" style="display:none;background:rgba(108,143,255,0.04);border:1px solid #252c42;border-radius:10px;padding:1rem 1.1rem;margin-top:0.5rem;">
@@ -763,12 +763,12 @@
           <div style="margin-bottom:0.85rem;">
             <label class="field-label" for="emailRecipients" style="display:block;margin-bottom:0.3rem;">
               Recipient emails
-              <span style="color:#4a5578;font-weight:400;margin-left:0.4rem;">(comma-separated)</span>
+              <span style="color:#8b96bf;font-weight:400;margin-left:0.4rem;">(comma-separated)</span>
             </label>
             <input type="text" id="emailRecipients" class="field-input"
                    placeholder="teacher1@school.edu, teacher2@school.edu"
                    aria-describedby="emailRecipientsHint" />
-            <p id="emailRecipientsHint" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:#4a5578;margin:0.3rem 0 0;">
+            <p id="emailRecipientsHint" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:#8b96bf;margin:0.3rem 0 0;">
               Special education teacher addresses who will receive the automated data requests.
             </p>
           </div>
@@ -791,7 +791,7 @@
                    placeholder="Auto-generated from student initials and week date"
                    aria-describedby="emailSubjectHint"
                    oninput="_emailSubjectEdited = true" />
-            <p id="emailSubjectHint" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:#4a5578;margin:0.3rem 0 0;">
+            <p id="emailSubjectHint" style="font-family:'Inter',sans-serif;font-size:0.72rem;color:#8b96bf;margin:0.3rem 0 0;">
               Defaults to <span style="font-family:'JetBrains Mono',monospace;">C.F. Week of [DATE] Data Collection</span>.
               Edit to resolve duplicate initials or customise wording.
               <button type="button"
@@ -804,7 +804,7 @@
             <input type="checkbox" id="emailConfigActive"
                    style="width:15px;height:15px;accent-color:#6c8fff;cursor:pointer;" />
             <label for="emailConfigActive"
-                   style="font-family:'Inter',sans-serif;font-size:0.78rem;color:#7d8fb3;cursor:pointer;margin:0;">
+                   style="font-family:'Inter',sans-serif;font-size:0.78rem;color:#9aa5cc;cursor:pointer;margin:0;">
               Enable automated data requests for this student
             </label>
           </div>
@@ -1064,7 +1064,7 @@
 
     function setPanelStatus(panel, msg, colour) {
       var el = document.getElementById('status-' + panel);
-      if (el) { el.textContent = msg; el.style.color = colour || '#4a5578'; }
+      if (el) { el.textContent = msg; el.style.color = colour || '#8b96bf'; }
     }
 
     var _toastTimer = null;
@@ -1487,7 +1487,7 @@ function parseAccommodations(raw) {
 
         if (std.description) {
           var stdDesc = document.createElement('p');
-          stdDesc.style.cssText = 'font-size:0.75rem;color:#4a5578;font-style:italic;margin-top:0.35rem;line-height:1.4;';
+          stdDesc.style.cssText = 'font-size:0.75rem;color:#8b96bf;font-style:italic;margin-top:0.35rem;line-height:1.4;';
           stdDesc.textContent = std.description;
           card.appendChild(stdDesc);
         }
@@ -1512,7 +1512,7 @@ function parseAccommodations(raw) {
         var sdiMeta = [sdi.evidence_base||'', sdi.delivery_model||'', sdi.frequency||''].filter(Boolean).join(' · ');
         if (sdiMeta) {
           var sdiMetaEl = document.createElement('p');
-          sdiMetaEl.style.cssText = 'font-size:0.71rem;color:#4a5578;font-family:"JetBrains Mono",monospace;margin:0.15rem 0 0;';
+          sdiMetaEl.style.cssText = 'font-size:0.71rem;color:#8b96bf;font-family:"JetBrains Mono",monospace;margin:0.15rem 0 0;';
           sdiMetaEl.textContent = sdiMeta;
           card.appendChild(sdiMetaEl);
         }
@@ -1527,13 +1527,13 @@ function parseAccommodations(raw) {
           pmRow.style.cssText = 'display:flex;align-items:center;flex-wrap:wrap;gap:0.6rem;margin-top:0.55rem;padding-top:0.45rem;border-top:1px solid #1e2335;';
           if (pm.method_of_measurement) {
             var mmBadge = document.createElement('span');
-            mmBadge.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:0.6rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#4a5578;background:rgba(255,255,255,0.03);border:1px solid #1e2335;border-radius:4px;padding:0.15rem 0.5rem;';
+            mmBadge.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:0.6rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#8b96bf;background:rgba(255,255,255,0.03);border:1px solid #1e2335;border-radius:4px;padding:0.15rem 0.5rem;';
             mmBadge.textContent = pm.method_of_measurement;
             pmRow.appendChild(mmBadge);
           }
           if (pm.metric) {
             var mBadge = document.createElement('span');
-            mBadge.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#4a5578;';
+            mBadge.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:#8b96bf;';
             mBadge.textContent = pm.metric;
             pmRow.appendChild(mBadge);
           }
@@ -1548,7 +1548,7 @@ function parseAccommodations(raw) {
           }
           if (pm.mastery_criterion) {
             var mast = document.createElement('span');
-            mast.style.cssText = 'font-size:0.72rem;color:#4a5578;';
+            mast.style.cssText = 'font-size:0.72rem;color:#8b96bf;';
             mast.textContent = pm.mastery_criterion;
             pmRow.appendChild(mast);
           }
@@ -1559,7 +1559,7 @@ function parseAccommodations(raw) {
           var artDiv = document.createElement('div');
           artDiv.style.cssText = 'margin-top:0.4rem;text-align:right;';
           var artSpan = document.createElement('span');
-          artSpan.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:0.6rem;color:#4a5578;background:rgba(255,255,255,0.03);border:1px solid #1e2335;border-radius:4px;padding:0.1rem 0.45rem;';
+          artSpan.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:0.6rem;color:#8b96bf;background:rgba(255,255,255,0.03);border:1px solid #1e2335;border-radius:4px;padding:0.1rem 0.45rem;';
           artSpan.textContent = g.artifact_type.replace(/_/g,' ');
           artDiv.appendChild(artSpan);
           card.appendChild(artDiv);
@@ -2286,7 +2286,7 @@ function parseAccommodations(raw) {
       var s = document.getElementById('iep-import-status');
       if (!s) return;
       s.style.display = 'block';
-      s.style.color = tone === 'error' ? '#f87171' : (tone === 'ok' ? '#34d399' : '#7d8fb3');
+      s.style.color = tone === 'error' ? '#f87171' : (tone === 'ok' ? '#34d399' : '#9aa5cc');
       s.textContent = msg;
     }
 
@@ -2988,7 +2988,7 @@ function parseAccommodations(raw) {
     el.style.display = msg ? 'block' : 'none';
     el.style.color = tone === 'ok'  ? '#34d399'
                    : tone === 'err' ? '#f87171'
-                   : '#7d8fb3';
+                   : '#9aa5cc';
   }
 
   function _monShowResult(data) {
@@ -3164,7 +3164,7 @@ function parseAccommodations(raw) {
     el.style.display = msg ? 'block' : 'none';
     el.style.color = tone === 'ok'  ? '#34d399'
                    : tone === 'err' ? '#f87171'
-                   : '#7d8fb3';
+                   : '#9aa5cc';
   }
 
   function _emailCfgSummary(recipients, frequency, active) {
@@ -3174,7 +3174,7 @@ function parseAccommodations(raw) {
     var freqLabel = FREQ_LABELS[frequency] || frequency;
     el.textContent = (active ? '✓ Active' : '⏸ Paused') + ' · ' + freqLabel +
                      ' · ' + recipients.split(',').length + ' recipient(s)';
-    el.style.color = active ? '#34d399' : '#7d8fb3';
+    el.style.color = active ? '#34d399' : '#9aa5cc';
     el.style.display = 'block';
   }
 
