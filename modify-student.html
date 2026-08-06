@@ -2920,18 +2920,26 @@ function parseAccommodations(raw) {
      @param {string} goalId     — "LOCAL-…" pre-dock, or "CM-GOAL-XXXXX"
                                    after Caseload Manager reconciliation.
 
-     Replace the alert() stub with Tracker navigation / modal once the
-     Data/Click Tracker tool is built. goal_id is the join key the
-     Tracker uses when pushing timeseries_event packets back.
+     Opens the Data/Click Tracker for this student in a new tab:
+       https://data.mpowerededucation.com/tracker.html?student=<tag>&sid=<DatabaseID>
+     'student' is the FERPA-safe tag (COL.TAG); 'sid' is the numeric
+     DatabaseID (COL.ID — same value as this page's own ?id= param).
+     goal_id is appended as an optional extra param so a future Tracker
+     revision can deep-link straight to the goal that was clicked;
+     today's Tracker can simply ignore it.
   ══════════════════════════════════════════════════════════════ */
   function launchTracker(studentTag, goalId) {
-    console.log('[launchTracker] student:', studentTag, '| goal_id:', goalId);
-    alert(
-      'Track Progress\n' +
-      'Student token : ' + studentTag + '\n' +
-      'Goal ID       : ' + goalId     + '\n\n' +
-      '(Data/Click Tracker — coming soon)'
-    );
+    var sid = _record ? String(_record[COL.ID] || '').trim() : '';
+    if (!studentTag || !sid) {
+      alert('Cannot open Tracker: missing student tag or DatabaseID for this record.');
+      return;
+    }
+    var url = 'https://data.mpowerededucation.com/tracker.html'
+      + '?student=' + encodeURIComponent(studentTag)
+      + '&sid=' + encodeURIComponent(sid);
+    if (goalId) url += '&goal=' + encodeURIComponent(goalId);
+    console.log('[launchTracker] opening:', url);
+    window.open(url, '_blank', 'noopener');
   }
    /* ================================================================
      MONITORING FORM GENERATION
