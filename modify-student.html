@@ -1473,9 +1473,9 @@ function parseAccommodations(raw) {
         trackBtn.style.cssText = 'flex-shrink:0;display:inline-flex;align-items:center;gap:0.3rem;background:rgba(108,143,255,0.08);color:#6c8fff;border:1px solid rgba(108,143,255,0.25);border-radius:6px;padding:0.28rem 0.65rem;font-family:"JetBrains Mono",monospace;font-size:0.65rem;font-weight:600;cursor:pointer;transition:background 0.13s;white-space:nowrap;';
         trackBtn.textContent = '↗ Track';
         trackBtn.setAttribute('aria-label', 'Track progress for goal '+(idx+1));
-        (function(goalId, tag) {
-          trackBtn.addEventListener('click', function() { launchTracker(tag, goalId); });
-        }(g.goal_id || ('LOCAL-legacy-'+idx), String(_record[COL.TAG]||'')));
+        (function(goalId, tag, databaseId) {
+          trackBtn.addEventListener('click', function() { launchTracker(tag, goalId, databaseId); });
+        }(g.goal_id || ('LOCAL-legacy-'+idx), String(_record[COL.TAG]||''), String(_record[COL.ID]||'')));
         header.appendChild(trackBtn);
         card.appendChild(header);
 
@@ -2919,6 +2919,10 @@ function parseAccommodations(raw) {
      @param {string} studentTag — opaque FERPA-safe token (COL.TAG value)
      @param {string} goalId     — "LOCAL-…" pre-dock, or "CM-GOAL-XXXXX"
                                    after Caseload Manager reconciliation.
+     @param {string} databaseId — COL.ID value (numeric DatabaseID), read
+                                   from _record by the caller INSIDE the
+                                   App IIFE and passed in, since this
+                                   function itself has no access to _record.
 
      Opens the Data/Click Tracker for this student in a new tab:
        https://data.mpowerededucation.com/tracker.html?student=<tag>&sid=<DatabaseID>
@@ -2928,8 +2932,15 @@ function parseAccommodations(raw) {
      revision can deep-link straight to the goal that was clicked;
      today's Tracker can simply ignore it.
   ══════════════════════════════════════════════════════════════ */
-  function launchTracker(studentTag, goalId) {
-    var sid = _record ? String(_record[COL.ID] || '').trim() : '';
+  function launchTracker(studentTag, goalId, databaseId) {
+    // NOTE: this function lives OUTSIDE the App IIFE (see the "Public
+    // API" boundary comment above _record's declaration), so it has no
+    // access to _record/_studentId directly — that was the cause of
+    // "Uncaught ReferenceError: _record is not defined". DatabaseID
+    // must be passed in by the caller instead (see the Track button
+    // click-handler closure above, which reads _record from inside
+    // the IIFE where it's legally in scope).
+    var sid = String(databaseId || '').trim();
     if (!studentTag || !sid) {
       alert('Cannot open Tracker: missing student tag or DatabaseID for this record.');
       return;
