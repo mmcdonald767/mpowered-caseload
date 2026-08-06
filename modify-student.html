@@ -3006,7 +3006,7 @@ function parseAccommodations(raw) {
     if (btn) btn.disabled = true;
     _monStatus('Generating monitoring form…');
 
-    _gasPost({
+    App.gasPostPublic({
       action:     'exportMonitoringForm',
       studentTag: tag,
       goals:      goals
@@ -3043,7 +3043,7 @@ function parseAccommodations(raw) {
   function loadExistingMonitoringForm() {
     var tag = MONITOR_CFG.getStudentTag();
     if (!tag) return;
-    _gasPost({ action: 'getMonitoringForms', studentTag: tag })
+    App.gasPostPublic({ action: 'getMonitoringForms', studentTag: tag })
     .then(function (data) {
       var active = (data.forms || []).filter(function (f) { return f.status === 'active'; })[0];
       if (active) {
